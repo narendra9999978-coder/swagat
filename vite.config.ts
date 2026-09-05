@@ -13,24 +13,29 @@ export default defineConfig({
     },
     proxy: {
       '/healthz': {
-        target: 'http://localhost:8080',
+        target: 'https://swagat-backend.onrender.com',
         changeOrigin: true,
+        secure: false,
       },
       '/auth': {
-        target: 'http://localhost:8080',
+        target: 'https://swagat-backend.onrender.com',
         changeOrigin: true,
+        secure: false,
       },
       '/admin': {
-        target: 'http://localhost:8080',
+        target: 'https://swagat-backend.onrender.com',
         changeOrigin: true,
+        secure: false,
       },
       '/apply': {
-        target: 'http://localhost:8080',
+        target: 'https://swagat-backend.onrender.com',
         changeOrigin: true,
+        secure: false,
       },
       '/dept': {
-        target: 'http://localhost:8080',
+        target: 'https://swagat-backend.onrender.com',
         changeOrigin: true,
+        secure: false,
       }
     }
   },

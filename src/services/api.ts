@@ -53,28 +53,54 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-  const url = `${API_BASE_URL}${cleanEndpoint}`;
+  let url = `${API_BASE_URL}${cleanEndpoint}`;
 
-  const res = await fetch(url, { ...options, headers });
-  if (!res.ok) {
-    let errorMessage = `HTTP Error ${res.status}`;
-    try {
-      const errorData = await res.json();
-      errorMessage = errorData.error || errorData.message || errorMessage;
-    } catch { errorMessage = res.statusText || errorMessage; }
-    throw new Error(errorMessage);
+  try {
+    const res = await fetch(url, { ...options, headers });
+    if (!res.ok) {
+      let errorMessage = `HTTP Error ${res.status}`;
+      try {
+        const errorData = await res.json();
+        errorMessage = errorData.error || errorData.message || errorMessage;
+      } catch { errorMessage = res.statusText || errorMessage; }
+      throw new Error(errorMessage);
+    }
+    return await res.json() as T;
+  } catch (err: any) {
+    // If local/relative path fetch failed, attempt direct Render backend fallback
+    if (!API_BASE_URL && !url.startsWith('http')) {
+      try {
+        const directRes = await fetch(`https://swagat-backend.onrender.com${cleanEndpoint}`, { ...options, headers });
+        if (directRes.ok) {
+          return await directRes.json() as T;
+        }
+      } catch {}
+    }
+    throw err;
   }
-  return await res.json() as T;
 }
 
-// Check Backend Health
+// Check Backend Health & Database Connectivity
 export const checkBackendHealth = async (): Promise<boolean> => {
   try {
-    const res = await fetch(`${API_BASE_URL}/healthz`);
-    if (!res.ok) return false;
-    const data = await res.json();
-    return data.status === 'ok';
-  } catch { return false; }
+    const target = API_BASE_URL ? `${API_BASE_URL}/healthz` : '/healthz';
+    const res = await fetch(target);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.status === 'ok') return true;
+    }
+  } catch {}
+
+  // Fallback to direct Render healthz check
+  try {
+    const res2 = await fetch('https://swagat-backend.onrender.com/healthz');
+    if (res2.ok) {
+      const d2 = await res2.json();
+      return d2.status === 'ok';
+    }
+  } catch {}
+
+  return false;
 };
 
 // ============================================================

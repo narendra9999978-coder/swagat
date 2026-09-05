@@ -15,7 +15,7 @@ var Pool *pgxpool.Pool
 func Connect() error {
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {
-		dsn = "postgres://swagat:swagat@localhost:5432/swagat?sslmode=disable"
+		dsn = "postgresql://postgres.vdcuqhwpnerguygvgdhv:Dhananjay%23DK%402610@aws-0-ap-south-1.pooler.supabase.com:5432/postgres"
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
