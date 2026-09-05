@@ -12,7 +12,6 @@ import {
   ChevronRight,
   ShieldCheck
 } from 'lucide-react';
-import { IndiaGeoMap } from './IndiaGeoMap';
 import { allIndianStatesList, StateItemSimple, getStateDataByCode } from '../data/indiaStatesData';
 import { useSwagat } from '../context/SwagatContext';
 
@@ -111,12 +110,13 @@ export const ExploreIndiaSection: React.FC = () => {
                 </span>
               </div>
 
-              {/* Map SVG Component */}
-              <div className="w-full flex justify-center py-2">
-            <IndiaGeoMap
-              onSelectState={handleMapSelectState}
-              selectedStateName={selectedStateName}
-            />
+              {/* Static Map Image */}
+              <div className="w-full flex justify-center py-3">
+                <img
+                  src="/india_states_map.svg"
+                  alt="National Clearance Map of India"
+                  className="w-full max-h-[460px] object-contain drop-shadow-[0_12px_30px_rgba(0,0,0,0.6)]"
+                />
               </div>
 
               {/* Bottom Map Active State Bar */}
