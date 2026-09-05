@@ -72,6 +72,9 @@ export const HeaderNavbar: React.FC = () => {
       if (stateRef.current && !stateRef.current.contains(event.target as Node)) {
         setIsStateDropdownOpen(false);
       }
+      if (loginDropdownRef.current && !loginDropdownRef.current.contains(event.target as Node)) {
+        setIsLoginDropdownOpen(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -90,11 +93,32 @@ export const HeaderNavbar: React.FC = () => {
     }
   };
 
-  const openAuthWithMode = (mode: 'login' | 'signup' | 'investor' | 'officer') => {
+  const [isLoginDropdownOpen, setIsLoginDropdownOpen] = useState(false);
+  const loginDropdownRef = useRef<HTMLDivElement>(null);
+
+  const openAuthWithMode = (mode: 'signin-investor' | 'signup-investor' | 'signin-officer' | 'signup-officer' | 'signin-super') => {
     setAuthModalMode(mode);
     setIsAuthModalOpen(true);
     setIsThreeDotOpen(false);
+    setIsLoginDropdownOpen(false);
     setIsMobileMenuOpen(false);
+  };
+
+  const logoClicksRef = useRef<{ count: number; lastTime: number }>({ count: 0, lastTime: 0 });
+  const handleLogoClick = () => {
+    const now = Date.now();
+    if (now - logoClicksRef.current.lastTime > 2500) {
+      logoClicksRef.current = { count: 1, lastTime: now };
+    } else {
+      logoClicksRef.current.count += 1;
+      logoClicksRef.current.lastTime = now;
+      if (logoClicksRef.current.count >= 5) {
+        logoClicksRef.current = { count: 0, lastTime: 0 };
+        openAuthWithMode('signin-super');
+        return;
+      }
+    }
+    handleNavClick('home');
   };
 
   return (
@@ -127,8 +151,9 @@ export const HeaderNavbar: React.FC = () => {
             {/* Left: SWAGAT Brand Logo */}
             <button
               id="swagat-brand-home-btn"
-              onClick={() => handleNavClick('home')}
-              className="focus:outline-hidden text-left"
+              onClick={handleLogoClick}
+              className="focus:outline-hidden text-left cursor-pointer"
+              title="SWAGAT Portal (Click 5 times for Super Admin)"
             >
               <SwagatLogo size="md" showWordmark={true} showTagline={false} theme="light" />
             </button>
@@ -358,20 +383,78 @@ export const HeaderNavbar: React.FC = () => {
               </div>
 
               {/* User Profile Badge (if logged in) */}
-              {userProfile && (
+              {userProfile ? (
                 <button
                   id="header-user-badge"
                   onClick={() => handleNavClick('dashboard')}
                   className="hidden sm:flex items-center space-x-2 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100/90 border border-emerald-200 rounded-xl transition-colors text-left"
                 >
-                  <div className="w-7 h-7 rounded-lg bg-emerald-700 text-white flex items-center justify-center text-xs font-bold shadow-2xs">
+                  <div className={`w-7 h-7 rounded-lg text-white flex items-center justify-center text-xs font-bold shadow-2xs ${
+                    userProfile.role === 'super_admin' ? 'bg-purple-700' :
+                    userProfile.role === 'officer' ? 'bg-[#07182C]' : 'bg-emerald-700'
+                  }`}>
                     {userProfile.avatarInitials}
                   </div>
                   <div className="leading-tight">
                     <div className="text-xs font-bold text-emerald-950 truncate max-w-[110px]">{userProfile.name}</div>
-                    <div className="text-[10px] text-emerald-700 font-medium">DigiLocker Verified</div>
+                    <div className="text-[10px] text-emerald-700 font-medium capitalize">
+                      {userProfile.role === 'super_admin' ? 'Super Admin' : userProfile.role === 'officer' ? 'Officer Portal' : 'Business User'}
+                    </div>
                   </div>
                 </button>
+              ) : (
+                /* Login Dropdown Button — shown only when not logged in */
+                <div className="relative" ref={loginDropdownRef}>
+                  <button
+                    id="login-dropdown-btn"
+                    onClick={() => setIsLoginDropdownOpen(!isLoginDropdownOpen)}
+                    className="flex items-center space-x-2 px-4 py-2 bg-[#07182C] hover:bg-[#0B2545] text-white text-sm font-bold rounded-xl transition-all shadow-md"
+                  >
+                    <LogIn className="w-4 h-4" />
+                    <span>Login</span>
+                    <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isLoginDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {isLoginDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-60 bg-white rounded-2xl shadow-2xl border border-slate-200 py-2 z-50 animate-in fade-in slide-in-from-top-2">
+                      <div className="px-4 py-2 text-[10px] font-bold uppercase text-slate-400 tracking-wider border-b border-slate-100">
+                        Select Portal
+                      </div>
+
+                      <button
+                        id="login-as-investor-btn"
+                        onClick={() => openAuthWithMode('signin-investor')}
+                        className="w-full text-left px-4 py-3 hover:bg-emerald-50 transition group"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition">
+                            <Building2 className="w-4 h-4 text-emerald-700" />
+                          </div>
+                          <div>
+                            <div className="text-xs font-bold text-slate-900">Business User Login</div>
+                            <div className="text-[10px] text-slate-500">Investor / Entrepreneur</div>
+                          </div>
+                        </div>
+                      </button>
+
+                      <button
+                        id="login-as-officer-btn"
+                        onClick={() => openAuthWithMode('signin-officer')}
+                        className="w-full text-left px-4 py-3 hover:bg-slate-50 transition group"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition">
+                            <ShieldCheck className="w-4 h-4 text-[#07182C]" />
+                          </div>
+                          <div>
+                            <div className="text-xs font-bold text-slate-900">Ministry Officer Login</div>
+                            <div className="text-[10px] text-slate-500">Department Admin</div>
+                          </div>
+                        </div>
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
 
               {/* THREE-DOT VERTICAL MENU (Requested specifically) */}
@@ -432,50 +515,49 @@ export const HeaderNavbar: React.FC = () => {
                       ) : (
                         <>
                           <button
-                            id="menu-action-login"
-                            onClick={() => openAuthWithMode('login')}
+                            id="menu-action-login-investor"
+                            onClick={() => openAuthWithMode('signin-investor')}
                             className="w-full text-left px-4 py-2.5 text-xs font-bold text-[#07182C] hover:bg-slate-100 flex items-center space-x-2.5"
                           >
-                            <LogIn className="w-4 h-4 text-emerald-600" />
-                            <span>{t('menu_login')}</span>
+                            <Building2 className="w-4 h-4 text-emerald-600" />
+                            <span>Business User Login</span>
                           </button>
 
                           <button
-                            id="menu-action-signup"
-                            onClick={() => openAuthWithMode('signup')}
+                            id="menu-action-login-officer"
+                            onClick={() => openAuthWithMode('signin-officer')}
                             className="w-full text-left px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100 flex items-center space-x-2.5"
                           >
-                            <UserPlus className="w-4 h-4 text-blue-600" />
-                            <span>{t('menu_signup')}</span>
+                            <ShieldCheck className="w-4 h-4 text-blue-600" />
+                            <span>Ministry Officer Login</span>
+                          </button>
+
+                          <button
+                            id="menu-action-signup-investor"
+                            onClick={() => openAuthWithMode('signup-investor')}
+                            className="w-full text-left px-4 py-2 text-xs font-medium text-slate-500 hover:bg-slate-100 flex items-center space-x-2.5"
+                          >
+                            <UserPlus className="w-4 h-4 text-slate-400" />
+                            <span>New Business Account</span>
                           </button>
                         </>
                       )}
                     </div>
 
-                    {/* Section 2: Personas (Investor vs Ministry) */}
-                    <div className="py-1">
-                      <div className="px-4 py-1 text-[10px] font-bold uppercase text-slate-400 tracking-wider">
-                        Portal Portfolios
+                    {/* Section 2: Role Labels */}
+                    {userProfile && (
+                      <div className="py-1">
+                        <div className="px-4 py-1 text-[10px] font-bold uppercase text-slate-400 tracking-wider">
+                          Current Role
+                        </div>
+                        <div className="px-4 py-2 text-xs text-slate-700 flex items-center space-x-2">
+                          {userProfile.role === 'super_admin' ? <ShieldCheck className="w-4 h-4 text-purple-600" /> :
+                           userProfile.role === 'officer' ? <ShieldCheck className="w-4 h-4 text-[#0B2545]" /> :
+                           <Building2 className="w-4 h-4 text-emerald-600" />}
+                          <span className="font-semibold">{userProfile.role === 'super_admin' ? 'Super Administrator' : userProfile.role === 'officer' ? 'Ministry / Dept Officer' : 'Business / Investor'}</span>
+                        </div>
                       </div>
-
-                      <button
-                        id="menu-persona-investor"
-                        onClick={() => openAuthWithMode('investor')}
-                        className="w-full text-left px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100 flex items-center space-x-2.5"
-                      >
-                        <Building2 className="w-4 h-4 text-amber-600" />
-                        <span>{t('menu_investor')}</span>
-                      </button>
-
-                      <button
-                        id="menu-persona-officer"
-                        onClick={() => openAuthWithMode('officer')}
-                        className="w-full text-left px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100 flex items-center space-x-2.5"
-                      >
-                        <ShieldCheck className="w-4 h-4 text-[#0B2545]" />
-                        <span>{t('menu_officer')}</span>
-                      </button>
-                    </div>
+                    )}
 
                     {/* Section 3: Help & Contact */}
                     <div className="py-1">
@@ -596,7 +678,7 @@ export const HeaderNavbar: React.FC = () => {
                 </button>
               ) : (
                 <button
-                  onClick={() => openAuthWithMode('login')}
+                  onClick={() => openAuthWithMode('signin-investor')}
                   className="w-full flex items-center justify-center space-x-2 px-4 py-3 text-sm font-bold text-white bg-gradient-to-r from-[#07182C] to-[#0B2545] rounded-xl shadow-md"
                 >
                   <LogIn className="w-4 h-4 text-emerald-400" />

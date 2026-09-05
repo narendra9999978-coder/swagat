@@ -4,6 +4,26 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
+      "source": "/healthz",
+      "destination": "https://swagat-backend.onrender.com/healthz"
+    },
+    {
+      "source": "/auth/:path*",
+      "destination": "https://swagat-backend.onrender.com/auth/:path*"
+    },
+    {
+      "source": "/admin/:path*",
+      "destination": "https://swagat-backend.onrender.com/admin/:path*"
+    },
+    {
+      "source": "/apply/:path*",
+      "destination": "https://swagat-backend.onrender.com/apply/:path*"
+    },
+    {
+      "source": "/dept/:path*",
+      "destination": "https://swagat-backend.onrender.com/dept/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

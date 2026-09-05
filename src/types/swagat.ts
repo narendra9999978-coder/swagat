@@ -179,6 +179,10 @@ export interface RenewalItem {
   statutoryDaysAllowed: number;
 }
 
+// ── New role type (includes super_admin) ────────────────────────────────────
+
+export type UserRole = 'investor' | 'officer' | 'super_admin';
+
 export interface UserProfile {
   id: string;
   name: string;
@@ -192,8 +196,10 @@ export interface UserProfile {
   state: string;
   address: string;
   isDigiLockerVerified: boolean;
-  role: 'investor' | 'officer';
+  role: UserRole;
   avatarInitials: string;
+  avatarUrl?: string;
+  departmentName?: string; // for officers
 }
 
 export interface KYAState {
@@ -209,4 +215,106 @@ export interface KYAState {
   exportOriented: string;
   completed: boolean;
   recommendedApprovalIds: string[];
+}
+
+// ── New types for backend API integration ───────────────────────────────────
+
+export interface BusinessType {
+  id: string;
+  name: string;
+  code?: string;
+  icon?: string;
+  description?: string;
+  is_active?: boolean;
+  created_at?: string;
+}
+
+export interface TreeNode {
+  id: string;
+  label: string;
+  node_type: 'question' | 'option';
+  is_leaf: boolean;
+  sort_order: number;
+  step?: string;
+  children?: TreeNode[];
+}
+
+export interface ChecklistDocument {
+  id: string;
+  application_id: string;
+  document_type_name: string;
+  department_name: string;
+  is_mandatory: boolean;
+  file_url?: string;
+  status: 'pending_review' | 'approved' | 'rejected' | 'expired' | 'waiting_on_dependency';
+  reused_from_vault: boolean;
+  depends_on?: string;
+}
+
+export interface BundleStatus {
+  id: string;
+  department_id: string;
+  department_name: string;
+  status: 'pending' | 'in_review' | 'approved' | 'deemed_approved' | 'breached';
+  dispatched_at?: string;
+  sla_deadline?: string;
+  sla_hours: number;
+  reassigned_count: number;
+  documents: ChecklistDocument[];
+}
+
+export interface ApplicationStatusResponse {
+  application: {
+    id: string;
+    status: 'in_progress' | 'submitted' | 'dispatched' | 'completed';
+    business_type_name?: string;
+    created_at: string;
+    submitted_at?: string;
+  };
+  bundles: BundleStatus[];
+}
+
+// ── Department Admin Queue ──────────────────────────────────────────────────
+
+export interface AdminQueueDocument {
+  id: string;
+  document_type_name: string;
+  is_mandatory: boolean;
+  file_url?: string;
+  status: 'pending_review' | 'approved' | 'rejected' | 'expired';
+  applicant_name?: string;
+  company_name?: string;
+  uploaded_at?: string;
+}
+
+export interface AdminQueueBundle {
+  id: string;
+  application_id: string;
+  applicant_name: string;
+  company_name: string;
+  business_type: string;
+  submitted_at: string;
+  sla_deadline?: string;
+  sla_hours: number;
+  status: 'pending' | 'in_review' | 'approved' | 'rejected' | 'breached';
+  documents: AdminQueueDocument[];
+}
+
+// ── Wizard session state ────────────────────────────────────────────────────
+
+export type WizardStep = 'business_registration' | 'business_activity' | 'foreign_investment' | 'project_land';
+
+export interface WizardStepState {
+  currentNodeId: string | null;
+  selectedPath: TreeNode[];
+  leafReached: boolean;
+  leafNodeId: string | null;
+}
+
+export interface WizardSession {
+  businessType: BusinessType;
+  applicationId: string | null;
+  steps: Record<WizardStep, WizardStepState>;
+  activeStep: WizardStep;
+  allStepsComplete: boolean;
 }

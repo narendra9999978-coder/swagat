@@ -31,7 +31,8 @@ import {
   FileText
 } from 'lucide-react';
 import { useSwagat } from '../context/SwagatContext';
-import { Application, DocumentItem, RenewalItem } from '../types/swagat';
+import { Application, DocumentItem, RenewalItem, BusinessType } from '../types/swagat';
+import { applicantApi } from '../services/api';
 
 export const DashboardView: React.FC = () => {
   const { 
@@ -51,7 +52,8 @@ export const DashboardView: React.FC = () => {
     kyaState,
     showToast,
     startApplication,
-    approvals
+    approvals,
+    openWizard
   } = useSwagat();
 
   const [documentSearch, setDocumentSearch] = useState('');
@@ -60,6 +62,17 @@ export const DashboardView: React.FC = () => {
   const [newDocName, setNewDocName] = useState('');
   const [newDocCategory, setNewDocCategory] = useState<DocumentItem['category']>('Licenses');
   const [newDocNumber, setNewDocNumber] = useState('');
+
+  // Wizard sectors
+  const [wizardSectors, setWizardSectors] = useState<BusinessType[]>([]);
+
+  React.useEffect(() => {
+    applicantApi.getBusinessTypes().then(types => {
+      setWizardSectors(types);
+    }).catch(err => {
+      console.error('Failed to load business types', err);
+    });
+  }, []);
 
   // Dashboard Stats
   const activeApplicationsCount = applications.filter(a => ['Submitted', 'Under Review', 'Query Raised', 'Response Submitted'].includes(a.currentStatus)).length;
@@ -267,6 +280,56 @@ export const DashboardView: React.FC = () => {
                   <span className="text-[10px] text-rose-700 font-semibold">&lt; 60 Days Remaining</span>
                 </div>
 
+              </div>
+
+              {/* Sector Selection Grid for 4-Step Questionnaire Wizard */}
+              <div className="bg-gradient-to-br from-[#07182C] via-[#0B2545] to-[#133E70] rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+                
+                <div className="relative z-10 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/30">
+                        <Sparkles className="w-3.5 h-3.5" />
+                        <span>Dynamic Decision Tree Engine</span>
+                      </div>
+                      <h3 className="text-xl sm:text-2xl font-bold text-white mt-2">
+                        Start New Business Approval Journey
+                      </h3>
+                      <p className="text-xs text-slate-300 max-w-2xl mt-1">
+                        Select your business sector below to launch the 4-step dynamic questionnaire. Our intelligent engine automatically identifies statutory clearances, compiles your document checklist, and initiates real-time SLA countdowns.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 pt-2">
+                    {wizardSectors.map((sec) => (
+                      <div
+                        key={sec.id}
+                        onClick={() => openWizard(sec)}
+                        className="group p-4 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/10 hover:border-emerald-400/50 cursor-pointer transition-all duration-200 backdrop-blur-xs flex flex-col justify-between"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-bold text-sm text-white group-hover:text-emerald-300 transition-colors">
+                              {sec.name}
+                            </span>
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-emerald-400">
+                              {sec.code}
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-300 line-clamp-2 leading-relaxed">
+                            {sec.description || 'Statutory clearance tree & unified document checklist'}
+                          </p>
+                        </div>
+                        <div className="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between text-xs text-emerald-400 font-semibold">
+                          <span>Launch 4-Step Wizard</span>
+                          <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               {/* Active Applications Section */}
