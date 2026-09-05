@@ -12,7 +12,7 @@ import {
   ChevronRight,
   ShieldCheck
 } from 'lucide-react';
-import { InteractiveIndiaMap } from './InteractiveIndiaMap';
+import { IndiaGeoMap } from './IndiaGeoMap';
 import { allIndianStatesList, StateItemSimple, getStateDataByCode } from '../data/indiaStatesData';
 import { useSwagat } from '../context/SwagatContext';
 
@@ -84,7 +84,7 @@ export const ExploreIndiaSection: React.FC = () => {
             <span>Pan-India Single Window Coverage</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-[#07182C] tracking-tight">
-            Explore Business Opportunities Across India
+            Explore clearance coverage and approval status across India
           </h2>
           <p className="mt-3 text-slate-600 text-base">
             Click any State or Union Territory to view available statutory approvals, processing times, and state-specific incentive policies.
@@ -103,7 +103,7 @@ export const ExploreIndiaSection: React.FC = () => {
                 <div className="flex items-center space-x-2">
                   <div className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
                   <span className="text-xs font-bold uppercase tracking-wider text-amber-300">
-                    National Clearance Topology Map
+                    National Clearance Map
                   </span>
                 </div>
                 <span className="text-[11px] text-slate-400">
@@ -113,10 +113,10 @@ export const ExploreIndiaSection: React.FC = () => {
 
               {/* Map SVG Component */}
               <div className="w-full flex justify-center py-2">
-                <InteractiveIndiaMap
-                  onSelectState={handleMapSelectState}
-                  selectedStateName={selectedStateName}
-                />
+            <IndiaGeoMap
+              onSelectState={handleMapSelectState}
+              selectedStateName={selectedStateName}
+            />
               </div>
 
               {/* Bottom Map Active State Bar */}
