@@ -77,8 +77,8 @@ export const HeroSection: React.FC = () => {
         {/* Digital Grid lines */}
         <div className="absolute inset-0 bg-[radial-gradient(#1e3a8a_1px,transparent_1px)] [background-size:32px_32px] opacity-25"></div>
 
-        {/* Subtle India Map Circuit Background with Nodes */}
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-full lg:w-3/5 h-full opacity-15 lg:opacity-25 flex items-center justify-center pointer-events-none">
+        {/* India Map Silhouette Background */}
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-full lg:w-3/5 h-[90%] opacity-35 lg:opacity-45 flex items-center justify-center pointer-events-none transition-opacity duration-700">
           <InteractiveIndiaMap isHeroBackground={true} />
         </div>
 
