@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { allIndianStatesList, StateItemSimple, getStateDataByCode } from '../data/indiaStatesData';
 import { useSwagat } from '../context/SwagatContext';
+import { IndiaVectorMap } from './IndiaVectorMap';
 
 export const ExploreIndiaSection: React.FC = () => {
   const { openStateDetailModal, setSelectedStateFilter, updateKyaState } = useSwagat();
@@ -110,12 +111,12 @@ export const ExploreIndiaSection: React.FC = () => {
                 </span>
               </div>
 
-              {/* Static Map Image */}
-              <div className="w-full flex justify-center py-3">
-                <img
-                  src="/india_states_map.svg"
-                  alt="National Clearance Map of India"
-                  className="w-full max-h-[460px] object-contain drop-shadow-[0_12px_30px_rgba(0,0,0,0.6)]"
+              {/* Clickable India Vector Map Component */}
+              <div className="w-full flex justify-center py-2">
+                <IndiaVectorMap
+                  onSelectState={handleMapSelectState}
+                  selectedStateCode={selectedStateCode}
+                  selectedStateName={selectedStateName}
                 />
               </div>
 
