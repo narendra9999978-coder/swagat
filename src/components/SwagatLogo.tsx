@@ -106,18 +106,13 @@ export const SwagatLogo: React.FC<SwagatLogoProps> = ({
       {/* Wordmark */}
       {showWordmark && (
         <div className="flex flex-col leading-tight">
-          <div className="flex items-center space-x-1.5">
-            <span
-              className={`font-display font-extrabold tracking-tight ${s.text} ${
-                theme === 'dark' ? 'text-white' : 'text-[#07182C]'
-              }`}
-            >
-              SWAGAT
-            </span>
-            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-amber-50 text-amber-800 border border-amber-200/80 shadow-2xs">
-              NSWS Flow
-            </span>
-          </div>
+          <span
+            className={`font-display font-extrabold tracking-tight ${s.text} ${
+              theme === 'dark' ? 'text-white' : 'text-[#07182C]'
+            }`}
+          >
+            SWAGAT
+          </span>
 
           {showTagline ? (
             <span
@@ -129,7 +124,7 @@ export const SwagatLogo: React.FC<SwagatLogoProps> = ({
             </span>
           ) : (
             <span
-              className={`text-[10px] font-medium leading-none ${
+              className={`text-[10px] font-medium leading-none whitespace-nowrap hidden sm:inline ${
                 theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
               }`}
             >

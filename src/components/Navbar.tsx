@@ -55,7 +55,7 @@ export const Navbar: React.FC = () => {
               <span>GovTech Architecture Stack</span>
             </button>
             <span>•</span>
-            <span className="text-slate-300">Complementing NSWS, UMANG, MyScheme & DigiLocker</span>
+            <span className="text-slate-300">Complementing UMANG, MyScheme &amp; DigiLocker</span>
           </div>
         </div>
       </div>

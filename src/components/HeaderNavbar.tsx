@@ -124,8 +124,8 @@ export const HeaderNavbar: React.FC = () => {
   return (
     <>
       {/* Top Single Window Assurance Bar */}
-      <div className="bg-[#07182C] text-slate-300 text-[11px] font-medium py-1 px-4 border-b border-white/10 hidden md:block">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <div className="bg-[#07182C] text-slate-300 text-[11px] font-medium py-1 px-4 sm:px-6 lg:px-8 border-b border-white/10 hidden md:block">
+        <div className="w-full flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             <span className="font-semibold text-white">SWAGAT</span>
@@ -145,110 +145,104 @@ export const HeaderNavbar: React.FC = () => {
 
       {/* Main Navigation Bar */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-20 gap-3">
             
-            {/* Left: SWAGAT Brand Logo */}
-            <button
-              id="swagat-brand-home-btn"
-              onClick={handleLogoClick}
-              className="focus:outline-hidden text-left cursor-pointer"
-              title="SWAGAT Portal (Click 5 times for Super Admin)"
-            >
-              <SwagatLogo size="md" showWordmark={true} showTagline={false} theme="light" />
-            </button>
-
-            {/* Center/Left: Main Navigation Links */}
-            <nav className="hidden lg:flex items-center space-x-1 font-medium text-sm text-slate-700">
+            {/* Left: SWAGAT Brand Logo & Navigation Links */}
+            <div className="flex items-center space-x-3 xl:space-x-6 min-w-0">
               <button
-                id="nav-link-home"
-                onClick={() => handleNavClick('home')}
-                className={`px-3 py-2 rounded-lg transition-colors ${
-                  currentView === 'home' ? 'text-[#07182C] font-bold bg-slate-100' : 'hover:text-[#07182C] hover:bg-slate-50'
-                }`}
+                id="swagat-brand-home-btn"
+                onClick={handleLogoClick}
+                className="focus:outline-hidden text-left cursor-pointer shrink-0"
+                title="SWAGAT Portal (Click 5 times for Super Admin)"
               >
-                {t('nav_home')}
+                <SwagatLogo size="md" showWordmark={true} showTagline={false} theme="light" />
               </button>
 
-              <button
-                id="nav-link-kya"
-                onClick={() => handleNavClick('home', 'section-kya')}
-                className="px-3 py-2 rounded-lg text-amber-700 font-semibold hover:bg-amber-50/80 transition-colors flex items-center space-x-1.5"
-              >
-                <Compass className="w-4 h-4 text-amber-600" />
-                <span>{t('nav_kya')}</span>
-              </button>
-
-              <button
-                id="nav-link-approvals"
-                onClick={() => handleNavClick('home', 'section-approvals')}
-                className={`px-3 py-2 rounded-lg transition-colors ${
-                  currentView === 'approvals' ? 'text-[#07182C] font-bold bg-slate-100' : 'hover:text-[#07182C] hover:bg-slate-50'
-                }`}
-              >
-                {t('nav_approvals')}
-              </button>
-
-              <button
-                id="nav-link-schemes"
-                onClick={() => handleNavClick('home', 'section-schemes')}
-                className={`px-3 py-2 rounded-lg transition-colors ${
-                  currentView === 'schemes' ? 'text-[#07182C] font-bold bg-slate-100' : 'hover:text-[#07182C] hover:bg-slate-50'
-                }`}
-              >
-                {t('nav_schemes')}
-              </button>
-
-              <button
-                id="nav-link-states"
-                onClick={() => handleNavClick('home', 'section-states')}
-                className="px-3 py-2 rounded-lg hover:text-[#07182C] hover:bg-slate-50 transition-colors"
-              >
-                {t('state_approvals')}
-              </button>
-
-              <button
-                id="nav-link-about"
-                onClick={() => handleNavClick('home', 'section-about')}
-                className="px-3 py-2 rounded-lg hover:text-[#07182C] hover:bg-slate-50 transition-colors"
-              >
-                {t('nav_about')}
-              </button>
-
-              <button
-                id="nav-link-resources"
-                onClick={() => handleNavClick('home', 'section-help')}
-                className="px-3 py-2 rounded-lg hover:text-[#07182C] hover:bg-slate-50 transition-colors"
-              >
-                {t('nav_resources')}
-              </button>
-
-              <button
-                id="nav-link-help"
-                onClick={() => handleNavClick('home', 'section-help')}
-                className="px-3 py-2 rounded-lg hover:text-[#07182C] hover:bg-slate-50 transition-colors"
-              >
-                {t('nav_help')}
-              </button>
-
-              {userProfile && (
+              {/* Main Navigation Links moved to left next to logo */}
+              <nav className="hidden lg:flex items-center space-x-0.5 xl:space-x-1 font-medium text-xs xl:text-sm text-slate-700 whitespace-nowrap">
                 <button
-                  id="nav-link-dashboard"
-                  onClick={() => handleNavClick('dashboard')}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 ${
-                    currentView === 'dashboard' 
-                      ? 'bg-[#07182C] text-white shadow-xs' 
-                      : 'bg-blue-50 text-[#0B2545] border border-blue-200 hover:bg-blue-100'
+                  id="nav-link-home"
+                  onClick={() => handleNavClick('home')}
+                  className={`px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-lg transition-colors ${
+                    currentView === 'home' ? 'text-[#07182C] font-bold bg-slate-100' : 'hover:text-[#07182C] hover:bg-slate-50'
                   }`}
                 >
-                  <LayoutDashboard className="w-3.5 h-3.5" />
-                  <span>{t('nav_dashboard')}</span>
+                  {t('nav_home')}
                 </button>
-              )}
-            </nav>
+
+                <button
+                  id="nav-link-kya"
+                  onClick={() => handleNavClick('home', 'section-kya')}
+                  className="px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-lg text-amber-700 font-semibold hover:bg-amber-50/80 transition-colors flex items-center space-x-1"
+                >
+                  <Compass className="w-3.5 h-3.5 xl:w-4 xl:h-4 text-amber-600 shrink-0" />
+                  <span>{t('nav_kya')}</span>
+                </button>
+
+                <button
+                  id="nav-link-approvals"
+                  onClick={() => handleNavClick('home', 'section-approvals')}
+                  className={`px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-lg transition-colors ${
+                    currentView === 'approvals' ? 'text-[#07182C] font-bold bg-slate-100' : 'hover:text-[#07182C] hover:bg-slate-50'
+                  }`}
+                >
+                  {t('nav_approvals')}
+                </button>
+
+                <button
+                  id="nav-link-schemes"
+                  onClick={() => handleNavClick('home', 'section-schemes')}
+                  className={`px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-lg transition-colors ${
+                    currentView === 'schemes' ? 'text-[#07182C] font-bold bg-slate-100' : 'hover:text-[#07182C] hover:bg-slate-50'
+                  }`}
+                >
+                  {t('nav_schemes')}
+                </button>
+
+                <button
+                  id="nav-link-states"
+                  onClick={() => handleNavClick('home', 'section-states')}
+                  className="px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-lg hover:text-[#07182C] hover:bg-slate-50 transition-colors"
+                >
+                  {t('state_approvals')}
+                </button>
+
+                <button
+                  id="nav-link-about"
+                  onClick={() => handleNavClick('home', 'section-about')}
+                  className="px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-lg hover:text-[#07182C] hover:bg-slate-50 transition-colors"
+                >
+                  {t('nav_about')}
+                </button>
+
+                <button
+                  id="nav-link-help"
+                  onClick={() => handleNavClick('home', 'section-help')}
+                  className="px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-lg hover:text-[#07182C] hover:bg-slate-50 transition-colors"
+                >
+                  {t('nav_help')}
+                </button>
+
+                {userProfile && (
+                  <button
+                    id="nav-link-dashboard"
+                    onClick={() => handleNavClick('dashboard')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 ${
+                      currentView === 'dashboard' 
+                        ? 'bg-[#07182C] text-white shadow-xs' 
+                        : 'bg-blue-50 text-[#0B2545] border border-blue-200 hover:bg-blue-100'
+                    }`}
+                  >
+                    <LayoutDashboard className="w-3.5 h-3.5" />
+                    <span>{t('nav_dashboard')}</span>
+                  </button>
+                )}
+              </nav>
+            </div>
 
             {/* Right: Search, Language Selector & THREE-DOT MENU */}
-            <div className="flex items-center space-x-2 sm:space-x-3">
+            <div className="flex items-center space-x-1.5 sm:space-x-2.5 shrink-0">
               
               {/* Global Search Button */}
               <button
