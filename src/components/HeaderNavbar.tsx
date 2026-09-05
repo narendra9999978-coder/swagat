@@ -135,7 +135,7 @@ export const HeaderNavbar: React.FC = () => {
           <div className="flex items-center space-x-4 text-xs">
             <span className="text-amber-400 font-semibold flex items-center space-x-1">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>National Single Window Architecture</span>
+              <span>Single Window Approval Gateway</span>
             </span>
             <span>•</span>
             <span className="text-slate-300">1,400+ Central &amp; State Approvals</span>
