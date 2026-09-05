@@ -19,6 +19,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { allIndianStatesList } from '../data/indiaStatesData';
 import { sectorsData } from '../data/sectorsData';
 import { InteractiveIndiaMap } from './InteractiveIndiaMap';
+import { IndiaBackgroundMap } from './IndiaBackgroundMap';
 
 export const HeroSection: React.FC = () => {
   const { 
@@ -77,9 +78,9 @@ export const HeroSection: React.FC = () => {
         {/* Digital Grid lines */}
         <div className="absolute inset-0 bg-[radial-gradient(#1e3a8a_1px,transparent_1px)] [background-size:32px_32px] opacity-25"></div>
 
-        {/* India Map Solid Silhouette Background */}
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-full lg:w-3/5 h-[92%] opacity-45 lg:opacity-60 flex items-center justify-center pointer-events-none transition-opacity duration-700">
-          <InteractiveIndiaMap isHeroBackground={true} />
+        {/* Clean, Accurate Geographical Outline Map of India */}
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-full lg:w-3/5 h-[95%] opacity-40 lg:opacity-55 flex items-center justify-center pointer-events-none transition-opacity duration-700">
+          <IndiaBackgroundMap outlineColor="tricolor" strokeWidth={1.4} className="w-full h-full object-contain" />
         </div>
 
         {/* Tricolour Accent Glows */}
