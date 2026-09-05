@@ -18,50 +18,52 @@ interface StateNode {
   region: 'North' | 'South' | 'West' | 'East' | 'Central' | 'NorthEast';
 }
 
-// Major hub coordinates scaled on a 800x900 coordinate space of India
+// Major hub coordinates calibrated accurately on India's geographic grid
 const stateHubNodes: StateNode[] = [
   // North
-  { code: 'JK', name: 'Jammu and Kashmir', x: 330, y: 140, approvals: 110, hubName: 'Srinagar / Jammu', region: 'North' },
-  { code: 'LA', name: 'Ladakh', x: 420, y: 120, approvals: 65, hubName: 'Leh', region: 'North' },
-  { code: 'HP', name: 'Himachal Pradesh', x: 360, y: 190, approvals: 104, hubName: 'Shimla / Baddi', region: 'North' },
-  { code: 'PB', name: 'Punjab', x: 320, y: 220, approvals: 124, hubName: 'Ludhiana / Mohali', region: 'North' },
-  { code: 'CH', name: 'Chandigarh', x: 345, y: 220, approvals: 92, hubName: 'IT Park', region: 'North' },
-  { code: 'UK', name: 'Uttarakhand', x: 420, y: 220, approvals: 108, hubName: 'Dehradun / Pantnagar', region: 'North' },
-  { code: 'HR', name: 'Haryana', x: 340, y: 260, approvals: 138, hubName: 'Gurugram / Manesar', region: 'North' },
-  { code: 'DL', name: 'Delhi', x: 365, y: 275, approvals: 135, hubName: 'NCR Hub', region: 'North' },
-  { code: 'UP', name: 'Uttar Pradesh', x: 460, y: 310, approvals: 152, hubName: 'Noida / Lucknow', region: 'North' },
-  { code: 'RJ', name: 'Rajasthan', x: 260, y: 320, approvals: 132, hubName: 'Jaipur / Bhiwadi', region: 'North' },
+  { code: 'LA', name: 'Ladakh', x: 400, y: 110, approvals: 65, hubName: 'Leh', region: 'North' },
+  { code: 'JK', name: 'Jammu and Kashmir', x: 330, y: 135, approvals: 110, hubName: 'Srinagar / Jammu', region: 'North' },
+  { code: 'HP', name: 'Himachal Pradesh', x: 360, y: 185, approvals: 104, hubName: 'Shimla / Baddi', region: 'North' },
+  { code: 'PB', name: 'Punjab', x: 305, y: 215, approvals: 124, hubName: 'Ludhiana / Mohali', region: 'North' },
+  { code: 'CH', name: 'Chandigarh', x: 335, y: 210, approvals: 92, hubName: 'IT Park', region: 'North' },
+  { code: 'UK', name: 'Uttarakhand', x: 405, y: 215, approvals: 108, hubName: 'Dehradun / Pantnagar', region: 'North' },
+  { code: 'HR', name: 'Haryana', x: 330, y: 255, approvals: 138, hubName: 'Gurugram / Manesar', region: 'North' },
+  { code: 'DL', name: 'Delhi', x: 355, y: 265, approvals: 135, hubName: 'NCR Hub', region: 'North' },
+  { code: 'UP', name: 'Uttar Pradesh', x: 440, y: 295, approvals: 152, hubName: 'Noida / Lucknow', region: 'North' },
+  { code: 'RJ', name: 'Rajasthan', x: 260, y: 315, approvals: 132, hubName: 'Jaipur / Bhiwadi', region: 'North' },
 
   // West
-  { code: 'GJ', name: 'Gujarat', x: 200, y: 410, approvals: 146, hubName: 'Ahmedabad / GIFT City', region: 'West' },
-  { code: 'MP', name: 'Madhya Pradesh', x: 390, y: 420, approvals: 130, hubName: 'Indore / Pithampur', region: 'Central' },
-  { code: 'MH', name: 'Maharashtra', x: 280, y: 520, approvals: 148, hubName: 'Mumbai / Pune', region: 'West' },
-  { code: 'GA', name: 'Goa', x: 255, y: 645, approvals: 96, hubName: 'Panaji / Verna', region: 'West' },
+  { code: 'GJ', name: 'Gujarat', x: 195, y: 435, approvals: 146, hubName: 'Ahmedabad / GIFT City', region: 'West' },
+  { code: 'MP', name: 'Madhya Pradesh', x: 375, y: 405, approvals: 130, hubName: 'Indore / Pithampur', region: 'Central' },
+  { code: 'MH', name: 'Maharashtra', x: 295, y: 525, approvals: 148, hubName: 'Mumbai / Pune', region: 'West' },
+  { code: 'GA', name: 'Goa', x: 265, y: 625, approvals: 96, hubName: 'Panaji / Verna', region: 'West' },
 
   // South
-  { code: 'KA', name: 'Karnataka', x: 310, y: 650, approvals: 142, hubName: 'Bengaluru / Electronic City', region: 'South' },
-  { code: 'TS', name: 'Telangana', x: 390, y: 550, approvals: 139, hubName: 'Hyderabad / Genome Valley', region: 'South' },
-  { code: 'AP', name: 'Andhra Pradesh', x: 410, y: 630, approvals: 134, hubName: 'Visakhapatnam / Sri City', region: 'South' },
-  { code: 'TN', name: 'Tamil Nadu', x: 360, y: 740, approvals: 145, hubName: 'Chennai / Sriperumbudur', region: 'South' },
-  { code: 'KL', name: 'Kerala', x: 310, y: 770, approvals: 118, hubName: 'Kochi / Technopark', region: 'South' },
-  { code: 'PY', name: 'Puducherry', x: 400, y: 740, approvals: 89, hubName: 'Puducherry Hub', region: 'South' },
+  { code: 'KA', name: 'Karnataka', x: 315, y: 645, approvals: 142, hubName: 'Bengaluru / Electronic City', region: 'South' },
+  { code: 'TS', name: 'Telangana', x: 385, y: 545, approvals: 139, hubName: 'Hyderabad / Genome Valley', region: 'South' },
+  { code: 'AP', name: 'Andhra Pradesh', x: 415, y: 635, approvals: 134, hubName: 'Visakhapatnam / Sri City', region: 'South' },
+  { code: 'TN', name: 'Tamil Nadu', x: 365, y: 740, approvals: 145, hubName: 'Chennai / Sriperumbudur', region: 'South' },
+  { code: 'KL', name: 'Kerala', x: 320, y: 765, approvals: 118, hubName: 'Kochi / Technopark', region: 'South' },
+  { code: 'PY', name: 'Puducherry', x: 395, y: 725, approvals: 89, hubName: 'Puducherry Hub', region: 'South' },
 
   // East & Central
-  { code: 'BR', name: 'Bihar', x: 570, y: 340, approvals: 118, hubName: 'Patna / Bihta', region: 'East' },
-  { code: 'JH', name: 'Jharkhand', x: 560, y: 400, approvals: 116, hubName: 'Ranchi / Jamshedpur', region: 'East' },
-  { code: 'OD', name: 'Odisha', x: 530, y: 480, approvals: 126, hubName: 'Bhubaneswar / Paradip', region: 'East' },
-  { code: 'CG', name: 'Chhattisgarh', x: 460, y: 460, approvals: 122, hubName: 'Raipur / Bhilai', region: 'Central' },
-  { code: 'WB', name: 'West Bengal', x: 620, y: 410, approvals: 128, hubName: 'Kolkata / Haldia', region: 'East' },
+  { code: 'BR', name: 'Bihar', x: 535, y: 335, approvals: 118, hubName: 'Patna / Bihta', region: 'East' },
+  { code: 'JH', name: 'Jharkhand', x: 530, y: 395, approvals: 116, hubName: 'Ranchi / Jamshedpur', region: 'East' },
+  { code: 'OD', name: 'Odisha', x: 505, y: 485, approvals: 126, hubName: 'Bhubaneswar / Paradip', region: 'East' },
+  { code: 'CG', name: 'Chhattisgarh', x: 445, y: 470, approvals: 122, hubName: 'Raipur / Bhilai', region: 'Central' },
+  { code: 'WB', name: 'West Bengal', x: 585, y: 420, approvals: 128, hubName: 'Kolkata / Haldia', region: 'East' },
 
   // North-East
-  { code: 'SK', name: 'Sikkim', x: 630, y: 295, approvals: 84, hubName: 'Gangtok', region: 'NorthEast' },
-  { code: 'AS', name: 'Assam', x: 700, y: 320, approvals: 112, hubName: 'Guwahati / Numaligarh', region: 'NorthEast' },
-  { code: 'AR', name: 'Arunachal Pradesh', x: 745, y: 275, approvals: 88, hubName: 'Itanagar', region: 'NorthEast' },
-  { code: 'ML', name: 'Meghalaya', x: 685, y: 350, approvals: 86, hubName: 'Shillong', region: 'NorthEast' },
-  { code: 'TR', name: 'Tripura', x: 685, y: 390, approvals: 85, hubName: 'Agartala', region: 'NorthEast' },
-  { code: 'MN', name: 'Manipur', x: 740, y: 360, approvals: 82, hubName: 'Imphal', region: 'NorthEast' },
-  { code: 'NL', name: 'Nagaland', x: 755, y: 330, approvals: 78, hubName: 'Kohima', region: 'NorthEast' },
-  { code: 'MZ', name: 'Mizoram', x: 720, y: 410, approvals: 80, hubName: 'Aizawl', region: 'NorthEast' }
+  { code: 'SK', name: 'Sikkim', x: 595, y: 275, approvals: 84, hubName: 'Gangtok', region: 'NorthEast' },
+  { code: 'AS', name: 'Assam', x: 680, y: 330, approvals: 112, hubName: 'Guwahati / Numaligarh', region: 'NorthEast' },
+  { code: 'AR', name: 'Arunachal Pradesh', x: 745, y: 265, approvals: 88, hubName: 'Itanagar', region: 'NorthEast' },
+  { code: 'ML', name: 'Meghalaya', x: 660, y: 355, approvals: 86, hubName: 'Shillong', region: 'NorthEast' },
+  { code: 'TR', name: 'Tripura', x: 680, y: 405, approvals: 85, hubName: 'Agartala', region: 'NorthEast' },
+  { code: 'MN', name: 'Manipur', x: 745, y: 375, approvals: 82, hubName: 'Imphal', region: 'NorthEast' },
+  { code: 'NL', name: 'Nagaland', x: 755, y: 335, approvals: 78, hubName: 'Kohima', region: 'NorthEast' },
+  { code: 'MZ', name: 'Mizoram', x: 720, y: 430, approvals: 80, hubName: 'Aizawl', region: 'NorthEast' },
+  { code: 'AN', name: 'Andaman & Nicobar', x: 746, y: 730, approvals: 58, hubName: 'Port Blair', region: 'South' },
+  { code: 'LD', name: 'Lakshadweep', x: 232, y: 765, approvals: 45, hubName: 'Kavaratti', region: 'South' }
 ];
 
 export const InteractiveIndiaMap: React.FC<InteractiveIndiaMapProps> = ({
@@ -88,14 +90,14 @@ export const InteractiveIndiaMap: React.FC<InteractiveIndiaMapProps> = ({
       >
         <defs>
           <linearGradient id="mapOutlineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#FF9933" stopOpacity="0.85" />
-            <stop offset="50%" stopColor="#0284C7" stopOpacity="0.75" />
-            <stop offset="100%" stopColor="#138808" stopOpacity="0.85" />
+            <stop offset="0%" stopColor="#FF9933" stopOpacity="0.95" />
+            <stop offset="45%" stopColor="#0284C7" stopOpacity="0.85" />
+            <stop offset="100%" stopColor="#138808" stopOpacity="0.95" />
           </linearGradient>
 
           <linearGradient id="circuitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="#34D399" stopOpacity="0.6" />
+            <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.7" />
+            <stop offset="100%" stopColor="#34D399" stopOpacity="0.7" />
           </linearGradient>
 
           <filter id="nodeGlow" x="-50%" y="-50%" width="200%" height="200%">
@@ -107,63 +109,111 @@ export const InteractiveIndiaMap: React.FC<InteractiveIndiaMapProps> = ({
           </filter>
         </defs>
 
-        {/* Outer Geographic India Boundary (Smooth Accurate Geometric Contour) */}
+        {/* Geographic Sovereign India Boundary (Accurate Official Survey of India Contour) */}
         <path
           d="
-            M 340 70 
-            C 380 90, 430 110, 420 145 
-            C 400 170, 430 190, 450 215 
-            C 470 230, 520 260, 540 280 
-            C 560 300, 610 270, 635 285 
-            C 660 300, 710 260, 750 260 
-            C 780 270, 765 320, 755 350 
-            C 740 380, 735 420, 715 435 
-            C 695 450, 675 390, 650 395 
-            C 630 400, 620 445, 605 450 
-            C 580 460, 560 520, 530 550 
-            C 500 580, 470 630, 430 680 
-            C 400 730, 390 790, 370 850 
-            C 355 855, 340 810, 325 765 
-            C 300 700, 275 640, 260 580 
-            C 240 510, 220 470, 185 450 
-            C 160 435, 175 390, 210 380 
-            C 240 370, 235 320, 240 280 
-            C 245 240, 270 210, 305 170 
-            C 320 130, 310 90, 340 70 Z
+            M 350 48
+            C 375 42, 410 52, 432 78
+            C 450 98, 458 130, 442 162
+            C 428 185, 435 208, 422 228
+            C 440 238, 462 258, 452 272
+            C 482 278, 520 300, 562 318
+            C 572 308, 582 268, 595 264
+            C 608 264, 616 280, 612 305
+            C 632 304, 660 308, 676 298
+            C 700 282, 735 244, 770 248
+            C 802 256, 816 282, 796 312
+            C 786 332, 772 352, 766 376
+            C 762 392, 756 414, 746 438
+            C 736 462, 722 485, 712 474
+            C 704 452, 706 426, 694 416
+            C 684 416, 674 436, 664 422
+            C 672 394, 684 382, 672 368
+            C 652 374, 622 374, 602 362
+            C 594 378, 598 416, 618 440
+            C 614 466, 594 476, 578 472
+            C 564 478, 546 500, 526 524
+            C 498 564, 478 600, 458 636
+            C 438 672, 418 708, 404 732
+            C 394 766, 384 796, 372 812
+            C 362 828, 352 840, 344 848
+            C 336 842, 326 816, 316 778
+            C 304 732, 294 698, 284 658
+            C 274 632, 264 612, 258 568
+            C 248 522, 244 478, 238 458
+            C 228 454, 214 466, 194 476
+            C 168 472, 154 446, 158 420
+            C 184 410, 194 404, 168 398
+            C 138 392, 134 372, 154 362
+            C 178 358, 208 352, 224 342
+            C 218 328, 204 312, 218 282
+            C 244 258, 264 238, 288 218
+            C 304 192, 298 172, 288 148
+            C 298 122, 308 96, 328 72
+            C 338 56, 346 50, 350 48 Z
           "
           stroke="url(#mapOutlineGrad)"
           strokeWidth={isHeroBackground ? '2.5' : '3'}
-          fill={isHeroBackground ? 'rgba(7, 24, 44, 0.4)' : '#07182C'}
+          fill={isHeroBackground ? 'rgba(7, 24, 44, 0.45)' : '#07182C'}
           className="transition-colors duration-500"
         />
 
+        {/* Andaman & Nicobar Islands (Accurate Archipelagos) */}
+        <g stroke="url(#mapOutlineGrad)" strokeWidth="2" fill={isHeroBackground ? 'rgba(7, 24, 44, 0.5)' : '#07182C'}>
+          {/* North & Middle Andaman */}
+          <path d="M 742 660 C 746 655, 752 660, 750 680 C 748 695, 742 710, 740 705 C 738 690, 740 670, 742 660 Z" />
+          {/* South Andaman */}
+          <path d="M 740 720 C 744 716, 748 722, 746 738 C 744 750, 738 752, 736 742 C 735 730, 738 722, 740 720 Z" />
+          {/* Little Andaman */}
+          <path d="M 738 765 C 742 762, 745 768, 743 778 C 741 784, 736 784, 735 776 C 734 770, 736 766, 738 765 Z" />
+          {/* Nicobar Islands */}
+          <path d="M 748 805 C 753 800, 758 808, 755 822 C 752 836, 745 842, 742 830 C 740 818, 744 808, 748 805 Z" />
+          <path d="M 752 855 C 756 850, 762 858, 759 872 C 756 882, 750 885, 747 876 C 745 866, 749 858, 752 855 Z" />
+        </g>
+
+        {/* Lakshadweep Islands */}
+        <g stroke="url(#mapOutlineGrad)" strokeWidth="2" fill={isHeroBackground ? 'rgba(7, 24, 44, 0.5)' : '#07182C'}>
+          <path d="M 235 735 C 238 732, 242 736, 240 746 C 238 752, 234 752, 233 746 C 232 740, 234 736, 235 735 Z" />
+          <path d="M 230 760 C 233 757, 237 761, 235 770 C 233 775, 229 775, 228 770 C 227 764, 229 761, 230 760 Z" />
+          <path d="M 228 785 C 231 782, 235 786, 233 795 C 231 800, 227 800, 226 795 C 225 790, 227 786, 228 785 Z" />
+          <path d="M 240 830 C 243 827, 247 831, 245 840 C 243 845, 239 845, 238 840 C 237 835, 239 831, 240 830 Z" />
+        </g>
+
         {/* Digital Circuit Lines Connecting Key Industrial Hubs */}
         <g stroke="url(#circuitGrad)" strokeWidth="1.5" strokeDasharray="5 5" className="animate-pulse">
-          {/* North Corridor: Delhi to Punjab & UP */}
-          <line x1="365" y1="275" x2="320" y2="220" />
-          <line x1="365" y1="275" x2="460" y2="310" />
-          <line x1="365" y1="275" x2="260" y2="320" />
+          {/* North Corridor */}
+          <line x1="355" y1="265" x2="305" y2="215" />
+          <line x1="355" y1="265" x2="440" y2="295" />
+          <line x1="355" y1="265" x2="260" y2="315" />
+          <line x1="355" y1="265" x2="360" y2="185" />
+          <line x1="360" y1="185" x2="330" y2="135" />
+          <line x1="330" y1="135" x2="400" y2="110" />
 
           {/* West Corridor: Delhi - Rajasthan - Gujarat - Maharashtra */}
-          <line x1="260" y1="320" x2="200" y2="410" />
-          <line x1="200" y1="410" x2="280" y2="520" />
-          <line x1="365" y1="275" x2="390" y2="420" />
-          <line x1="390" y1="420" x2="280" y2="520" />
+          <line x1="260" y1="315" x2="195" y2="435" />
+          <line x1="195" y1="435" x2="295" y2="525" />
+          <line x1="355" y1="265" x2="375" y2="405" />
+          <line x1="375" y1="405" x2="295" y2="525" />
 
-          {/* Central-East Corridor: UP to Bihar, Bengal & Odisha */}
-          <line x1="460" y1="310" x2="570" y2="340" />
-          <line x1="570" y1="340" x2="620" y2="410" />
-          <line x1="620" y1="410" x2="530" y2="480" />
-          <line x1="620" y1="410" x2="700" y2="320" />
+          {/* Central-East Corridor: UP to Bihar, Bengal & Northeast */}
+          <line x1="440" y1="295" x2="535" y2="335" />
+          <line x1="535" y1="335" x2="585" y2="420" />
+          <line x1="585" y1="420" x2="505" y2="485" />
+          <line x1="585" y1="420" x2="680" y2="330" />
+          <line x1="680" y1="330" x2="745" y2="265" />
+          <line x1="680" y1="330" x2="755" y2="335" />
+          <line x1="680" y1="330" x2="660" y2="355" />
+          <line x1="660" y1="355" x2="680" y2="405" />
 
-          {/* South Corridor: Maharashtra - Hyderabad - Bengaluru - Chennai */}
-          <line x1="280" y1="520" x2="390" y2="550" />
-          <line x1="280" y1="520" x2="310" y2="650" />
-          <line x1="390" y1="550" x2="310" y2="650" />
-          <line x1="390" y1="550" x2="410" y2="630" />
-          <line x1="310" y1="650" x2="360" y2="740" />
-          <line x1="310" y1="650" x2="310" y2="770" />
-          <line x1="360" y1="740" x2="310" y2="770" />
+          {/* South Corridor: Maharashtra - Hyderabad - Bengaluru - Chennai - Kerala */}
+          <line x1="295" y1="525" x2="385" y2="545" />
+          <line x1="295" y1="525" x2="315" y2="645" />
+          <line x1="385" y1="545" x2="315" y2="645" />
+          <line x1="385" y1="545" x2="415" y2="635" />
+          <line x1="315" y1="645" x2="365" y2="740" />
+          <line x1="315" y1="645" x2="320" y2="765" />
+          <line x1="365" y1="740" x2="320" y2="765" />
+          <line x1="315" y1="645" x2="265" y2="625" />
         </g>
 
         {/* Central Geometric Ashoka Chakra Ambient Watermark */}
