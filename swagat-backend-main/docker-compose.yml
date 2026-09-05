@@ -1,0 +1,58 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: swagat-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: swagat
+      POSTGRES_PASSWORD: swagat
+      POSTGRES_DB: swagat
+    ports:
+      - "5432:5432"
+    volumes:
+      - swagat_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U swagat -d swagat"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  migrate:
+    image: postgres:16-alpine
+    container_name: swagat-migrate
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./migrations:/migrations
+    environment:
+      PGPASSWORD: swagat
+    entrypoint: >
+      sh -c "for f in /migrations/*.sql; do
+        echo Applying $$f;
+        psql -h postgres -U swagat -d swagat -f $$f || exit 1;
+      done"
+    restart: "no"
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: swagat-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: "postgres://swagat:swagat@postgres:5432/swagat?sslmode=disable"
+      JWT_SECRET: "change-me-in-production"
+      PORT: "8080"
+    ports:
+      - "8080:8080"
+
+volumes:
+  swagat_pgdata:

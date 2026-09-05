@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    background-color: #F8FAFC;
+    color: #0F172A;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+}
+
+/* Custom GovTech styling utilities */
+.gov-gradient-subtle {
+  background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 50%, #F8FAFC 100%);
+}
+
+.gov-hero-mesh {
+  background: radial-gradient(at 0% 0%, rgba(19, 64, 116, 0.08) 0px, transparent 50%),
+              radial-gradient(at 100% 0%, rgba(224, 90, 16, 0.06) 0px, transparent 50%),
+              radial-gradient(at 50% 100%, rgba(5, 122, 85, 0.05) 0px, transparent 50%);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.glass-card-dark {
+  background: rgba(11, 37, 69, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.gov-border-gradient {
+  border-image: linear-gradient(to right, #E05A10, #0B2545, #057A55) 1;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Pulse glow keyframe */
+@keyframes voice-wave {
+  0%, 100% { height: 8px; }
+  50% { height: 28px; }
+}
+
+.voice-bar-1 { animation: voice-wave 0.8s ease-in-out infinite 0.1s; }
+.voice-bar-2 { animation: voice-wave 0.9s ease-in-out infinite 0.2s; }
+.voice-bar-3 { animation: voice-wave 0.7s ease-in-out infinite 0.3s; }
+.voice-bar-4 { animation: voice-wave 1.1s ease-in-out infinite 0.15s; }
+.voice-bar-5 { animation: voice-wave 0.85s ease-in-out infinite 0.25s; }
