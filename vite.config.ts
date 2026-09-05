@@ -9,7 +9,7 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     watch: {
-      ignored: ['**/swagat-backend-main/**', '**/.git/**', '**/node_modules/**']
+      ignored: ['**/swagat-backend-main/**', '**/.git/**', '**/node_modules/**', '**/*.sql', '**/*.md', '**/*.yaml']
     },
     proxy: {
       '/healthz': {
