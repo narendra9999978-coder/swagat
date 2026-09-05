@@ -89,16 +89,28 @@ export const InteractiveIndiaMap: React.FC<InteractiveIndiaMapProps> = ({
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
+          {/* Solid Hero Map Gradient */}
+          <linearGradient id="solidHeroMapFill" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#1e3a8a" stopOpacity="0.8" />
+            <stop offset="35%" stopColor="#0e2a47" stopOpacity="0.9" />
+            <stop offset="70%" stopColor="#071d33" stopOpacity="0.95" />
+            <stop offset="100%" stopColor="#064e3b" stopOpacity="0.75" />
+          </linearGradient>
+
           <linearGradient id="mapOutlineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#FF9933" stopOpacity="0.95" />
-            <stop offset="45%" stopColor="#38BDF8" stopOpacity="0.9" />
-            <stop offset="100%" stopColor="#10B981" stopOpacity="0.95" />
+            <stop offset="0%" stopColor="#FF9933" stopOpacity="1" />
+            <stop offset="45%" stopColor="#38BDF8" stopOpacity="0.95" />
+            <stop offset="100%" stopColor="#10B981" stopOpacity="1" />
           </linearGradient>
 
           <linearGradient id="circuitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.75" />
             <stop offset="100%" stopColor="#34D399" stopOpacity="0.75" />
           </linearGradient>
+
+          <filter id="solidGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="15" stdDeviation="25" floodColor="#0284C7" floodOpacity="0.35" />
+          </filter>
 
           <filter id="nodeGlow" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
@@ -109,7 +121,7 @@ export const InteractiveIndiaMap: React.FC<InteractiveIndiaMapProps> = ({
           </filter>
         </defs>
 
-        {/* Exact Official Silhouette Contour matching reference design */}
+        {/* Solid Official Silhouette Map */}
         <path
           d="
             M 310 80
@@ -155,138 +167,144 @@ export const InteractiveIndiaMap: React.FC<InteractiveIndiaMapProps> = ({
             C 380 115, 340 80, 310 80 Z
           "
           stroke="url(#mapOutlineGrad)"
-          strokeWidth={isHeroBackground ? '3' : '3.5'}
+          strokeWidth={isHeroBackground ? '4' : '3.5'}
           strokeLinecap="round"
           strokeLinejoin="round"
-          fill={isHeroBackground ? 'rgba(7, 24, 44, 0.4)' : '#07182C'}
+          fill={isHeroBackground ? 'url(#solidHeroMapFill)' : '#07182C'}
+          filter={isHeroBackground ? 'url(#solidGlow)' : undefined}
           className="transition-all duration-500"
         />
 
-        {/* Digital Circuit Lines Connecting Key Industrial Hubs */}
-        <g stroke="url(#circuitGrad)" strokeWidth="1.5" strokeDasharray="5 5" className="animate-pulse">
-          {/* North Corridor */}
-          <line x1="365" y1="280" x2="310" y2="225" />
-          <line x1="365" y1="280" x2="460" y2="320" />
-          <line x1="365" y1="280" x2="280" y2="340" />
-          <line x1="365" y1="280" x2="360" y2="195" />
-          <line x1="360" y1="195" x2="320" y2="140" />
-          <line x1="320" y1="140" x2="410" y2="130" />
+        {/* In Hero Background: Show only the clean, solid map */}
+        {!isHeroBackground && (
+          <>
+            {/* Digital Circuit Lines Connecting Key Industrial Hubs */}
+            <g stroke="url(#circuitGrad)" strokeWidth="1.5" strokeDasharray="5 5" className="animate-pulse">
+              {/* North Corridor */}
+              <line x1="365" y1="280" x2="310" y2="225" />
+              <line x1="365" y1="280" x2="460" y2="320" />
+              <line x1="365" y1="280" x2="280" y2="340" />
+              <line x1="365" y1="280" x2="360" y2="195" />
+              <line x1="360" y1="195" x2="320" y2="140" />
+              <line x1="320" y1="140" x2="410" y2="130" />
 
-          {/* West Corridor: Delhi - Rajasthan - Gujarat - Maharashtra */}
-          <line x1="280" y1="340" x2="200" y2="480" />
-          <line x1="200" y1="480" x2="310" y2="550" />
-          <line x1="365" y1="280" x2="390" y2="430" />
-          <line x1="390" y1="430" x2="310" y2="550" />
+              {/* West Corridor: Delhi - Rajasthan - Gujarat - Maharashtra */}
+              <line x1="280" y1="340" x2="200" y2="480" />
+              <line x1="200" y1="480" x2="310" y2="550" />
+              <line x1="365" y1="280" x2="390" y2="430" />
+              <line x1="390" y1="430" x2="310" y2="550" />
 
-          {/* Central-East Corridor: UP to Bihar, Bengal & Northeast */}
-          <line x1="460" y1="320" x2="550" y2="355" />
-          <line x1="550" y1="355" x2="610" y2="440" />
-          <line x1="610" y1="440" x2="540" y2="510" />
-          <line x1="610" y1="440" x2="770" y2="370" />
-          <line x1="770" y1="370" x2="840" y2="295" />
-          <line x1="770" y1="370" x2="850" y2="360" />
-          <line x1="770" y1="370" x2="730" y2="390" />
-          <line x1="730" y1="390" x2="790" y2="460" />
+              {/* Central-East Corridor: UP to Bihar, Bengal & Northeast */}
+              <line x1="460" y1="320" x2="550" y2="355" />
+              <line x1="550" y1="355" x2="610" y2="440" />
+              <line x1="610" y1="440" x2="540" y2="510" />
+              <line x1="610" y1="440" x2="770" y2="370" />
+              <line x1="770" y1="370" x2="840" y2="295" />
+              <line x1="770" y1="370" x2="850" y2="360" />
+              <line x1="770" y1="370" x2="730" y2="390" />
+              <line x1="730" y1="390" x2="790" y2="460" />
 
-          {/* South Corridor: Maharashtra - Hyderabad - Bengaluru - Chennai - Kerala */}
-          <line x1="310" y1="550" x2="410" y2="570" />
-          <line x1="310" y1="550" x2="330" y2="680" />
-          <line x1="410" y1="570" x2="330" y2="680" />
-          <line x1="410" y1="570" x2="440" y2="670" />
-          <line x1="330" y1="680" x2="390" y2="790" />
-          <line x1="330" y1="680" x2="340" y2="815" />
-          <line x1="390" y1="790" x2="340" y2="815" />
-          <line x1="330" y1="680" x2="275" y2="660" />
-        </g>
-
-        {/* Central Geometric Ashoka Chakra Ambient Watermark */}
-        <g opacity={isHeroBackground ? 0.08 : 0.12} transform="translate(420, 480)">
-          <circle r="90" stroke="#38BDF8" strokeWidth="2" fill="none" />
-          <circle r="25" stroke="#38BDF8" strokeWidth="1.5" fill="none" />
-          {[0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180, 195, 210, 225, 240, 255, 270, 285, 300, 315, 330, 345].map((deg) => (
-            <line
-              key={deg}
-              x1="0"
-              y1="25"
-              x2="0"
-              y2="90"
-              stroke="#38BDF8"
-              strokeWidth="1.5"
-              transform={`rotate(${deg})`}
-            />
-          ))}
-        </g>
-
-        {/* Interactive State Hub Nodes */}
-        {stateHubNodes.map((node) => {
-          const isSelected = selectedStateName === node.name;
-          const isHovered = hoveredNode?.code === node.code;
-
-          return (
-            <g
-              key={node.code}
-              className="cursor-pointer transition-transform duration-200 group"
-              onClick={() => handleStateClick(node)}
-              onMouseEnter={() => setHoveredNode(node)}
-              onMouseLeave={() => setHoveredNode(null)}
-            >
-              {/* Pulsing ring for active or hovered nodes */}
-              {(isHovered || isSelected) && (
-                <circle
-                  cx={node.x}
-                  cy={node.y}
-                  r="20"
-                  fill="none"
-                  stroke="#FF9933"
-                  strokeWidth="2"
-                  className="animate-ping origin-center opacity-75"
-                />
-              )}
-
-              {/* Outer halo */}
-              <circle
-                cx={node.x}
-                cy={node.y}
-                r={isHovered || isSelected ? '12' : '8'}
-                fill={
-                  isSelected
-                    ? '#FF9933'
-                    : isHovered
-                    ? '#38BDF8'
-                    : '#0D2F57'
-                }
-                stroke={isSelected ? '#FFFFFF' : '#38BDF8'}
-                strokeWidth="2"
-                filter={isHovered || isSelected ? 'url(#nodeGlow)' : undefined}
-                className="transition-all duration-300"
-              />
-
-              {/* Center Dot */}
-              <circle
-                cx={node.x}
-                cy={node.y}
-                r="3.5"
-                fill={isSelected ? '#07182C' : isHovered ? '#FFFFFF' : '#34D399'}
-              />
-
-              {/* State Abbreviation Badge */}
-              <text
-                x={node.x}
-                y={node.y - 14}
-                textAnchor="middle"
-                className={`text-[11px] font-extrabold select-none transition-all ${
-                  isSelected
-                    ? 'fill-amber-300 font-black text-[13px]'
-                    : isHovered
-                    ? 'fill-white font-bold'
-                    : 'fill-slate-300 opacity-80 text-[10px]'
-                }`}
-              >
-                {node.code}
-              </text>
+              {/* South Corridor: Maharashtra - Hyderabad - Bengaluru - Chennai - Kerala */}
+              <line x1="310" y1="550" x2="410" y2="570" />
+              <line x1="310" y1="550" x2="330" y2="680" />
+              <line x1="410" y1="570" x2="330" y2="680" />
+              <line x1="410" y1="570" x2="440" y2="670" />
+              <line x1="330" y1="680" x2="390" y2="790" />
+              <line x1="330" y1="680" x2="340" y2="815" />
+              <line x1="390" y1="790" x2="340" y2="815" />
+              <line x1="330" y1="680" x2="275" y2="660" />
             </g>
-          );
-        })}
+
+            {/* Central Geometric Ashoka Chakra Ambient Watermark */}
+            <g opacity={0.12} transform="translate(420, 480)">
+              <circle r="90" stroke="#38BDF8" strokeWidth="2" fill="none" />
+              <circle r="25" stroke="#38BDF8" strokeWidth="1.5" fill="none" />
+              {[0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180, 195, 210, 225, 240, 255, 270, 285, 300, 315, 330, 345].map((deg) => (
+                <line
+                  key={deg}
+                  x1="0"
+                  y1="25"
+                  x2="0"
+                  y2="90"
+                  stroke="#38BDF8"
+                  strokeWidth="1.5"
+                  transform={`rotate(${deg})`}
+                />
+              ))}
+            </g>
+
+            {/* Interactive State Hub Nodes */}
+            {stateHubNodes.map((node) => {
+              const isSelected = selectedStateName === node.name;
+              const isHovered = hoveredNode?.code === node.code;
+
+              return (
+                <g
+                  key={node.code}
+                  className="cursor-pointer transition-transform duration-200 group"
+                  onClick={() => handleStateClick(node)}
+                  onMouseEnter={() => setHoveredNode(node)}
+                  onMouseLeave={() => setHoveredNode(null)}
+                >
+                  {/* Pulsing ring for active or hovered nodes */}
+                  {(isHovered || isSelected) && (
+                    <circle
+                      cx={node.x}
+                      cy={node.y}
+                      r="20"
+                      fill="none"
+                      stroke="#FF9933"
+                      strokeWidth="2"
+                      className="animate-ping origin-center opacity-75"
+                    />
+                  )}
+
+                  {/* Outer halo */}
+                  <circle
+                    cx={node.x}
+                    cy={node.y}
+                    r={isHovered || isSelected ? '12' : '8'}
+                    fill={
+                      isSelected
+                        ? '#FF9933'
+                        : isHovered
+                        ? '#38BDF8'
+                        : '#0D2F57'
+                    }
+                    stroke={isSelected ? '#FFFFFF' : '#38BDF8'}
+                    strokeWidth="2"
+                    filter={isHovered || isSelected ? 'url(#nodeGlow)' : undefined}
+                    className="transition-all duration-300"
+                  />
+
+                  {/* Center Dot */}
+                  <circle
+                    cx={node.x}
+                    cy={node.y}
+                    r="3.5"
+                    fill={isSelected ? '#07182C' : isHovered ? '#FFFFFF' : '#34D399'}
+                  />
+
+                  {/* State Abbreviation Badge */}
+                  <text
+                    x={node.x}
+                    y={node.y - 14}
+                    textAnchor="middle"
+                    className={`text-[11px] font-extrabold select-none transition-all ${
+                      isSelected
+                        ? 'fill-amber-300 font-black text-[13px]'
+                        : isHovered
+                        ? 'fill-white font-bold'
+                        : 'fill-slate-300 opacity-80 text-[10px]'
+                    }`}
+                  >
+                    {node.code}
+                  </text>
+                </g>
+              );
+            })}
+          </>
+        )}
 
         {/* Dynamic Tooltip on Hover */}
         {hoveredNode && !isHeroBackground && (
