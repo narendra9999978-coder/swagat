@@ -26,7 +26,11 @@ export const AuthModal: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showGoogleAccountPicker, setShowGoogleAccountPicker] = useState(false);
+  const [customGoogleEmail, setCustomGoogleEmail] = useState('');
+  const [customGoogleName, setCustomGoogleName] = useState('');
 
+  // All hooks must be declared above this early return
   if (!isAuthModalOpen) return null;
 
   const isOfficerMode = authModalMode.includes('officer') || authModalMode.includes('super');
@@ -66,10 +70,6 @@ export const AuthModal: React.FC = () => {
       setLoading(false);
     }
   };
-
-  const [showGoogleAccountPicker, setShowGoogleAccountPicker] = useState(false);
-  const [customGoogleEmail, setCustomGoogleEmail] = useState('');
-  const [customGoogleName, setCustomGoogleName] = useState('');
 
   const handleGoogleSignIn = async () => {
     try {

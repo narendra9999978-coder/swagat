@@ -28,6 +28,7 @@ import {
   MockRole,
   seedDefaultUsers,
 } from '../lib/mockAuth';
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 
 // ── View type ─────────────────────────────────────────────────────────────────
 
@@ -283,6 +284,38 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         avatarInitials: user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2),
         departmentName: user.departmentName,
       });
+    }
+
+    // ── Supabase Google OAuth callback handler ────────────────────────────────
+    if (isSupabaseConfigured()) {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, supaSession) => {
+        if (supaSession?.user) {
+          const su = supaSession.user;
+          const gName = su.user_metadata?.full_name || su.user_metadata?.name || su.email?.split('@')[0] || 'User';
+          const gEmail = su.email || '';
+          const oauthRole = (localStorage.getItem('swagat_oauth_role') || 'investor') as UserRole;
+          const initials = gName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
+          setUserProfile({
+            id: su.id,
+            name: gName,
+            email: gEmail,
+            phone: su.phone || '',
+            pan: '',
+            gstNumber: '',
+            companyName: `${gName}'s Enterprise`,
+            cin: '',
+            entityType: 'Private Limited',
+            state: 'India',
+            address: '',
+            isDigiLockerVerified: false,
+            role: oauthRole,
+            avatarInitials: initials,
+          });
+          setIsAuthModalOpen(false);
+          setCurrentView('dashboard');
+        }
+      });
+      return () => subscription.unsubscribe();
     }
   }, []);
 
