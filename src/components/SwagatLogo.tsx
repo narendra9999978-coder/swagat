@@ -124,12 +124,12 @@ export const SwagatLogo: React.FC<SwagatLogoProps> = ({
             </span>
           ) : (
             <span
-              className={`text-[10px] font-medium leading-none block truncate w-[115px] max-w-[115px] min-w-0 overflow-hidden whitespace-nowrap text-ellipsis box-border hidden min-[601px]:block ${
+              className={`text-[10px] font-medium leading-none block whitespace-nowrap hidden min-[601px]:block ${
                 theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
               }`}
-              title="India’s Single Window for Business Approvals"
+              title="India’s Single Window Gateway"
             >
-              India’s Single Window for Business Approvals
+              India’s Single Window Gateway
             </span>
           )}
         </div>

@@ -160,11 +160,11 @@ export const HeaderNavbar: React.FC = () => {
             {/* ─────────────────────────────────────────────────────────────
                 COLUMN 1: SWAGAT Brand Logo (swagat-brand)
                 ───────────────────────────────────────────────────────────── */}
-            <div className="swagat-brand w-[190px] max-w-[190px] overflow-hidden shrink-0">
+            <div className="swagat-brand w-[235px] min-w-[235px] max-w-[235px] shrink-0">
               <button
                 id="swagat-brand-home-btn"
                 onClick={handleLogoClick}
-                className="focus:outline-hidden text-left cursor-pointer shrink-0 max-w-full overflow-hidden"
+                className="focus:outline-hidden text-left cursor-pointer shrink-0 max-w-full"
                 title="SWAGAT Portal (Click 5 times for Super Admin)"
               >
                 <SwagatLogo size="md" showWordmark={true} showTagline={false} theme="light" />

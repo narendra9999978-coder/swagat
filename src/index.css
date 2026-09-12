@@ -77,14 +77,13 @@
 }
 
 .swagat-brand {
-  width: 190px;
-  max-width: 190px;
-  min-width: 0;
+  width: 235px;
+  min-width: 235px;
+  max-width: 235px;
   display: flex;
   align-items: center;
   flex-shrink: 0;
   white-space: nowrap;
-  overflow: hidden;
 }
 
 .swagat-primary-nav {
