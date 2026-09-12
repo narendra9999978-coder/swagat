@@ -12,6 +12,9 @@ import {
   UserRole,
   BusinessType,
   WizardSession,
+  AppNotification,
+  ApplicationDocumentItem,
+  ApplicationApprovalItem,
 } from '../types/swagat';
 import { approvalsData } from '../data/approvalsData';
 import { schemesData } from '../data/schemesData';
@@ -20,6 +23,15 @@ import {
   authApi, 
   checkBackendHealth 
 } from '../services/api';
+import {
+  loadUserApplications,
+  addApplication,
+  updateApplication,
+  respondToQueryInStore,
+  reuploadDocumentInStore,
+  loadNotifications,
+  markNotificationRead,
+} from '../lib/applicationStore';
 import {
   mockLogin,
   mockRegister,
@@ -99,6 +111,12 @@ interface SwagatContextType {
   selectedQueryApp: { application: Application; query: ApplicationQuery } | null;
   setSelectedQueryApp: (item: { application: Application; query: ApplicationQuery } | null) => void;
   respondToQuery: (applicationId: string, queryId: string, responseText: string, attachedDocs?: string[]) => void;
+  reuploadDocument: (applicationId: string, documentName: string, fileName: string) => void;
+  refreshApplications: () => void;
+
+  // Real-time notifications
+  userNotifications: AppNotification[];
+  markNotifAsRead: (id: string) => void;
 
   // Documents Locker
   documents: DocumentItem[];
@@ -159,6 +177,8 @@ const initialKyaState: KYAState = {
   ]
 };
 
+// Applications are loaded per-user from the shared applicationStore on login/session restore.
+// The empty array below is the pre-login default.
 const initialApplications: Application[] = [
   {
     id: 'app-mh-78942',
@@ -230,9 +250,12 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [pendingApprovalToApply, setPendingApprovalToApply] = useState<Approval | null>(null);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
 
-  const [applications, setApplications] = useState<Application[]>(initialApplications);
+  const [applications, setApplications] = useState<Application[]>([]);
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
   const [selectedQueryApp, setSelectedQueryApp] = useState<{ application: Application; query: ApplicationQuery } | null>(null);
+
+  // Real-time notifications
+  const [userNotifications, setUserNotifications] = useState<AppNotification[]>([]);
 
   const [documents, setDocuments] = useState<DocumentItem[]>(initialDocuments);
   const [previewDocument, setPreviewDocument] = useState<DocumentItem | null>(null);
@@ -286,13 +309,46 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         accountType: user.accountType || (frontendRole === 'ADMIN' ? 'System Administrator' : 'Business User'),
       });
 
+      // Load this user's applications & notifications from shared store
+      if (frontendRole === 'USER') {
+        setApplications(loadUserApplications(user.id));
+        setUserNotifications(loadNotifications('USER', user.id));
+      } else {
+        setUserNotifications(loadNotifications('ADMIN'));
+      }
+
       // Synchronize view with restored session role if on dashboard path
       if (frontendRole === 'ADMIN') {
         setCurrentView('admin-dashboard');
       }
     }
 
-    // ── Supabase Google OAuth callback handler ────────────────────────────────
+    // Real-time synchronization listeners across tabs & within page
+    const syncStore = () => {
+      const stored = getStoredSession();
+      if (stored?.user) {
+        if (stored.user.role !== 'ADMIN') {
+          setApplications(loadUserApplications(stored.user.id));
+          setUserNotifications(loadNotifications('USER', stored.user.id));
+        } else {
+          setUserNotifications(loadNotifications('ADMIN'));
+        }
+      }
+    };
+
+    window.addEventListener('swagat_applications_updated', syncStore);
+    window.addEventListener('swagat_notifications_updated', syncStore);
+    window.addEventListener('storage', syncStore);
+
+    return () => {
+      window.removeEventListener('swagat_applications_updated', syncStore);
+      window.removeEventListener('swagat_notifications_updated', syncStore);
+      window.removeEventListener('storage', syncStore);
+    };
+  }, []);
+
+  // ── Supabase Google OAuth callback handler ────────────────────────────────
+  useEffect(() => {
     if (isSupabaseConfigured()) {
       const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, supaSession) => {
         if (supaSession?.user) {
@@ -386,6 +442,9 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/dashboard');
       showToast(`Welcome, ${name}! Signed in to SWAGAT ADMIN Portal.`);
     } else {
+      // Load this user's applications from the shared store
+      setApplications(loadUserApplications(user.id));
+
       setCurrentView('dashboard');
       if (typeof window !== 'undefined') window.history.pushState({}, '', '/dashboard');
       showToast(`Welcome, ${name}! Signed in to My SWAGAT Dashboard.`);
@@ -456,40 +515,150 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const submitNewApplication = (applicationData: Partial<Application>): Application => {
     const newId = `app-new-${Date.now()}`;
-    const newTracking = `SWG-2026-${(kyaState.state || 'IN').substring(0, 2).toUpperCase()}-${Math.floor(10000 + Math.random() * 90000)}`;
+    const stateCode = (kyaState.state || applicationData.projectState || 'IN').substring(0, 2).toUpperCase();
+    const newTracking = `SWG-2026-${stateCode}-${Math.floor(10000 + Math.random() * 90000)}`;
+
+    const appName = pendingApprovalToApply?.name || applicationData.approvalName || 'Factory License & Industrial Clearance';
+    const deptName = pendingApprovalToApply?.department || applicationData.department || 'Directorate of Industrial Safety & Health';
+    const ministryName = pendingApprovalToApply?.ministry || applicationData.ministry || 'Ministry of Commerce & Industry';
+    const state = kyaState.state || applicationData.projectState || 'Maharashtra';
+    const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+    // Build rich document items
+    const docItems: ApplicationDocumentItem[] = [
+      {
+        id: `doc-${newId}-1`,
+        documentName: 'Permanent Account Number (PAN Card)',
+        category: 'Company Registration',
+        fileUrl: '/docs/PAN_Document.pdf',
+        uploadDate: today,
+        verificationStatus: 'Approved',
+        adminRemark: 'Verified via DigiLocker corporate record',
+      },
+      {
+        id: `doc-${newId}-2`,
+        documentName: 'GST Registration Certificate (Form REG-06)',
+        category: 'Company Registration',
+        fileUrl: '/docs/GST_Document.pdf',
+        uploadDate: today,
+        verificationStatus: 'Approved',
+        adminRemark: 'Active GSTIN verified via GSTN API',
+      },
+      {
+        id: `doc-${newId}-3`,
+        documentName: 'Factory Building & Machinery Layout Plan',
+        category: 'Land Documents',
+        fileUrl: '/docs/Site_Layout.pdf',
+        uploadDate: today,
+        verificationStatus: 'Under Review',
+        adminRemark: 'Awaiting scrutiny by zonal technical officer',
+      },
+      {
+        id: `doc-${newId}-4`,
+        documentName: 'Effluent Treatment Scheme & Environmental Report',
+        category: 'Environmental Documents',
+        fileUrl: '/docs/Environmental_Report.pdf',
+        uploadDate: today,
+        verificationStatus: 'Under Review',
+        adminRemark: 'Desk scrutiny in progress by state pollution authority',
+      },
+    ];
+
+    // Build approval roadmap items
+    const approvalItems: ApplicationApprovalItem[] = [
+      {
+        id: `appr-${newId}-1`,
+        approvalName: 'Company Incorporation & Business Registration',
+        department: 'Ministry of Corporate Affairs (MCA)',
+        centralOrState: 'Central',
+        status: 'Approved',
+        submittedDate: today,
+        lastUpdated: today,
+        remarks: 'Corporate CIN active and authenticated',
+      },
+      {
+        id: `appr-${newId}-2`,
+        approvalName: appName,
+        department: deptName,
+        centralOrState: (pendingApprovalToApply?.centralOrState || 'State') as 'Central' | 'State',
+        status: 'Under Review',
+        submittedDate: today,
+        lastUpdated: today,
+        remarks: 'Automated desk scrutiny in progress (SLA: 48 Hours)',
+      },
+      {
+        id: `appr-${newId}-3`,
+        approvalName: 'Fire Safety NOC / Provisional Clearance',
+        department: 'State Fire Prevention Services',
+        centralOrState: 'State',
+        status: 'Pending',
+        submittedDate: today,
+        lastUpdated: today,
+        remarks: 'Site inspection pending inspector assignment',
+      },
+      {
+        id: `appr-${newId}-4`,
+        approvalName: 'Consent to Establish (CTE) / Pollution Clearance',
+        department: 'State Pollution Control Board',
+        centralOrState: 'State',
+        status: 'Under Review',
+        submittedDate: today,
+        lastUpdated: today,
+        remarks: 'Regional office evaluating process emission parameters',
+      },
+      {
+        id: `appr-${newId}-5`,
+        approvalName: 'Contract Labour & Shop Establishment Registration',
+        department: 'Department of Labour Welfare',
+        centralOrState: 'State',
+        status: 'Approved',
+        submittedDate: today,
+        lastUpdated: today,
+        remarks: 'Digital clearance certificate issued',
+      },
+    ];
 
     const newApp: Application = {
       id: newId,
       trackingNumber: newTracking,
+      userId: userProfile?.id,
+      applicantEmail: userProfile?.email,
+      applicantPhone: userProfile?.phone,
+      businessType: kyaState.sector || applicationData.businessType || 'General Enterprise',
       approvalId: pendingApprovalToApply?.id || 'app-custom',
-      approvalName: pendingApprovalToApply?.name || applicationData.approvalName || 'Single Window Approval',
-      department: pendingApprovalToApply?.department || applicationData.department || 'Competent Authority',
-      ministry: pendingApprovalToApply?.ministry || applicationData.ministry || 'Government of India',
-      centralOrState: pendingApprovalToApply?.centralOrState || 'State',
-      stateName: kyaState.state || 'India',
-      submissionDate: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+      approvalName: appName,
+      department: deptName,
+      ministry: ministryName,
+      centralOrState: (pendingApprovalToApply?.centralOrState || 'State') as 'Central' | 'State',
+      stateName: state,
+      submissionDate: today,
       lastUpdated: 'Just now',
       currentStatus: 'Submitted',
       nextAction: 'Initial automated desk scrutiny in progress (SLA: 48 Hours)',
       estimatedCompletionDays: pendingApprovalToApply?.processingDays || 30,
-      statutoryFeePaid: pendingApprovalToApply?.statutoryFee || '₹10,000',
+      statutoryFeePaid: pendingApprovalToApply?.statutoryFee || 'Rs.10,000',
       applicantName: userProfile?.name || 'Authorized Signatory',
       companyName: userProfile?.companyName || 'Enterprise Ltd',
-      panNumber: userProfile?.pan || '',
-      gstNumber: userProfile?.gstNumber || '',
-      cinNumber: userProfile?.cin,
-      projectTitle: applicationData.projectTitle || `${kyaState.sector} Project`,
-      projectState: kyaState.state || 'India',
+      panNumber: userProfile?.pan || 'AABCA9082F',
+      gstNumber: userProfile?.gstNumber || '27AABCA9082F1ZG',
+      cinNumber: userProfile?.cin || 'U29253MH2021PTC368940',
+      projectTitle: applicationData.projectTitle || `${kyaState.sector || 'Industrial'} Unit (${state})`,
+      projectState: state,
       projectDistrict: applicationData.projectDistrict || 'Industrial Area',
-      investmentAmount: kyaState.investmentSize || '₹10 - ₹50 Cr',
+      investmentAmount: kyaState.investmentSize || applicationData.investmentAmount || 'Rs.10 - Rs.50 Cr',
       timeline: [
-        { title: 'Application Drafted', date: 'Today', description: 'Application submitted', completed: true, current: false },
-        { title: 'Desk Scrutiny', date: 'In Progress', description: 'Verification in progress', completed: false, current: true },
-        { title: 'Competent Authority Approval', description: 'Final decision pending', completed: false, current: false }
+        { title: 'Application Drafted', date: today, description: 'Application submitted with CAF parameters', completed: true, current: false },
+        { title: 'Desk Scrutiny', date: 'In Progress', description: 'Statutory desk verification in progress', completed: false, current: true },
+        { title: 'Competent Authority Decision', description: 'Final order issuance and certification', completed: false, current: false }
       ],
-      documentsAttached: documents.slice(0, 3).map(d => ({ name: d.name, category: d.category, verified: d.verified })),
+      documentsAttached: docItems.map(d => ({ name: d.documentName, category: d.category, verified: d.verificationStatus === 'Approved' })),
+      documentsList: docItems,
+      approvalsList: approvalItems,
       queries: []
     };
+
+    // Persist to shared store so Admin sees this application immediately
+    addApplication(newApp);
 
     setApplications(prev => [newApp, ...prev]);
     setPendingApprovalToApply(null);
@@ -499,27 +668,33 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const respondToQuery = (applicationId: string, queryId: string, responseText: string, attachedDocs?: string[]) => {
-    setApplications(prev => prev.map(app => {
-      if (app.id !== applicationId) return app;
-      return {
-        ...app,
-        currentStatus: 'Response Submitted',
-        lastUpdated: 'Just now',
-        nextAction: 'Department scrutinizing applicant response (Expected: 3 Days)',
-        queries: app.queries.map(q =>
-          q.id === queryId
-            ? { ...q, status: 'Responded' as const, responseText, responseDate: 'Just now', attachedDocs: attachedDocs || [] }
-            : q
-        ),
-        timeline: app.timeline.map(step =>
-          step.queryRaised ? { ...step, completed: true, current: false, description: 'Response submitted' }
-          : step.title === 'Query Clarification' ? { ...step, completed: true, current: false, date: 'Today' }
-          : step
-        ),
-      };
-    }));
+    respondToQueryInStore(applicationId, queryId, responseText, attachedDocs);
+    if (userProfile?.id) {
+      setApplications(loadUserApplications(userProfile.id));
+    }
     setSelectedQueryApp(null);
     showToast('Response submitted to department.');
+  };
+
+  const reuploadDocument = (applicationId: string, documentName: string, fileName: string) => {
+    reuploadDocumentInStore(applicationId, documentName, fileName);
+    if (userProfile?.id) {
+      setApplications(loadUserApplications(userProfile.id));
+    }
+    showToast(`Corrected document "${documentName}" uploaded.`);
+  };
+
+  const refreshApplications = () => {
+    if (userProfile?.id) {
+      setApplications(loadUserApplications(userProfile.id));
+      setUserNotifications(loadNotifications('USER', userProfile.id));
+      showToast('Applications refreshed.');
+    }
+  };
+
+  const markNotifAsRead = (id: string) => {
+    markNotificationRead(id);
+    setUserNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
   };
 
   // ── Documents ─────────────────────────────────────────────────────────────
@@ -588,6 +763,8 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       startApplication, submitNewApplication,
       applications, selectedApplication, setSelectedApplication,
       selectedQueryApp, setSelectedQueryApp, respondToQuery,
+      reuploadDocument, refreshApplications,
+      userNotifications, markNotifAsRead,
       documents, addDocument, deleteDocument,
       previewDocument, setPreviewDocument,
       renewals, triggerRenewal,

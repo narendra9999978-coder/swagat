@@ -1,8 +1,17 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSwagat } from '../context/SwagatContext';
 import {
   getAllMockUsers, toggleUserStatus, createAdminAccount, MockUser,
 } from '../lib/mockAuth';
+import {
+  loadAllApplications,
+  updateApplicationStatus,
+  addQueryToApplication,
+  updateDocumentVerification,
+  updateApprovalItemStatus,
+  resolveQueryInStore,
+} from '../lib/applicationStore';
+import { Application, DocumentVerificationStatus, ApprovalItemStatus } from '../types/swagat';
 import {
   adminApplications, adminDepartments, adminApprovalsCatalog, adminSectors,
   adminQueries, adminRenewals, adminSchemes, adminSLARecords,
@@ -37,7 +46,7 @@ type AdminTab =
 // ─────────────────────────────────────────────────────────────────────────────
 // HELPERS
 // ─────────────────────────────────────────────────────────────────────────────
-const statusColor = (s: AppStatusAdmin) => {
+const statusColor = (s: string) => {
   const m: Record<string, string> = {
     'Draft': 'bg-slate-700 text-slate-300',
     'Submitted': 'bg-blue-900/60 text-blue-300 border border-blue-700/40',
@@ -46,6 +55,7 @@ const statusColor = (s: AppStatusAdmin) => {
     'Response Submitted': 'bg-violet-900/60 text-violet-300 border border-violet-700/40',
     'Approved': 'bg-emerald-900/60 text-emerald-300 border border-emerald-700/40',
     'Rejected': 'bg-rose-900/60 text-rose-300 border border-rose-700/40',
+    'Pending': 'bg-slate-800 text-slate-400 border border-white/10',
   };
   return m[s] || 'bg-slate-700 text-slate-300';
 };
@@ -272,6 +282,43 @@ const ActionBtn: React.FC<{ label: string; icon?: React.ComponentType<{ classNam
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// MAP Application (shared store) → AdminApplication (admin display type)
+// ─────────────────────────────────────────────────────────────────────────────
+function mapToAdminApplication(app: Application): AdminApplication {
+  const slaRem = app.estimatedCompletionDays ?? 30;
+  const slaStatus: AdminApplication['slaStatus'] =
+    slaRem <= 0 ? 'Overdue' : slaRem <= 2 ? 'Due Today' : slaRem <= 7 ? 'Due Soon' : 'On Track';
+  return {
+    id: app.id,
+    trackingNumber: app.trackingNumber,
+    applicantName: app.applicantName,
+    companyName: app.companyName,
+    email: app.applicantEmail || '',
+    state: app.stateName || app.projectState || 'India',
+    sector: app.businessType || app.approvalName?.split(' ')[0] || 'General',
+    approvalName: app.approvalName,
+    department: app.department,
+    ministry: app.ministry,
+    submittedDate: app.submissionDate,
+    lastUpdated: app.lastUpdated,
+    currentStatus: (app.currentStatus as AppStatusAdmin),
+    slaDeadlineDays: app.estimatedCompletionDays ?? 30,
+    slaRemainingDays: slaRem,
+    slaStatus,
+    investmentAmount: app.investmentAmount || '',
+    complexity: 'Medium' as const,
+    documentsCount: app.documentsAttached?.length ?? 0,
+    queriesCount: app.queries?.length ?? 0,
+    timeline: (app.timeline || []).map(t => ({
+      label: t.title,
+      date: t.date || '',
+      done: t.completed,
+      current: t.current,
+    })),
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // SIDEBAR NAV ITEMS
 // ─────────────────────────────────────────────────────────────────────────────
 const navItems: { id: AdminTab; label: string; icon: React.ComponentType<{ className?: string }>; badge?: number }[] = [
@@ -351,11 +398,30 @@ export const AdminDashboard: React.FC = () => {
   };
 
   // ── Applications State ───────────────────────────────────────────────────
-  const [appList, setAppList] = useState<AdminApplication[]>(adminApplications);
+  const [appList, setAppList] = useState<AdminApplication[]>(() =>
+    loadAllApplications().map(mapToAdminApplication)
+  );
   const [appSearch, setAppSearch] = useState('');
   const [appStateFilter, setAppStateFilter] = useState('All');
   const [appStatusFilter, setAppStatusFilter] = useState('All');
   const [selectedApp, setSelectedApp] = useState<AdminApplication | null>(null);
+  // Full Application record for selected app (for query details, docs, etc.)
+  const [selectedAppFull, setSelectedAppFull] = useState<Application | null>(null);
+  // Query modal state
+  const [queryModalOpen, setQueryModalOpen] = useState(false);
+  const [queryText, setQueryText] = useState('');
+
+  // Reload applications from shared store
+  const reloadApps = useCallback(() => {
+    setAppList(loadAllApplications().map(mapToAdminApplication));
+  }, []);
+
+  // Reload whenever the applications tab becomes active
+  useEffect(() => {
+    if (activeTab === 'applications' || activeTab === 'dashboard') {
+      reloadApps();
+    }
+  }, [activeTab, reloadApps]);
 
   const filteredApps = useMemo(() => appList.filter(a => {
     const q = appSearch.toLowerCase();
@@ -366,10 +432,99 @@ export const AdminDashboard: React.FC = () => {
   }), [appList, appSearch, appStateFilter, appStatusFilter]);
 
   const changeAppStatus = (id: string, newStatus: AppStatusAdmin) => {
+    // Persist to shared store so User sees the status change
+    updateApplicationStatus(
+      id,
+      newStatus as Application['currentStatus'],
+      newStatus === 'Approved'
+        ? 'Application has been approved. Certificate/licence will be issued.'
+        : newStatus === 'Rejected'
+        ? 'Application rejected. Applicant notified with remarks.'
+        : newStatus === 'Under Review'
+        ? 'Application is under active review by the department.'
+        : 'Status updated by administrator.',
+    );
     setAppList(prev => prev.map(a => a.id === id ? { ...a, currentStatus: newStatus } : a));
     showToast(`Application status updated to ${newStatus}.`);
     setSelectedApp(null);
+    setSelectedAppFull(null);
   };
+
+  const handleRaiseQuery = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedApp || !queryText.trim()) return;
+    addQueryToApplication(
+      selectedApp.id,
+      queryText.trim(),
+      userProfile?.name || 'Administrator',
+      userProfile?.departmentName || selectedApp.department,
+    );
+    setAppList(prev => prev.map(a =>
+      a.id === selectedApp.id
+        ? { ...a, currentStatus: 'Query Raised', queriesCount: a.queriesCount + 1 }
+        : a
+    ));
+    setQueryModalOpen(false);
+    setQueryText('');
+    showToast('Query raised. Applicant will be notified.');
+  };
+
+  // Document action modal state (for custom remarks / correction request / rejection)
+  const [docModalOpen, setDocModalOpen] = useState(false);
+  const [selectedDocId, setSelectedDocId] = useState('');
+  const [selectedDocName, setSelectedDocName] = useState('');
+  const [docModalAction, setDocModalAction] = useState<DocumentVerificationStatus>('Correction Required');
+  const [docModalRemark, setDocModalRemark] = useState('');
+
+  const handleVerifyDoc = (appId: string, docId: string, status: DocumentVerificationStatus, remark?: string) => {
+    updateDocumentVerification(appId, docId, status, remark);
+    reloadApps();
+    showToast(`Document updated to "${status}".`);
+  };
+
+  const openDocActionModal = (docId: string, docName: string, action: DocumentVerificationStatus) => {
+    setSelectedDocId(docId);
+    setSelectedDocName(docName);
+    setDocModalAction(action);
+    setDocModalRemark(
+      action === 'Correction Required'
+        ? 'Please upload updated document with authorized seal & signature.'
+        : action === 'Rejected'
+        ? 'Document does not satisfy mandatory statutory norms.'
+        : 'Verified successfully.'
+    );
+    setDocModalOpen(true);
+  };
+
+  const handleDocActionSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedApp || !selectedDocId) return;
+    handleVerifyDoc(selectedApp.id, selectedDocId, docModalAction, docModalRemark);
+    setDocModalOpen(false);
+  };
+
+  const handleUpdateApproval = (appId: string, apprId: string, status: ApprovalItemStatus, remarks?: string) => {
+    updateApprovalItemStatus(appId, apprId, status, remarks);
+    reloadApps();
+    showToast(`Clearance "${apprId}" status updated to ${status}.`);
+  };
+
+  const handleResolveQuery = (appId: string, queryId: string) => {
+    resolveQueryInStore(appId, queryId, 'Scrutiny officer verified applicant clarification.');
+    reloadApps();
+    showToast('Query marked as Resolved.');
+  };
+
+  // Real-time synchronization listener for Admin
+  useEffect(() => {
+    const handleSync = () => reloadApps();
+    window.addEventListener('swagat_applications_updated', handleSync);
+    window.addEventListener('storage', handleSync);
+    return () => {
+      window.removeEventListener('swagat_applications_updated', handleSync);
+      window.removeEventListener('storage', handleSync);
+    };
+  }, [reloadApps]);
 
   // ── Approvals State ──────────────────────────────────────────────────────
   const [approvalList, setApprovalList] = useState<AdminApproval[]>(adminApprovalsCatalog);
@@ -1021,7 +1176,11 @@ export const AdminDashboard: React.FC = () => {
   // ─────────────────────────────────────────────────────────────────────────
   const renderApplications = () => (
     <div className="space-y-4 animate-in fade-in duration-200">
-      <SectionHeader title="Application Management" subtitle={`${filteredApps.length} applications matching filters`} />
+      <SectionHeader
+        title="Application Management"
+        subtitle={`${filteredApps.length} of ${appList.length} applications — real data from shared store`}
+        actions={<ActionBtn label="Refresh" icon={RefreshCw} onClick={reloadApps} variant="ghost" />}
+      />
       <SearchBar value={appSearch} onChange={setAppSearch} placeholder="Search by applicant, tracking # or company...">
         <select value={appStateFilter} onChange={e => setAppStateFilter(e.target.value)} className="px-3 py-2 bg-[#07182C] border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
           <option value="All">All States</option>
@@ -1037,16 +1196,17 @@ export const AdminDashboard: React.FC = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead><tr>
-              <TH>Tracking #</TH><TH>Applicant</TH><TH>State</TH><TH>Sector</TH>
+              <TH>Tracking #</TH><TH>Applicant</TH><TH>Email</TH><TH>State</TH><TH>Sector</TH>
               <TH>Department</TH><TH>Submitted</TH><TH>Status</TH><TH>SLA</TH><TH className="text-right">Actions</TH>
             </tr></thead>
             <tbody className="divide-y divide-white/5">
               {filteredApps.length === 0 ? (
-                <tr><td colSpan={9}><EmptyState message="No applications match filters" icon={FileText} /></td></tr>
+                <tr><td colSpan={10}><EmptyState message="No applications match filters" sub="New user submissions appear here automatically." icon={FileText} /></td></tr>
               ) : filteredApps.map(a => (
                 <tr key={a.id} className="hover:bg-white/3 transition">
                   <TD><span className="font-mono text-amber-400 text-[10px]">{a.trackingNumber}</span></TD>
                   <TD><div className="font-semibold text-white text-xs">{a.applicantName}</div><div className="text-[10px] text-slate-400">{a.companyName}</div></TD>
+                  <TD><span className="text-slate-400 font-mono text-[10px]">{a.email || '—'}</span></TD>
                   <TD><span className="text-slate-300 text-xs">{a.state}</span></TD>
                   <TD><span className="text-slate-400 text-[10px] truncate max-w-[90px] block">{a.sector}</span></TD>
                   <TD><span className="text-slate-400 text-[10px] truncate max-w-[100px] block">{a.department}</span></TD>
@@ -1064,78 +1224,334 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Application Detail Modal */}
-      <Modal open={!!selectedApp} onClose={() => setSelectedApp(null)} title="Application Details" maxW="max-w-2xl">
-        {selectedApp && (
-          <div className="space-y-4 text-xs">
-            {/* Header */}
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="font-mono text-amber-400 text-[10px]">{selectedApp.trackingNumber}</p>
-                <p className="font-extrabold text-white text-base mt-0.5">{selectedApp.companyName}</p>
-                <p className="text-slate-400 mt-0.5">{selectedApp.applicantName} · {selectedApp.email}</p>
-              </div>
-              <div className="flex flex-col gap-1.5 items-end">
-                <Badge label={selectedApp.currentStatus} className={statusColor(selectedApp.currentStatus)} />
-                <Badge label={selectedApp.slaStatus} className={slaColor(selectedApp.slaStatus)} />
-                <Badge label={selectedApp.complexity + ' Complexity'} className={selectedApp.complexity === 'High' ? 'bg-rose-900/60 text-rose-300 border border-rose-700/40' : selectedApp.complexity === 'Medium' ? 'bg-amber-900/60 text-amber-300 border border-amber-700/40' : 'bg-emerald-900/60 text-emerald-300 border border-emerald-700/40'} />
-              </div>
-            </div>
-
-            {/* Grid info */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-              {[
-                { l: 'State', v: selectedApp.state }, { l: 'Sector', v: selectedApp.sector },
-                { l: 'Approval', v: selectedApp.approvalName }, { l: 'Department', v: selectedApp.department },
-                { l: 'Investment', v: selectedApp.investmentAmount }, { l: 'Submitted', v: selectedApp.submittedDate },
-                { l: 'SLA Days', v: `${selectedApp.slaDeadlineDays} days` }, { l: 'Remaining', v: `${selectedApp.slaRemainingDays > 0 ? selectedApp.slaRemainingDays : 'OVERDUE'}` },
-                { l: 'Documents', v: `${selectedApp.documentsCount} files` }, { l: 'Queries', v: `${selectedApp.queriesCount} raised` },
-              ].map(r => (
-                <div key={r.l} className="p-2.5 bg-[#07182C] rounded-xl border border-white/5">
-                  <p className="text-[10px] text-slate-400 font-semibold">{r.l}</p>
-                  <p className="font-bold text-white mt-0.5 truncate">{r.v}</p>
+      <Modal open={!!selectedApp} onClose={() => { setSelectedApp(null); setSelectedAppFull(null); }} title="Application Details" maxW="max-w-2xl">
+        {selectedApp && (() => {
+          const fullApps = loadAllApplications();
+          const full = fullApps.find(a => a.id === selectedApp.id);
+          return (
+            <div className="space-y-4 text-xs">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="font-mono text-amber-400 text-[10px]">{selectedApp.trackingNumber}</p>
+                  <p className="font-extrabold text-white text-base mt-0.5">{selectedApp.companyName}</p>
+                  <p className="text-slate-400 mt-0.5">{selectedApp.applicantName}</p>
                 </div>
-              ))}
-            </div>
+                <div className="flex flex-col gap-1.5 items-end">
+                  <Badge label={selectedApp.currentStatus} className={statusColor(selectedApp.currentStatus)} />
+                  <Badge label={selectedApp.slaStatus} className={slaColor(selectedApp.slaStatus)} />
+                </div>
+              </div>
 
-            {/* Timeline */}
-            <div className="p-3 bg-[#07182C] rounded-xl border border-white/5">
-              <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-3">Application Timeline</p>
-              <div className="flex items-center gap-0">
-                {selectedApp.timeline.map((step, i) => (
-                  <React.Fragment key={step.label}>
-                    <div className="flex flex-col items-center gap-1 min-w-[60px]">
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${step.done && !step.current ? 'bg-emerald-500 border-emerald-500' : step.current ? 'bg-amber-400 border-amber-400 ring-2 ring-amber-400/30' : 'border-slate-600 bg-transparent'}`}>
-                        {step.done && !step.current && <CheckCircle className="w-3 h-3 text-white" />}
-                        {step.current && <div className="w-2 h-2 rounded-full bg-[#07182C]" />}
-                      </div>
-                      <p className="text-[9px] text-center text-slate-400 leading-tight max-w-[55px]">{step.label}</p>
-                      {step.date && <p className="text-[8px] text-slate-600 text-center">{step.date}</p>}
+              {/* Real Applicant Details */}
+              <div className="p-3 bg-[#07182C] rounded-xl border border-emerald-700/30">
+                <p className="text-[10px] font-extrabold text-emerald-400 uppercase tracking-wider mb-2 flex items-center gap-1">
+                  <Users className="w-3.5 h-3.5" /> Real Applicant Information
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {[
+                    { l: 'Name', v: selectedApp.applicantName },
+                    { l: 'Email', v: selectedApp.email || '—' },
+                    { l: 'Phone', v: full?.applicantPhone || '—' },
+                    { l: 'Company', v: selectedApp.companyName },
+                    { l: 'State', v: selectedApp.state },
+                    { l: 'Sector', v: selectedApp.sector },
+                    { l: 'Investment', v: selectedApp.investmentAmount || '—' },
+                    { l: 'Submitted', v: selectedApp.submittedDate },
+                    { l: 'Last Updated', v: selectedApp.lastUpdated },
+                  ].map(r => (
+                    <div key={r.l} className="p-2 bg-[#0B2545]/60 rounded-xl border border-white/5">
+                      <p className="text-[10px] text-slate-400 font-semibold">{r.l}</p>
+                      <p className="font-bold text-white mt-0.5 truncate text-[11px]">{r.v}</p>
                     </div>
-                    {i < selectedApp.timeline.length - 1 && <div className={`flex-1 h-0.5 mb-6 ${step.done ? 'bg-emerald-500' : 'bg-slate-700'}`} />}
-                  </React.Fragment>
+                  ))}
+                </div>
+              </div>
+
+              {/* Approval / SLA */}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {[
+                  { l: 'Approval', v: selectedApp.approvalName },
+                  { l: 'Department', v: selectedApp.department },
+                  { l: 'SLA Days', v: `${selectedApp.slaDeadlineDays} days` },
+                  { l: 'Remaining', v: `${selectedApp.slaRemainingDays > 0 ? selectedApp.slaRemainingDays + ' days' : 'OVERDUE'}` },
+                  { l: 'Documents', v: `${selectedApp.documentsCount} files` },
+                  { l: 'Queries', v: `${selectedApp.queriesCount} raised` },
+                ].map(r => (
+                  <div key={r.l} className="p-2.5 bg-[#07182C] rounded-xl border border-white/5">
+                    <p className="text-[10px] text-slate-400 font-semibold">{r.l}</p>
+                    <p className="font-bold text-white mt-0.5 truncate">{r.v}</p>
+                  </div>
                 ))}
               </div>
-            </div>
 
-            {/* Status Change */}
-            <div className="p-3 bg-[#07182C] rounded-xl border border-white/5">
-              <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">Change Application Status</p>
-              <div className="flex flex-wrap gap-1.5">
-                {(['Under Review', 'Query Raised', 'Approved', 'Rejected'] as AppStatusAdmin[]).map(s => (
-                  <button key={s} onClick={() => changeAppStatus(selectedApp.id, s)}
-                    className={`px-3 py-1.5 rounded-xl text-[10px] font-bold transition cursor-pointer ${statusColor(s)}`}
-                    disabled={selectedApp.currentStatus === s}>
-                    {s}
-                  </button>
-                ))}
+              {/* ── APPROVALS ROADMAP SECTION ── */}
+              {full && full.approvalsList && full.approvalsList.length > 0 && (
+                <div className="p-3 bg-[#07182C] rounded-xl border border-blue-500/20">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-[10px] font-extrabold text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <ShieldCheck className="w-3.5 h-3.5" /> Statutory Approvals Roadmap ({full.approvalsList.length})
+                    </p>
+                    <span className="text-[10px] text-slate-500">Manage individual clearance statuses</span>
+                  </div>
+                  <div className="space-y-2">
+                    {full.approvalsList.map((appr) => (
+                      <div key={appr.id} className="p-2.5 bg-[#0B2545]/60 rounded-xl border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-white font-bold text-[11px]">{appr.approvalName}</span>
+                            <span className="text-[9px] px-1.5 py-0.2 rounded bg-white/10 text-slate-300">{appr.centralOrState}</span>
+                          </div>
+                          <p className="text-[10px] text-slate-400 mt-0.5">{appr.department} • <span className="text-slate-300 italic">{appr.remarks || 'No remarks'}</span></p>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <Badge label={appr.status} className={statusColor(appr.status)} />
+                          <select
+                            value={appr.status}
+                            onChange={(e) => handleUpdateApproval(selectedApp.id, appr.id, e.target.value as ApprovalItemStatus, `Status updated by scrutiny officer to ${e.target.value}`)}
+                            className="text-[10px] bg-[#07182C] border border-white/15 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-amber-400"
+                          >
+                            <option value="Under Review">Under Review</option>
+                            <option value="Approved">Approve</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Query Raised">Query Raised</option>
+                            <option value="Rejected">Reject</option>
+                          </select>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* ── DOCUMENTS VERIFICATION PANEL ── */}
+              {full && ((full.documentsList && full.documentsList.length > 0) || full.documentsAttached.length > 0) && (
+                <div className="p-3 bg-[#07182C] rounded-xl border border-white/10">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-[10px] font-extrabold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                      <FileText className="w-3.5 h-3.5 text-amber-400" /> Attached Documents &amp; Verification
+                    </p>
+                    <span className="text-[10px] text-slate-500">Click actions to approve, reject or request correction</span>
+                  </div>
+                  <div className="space-y-2">
+                    {(full.documentsList || full.documentsAttached.map((d, i) => ({
+                      id: `doc-${i}`,
+                      documentName: d.name,
+                      category: d.category,
+                      uploadDate: full.submissionDate,
+                      verificationStatus: (d.verified ? 'Approved' : 'Under Review') as DocumentVerificationStatus,
+                      adminRemark: d.verified ? 'Verified successfully' : 'Pending review',
+                    }))).map((doc) => (
+                      <div key={doc.id} className="p-2.5 bg-[#0B2545]/60 rounded-xl border border-white/5 space-y-1.5">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <FileText className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                              <span className="text-white font-bold text-[11px] truncate">{doc.documentName}</span>
+                            </div>
+                            <p className="text-[10px] text-slate-400 mt-0.5 ml-5">
+                              Category: <span className="text-slate-300">{doc.category}</span> • Uploaded: {doc.uploadDate}
+                            </p>
+                          </div>
+                          <Badge 
+                            label={doc.verificationStatus} 
+                            className={
+                              doc.verificationStatus === 'Approved' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                              doc.verificationStatus === 'Correction Required' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' :
+                              doc.verificationStatus === 'Rejected' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
+                              'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                            } 
+                          />
+                        </div>
+
+                        {doc.adminRemark && (
+                          <div className="ml-5 p-1.5 rounded bg-[#07182C]/80 border border-white/5 text-[10px] text-slate-300">
+                            <span className="text-slate-500 font-semibold">Remark: </span>{doc.adminRemark}
+                          </div>
+                        )}
+
+                        <div className="ml-5 pt-1 flex items-center gap-1.5 flex-wrap">
+                          <button
+                            type="button"
+                            onClick={() => handleVerifyDoc(selectedApp.id, doc.id, 'Approved', 'Verified successfully by scrutiny officer')}
+                            className="px-2.5 py-1 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold transition cursor-pointer"
+                          >
+                            ✓ Approve
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => openDocActionModal(doc.id, doc.documentName, 'Correction Required')}
+                            className="px-2.5 py-1 rounded-lg bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 border border-amber-500/40 text-[10px] font-bold transition cursor-pointer"
+                          >
+                            ⚠ Request Correction
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => openDocActionModal(doc.id, doc.documentName, 'Rejected')}
+                            className="px-2.5 py-1 rounded-lg bg-rose-600/30 hover:bg-rose-600/50 text-rose-300 border border-rose-500/40 text-[10px] font-bold transition cursor-pointer"
+                          >
+                            ✕ Reject
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* ── QUERIES & RESPONSES SECTION ── */}
+              {full && full.queries.length > 0 && (
+                <div className="p-3 bg-[#07182C] rounded-xl border border-amber-700/30">
+                  <p className="text-[10px] font-extrabold text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                    <MessageSquare className="w-3.5 h-3.5" /> Department Queries &amp; Applicant Clarifications ({full.queries.length})
+                  </p>
+                  <div className="space-y-2.5">
+                    {full.queries.map(q => (
+                      <div key={q.id} className="p-3 bg-[#0B2545]/60 rounded-xl border border-white/5 space-y-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <p className="text-white font-semibold text-[11px] leading-relaxed">"{q.queryText}"</p>
+                            <p className="text-slate-400 text-[10px] mt-1">Raised by {q.raisedByOfficer} ({q.department}) • {q.dateRaised}</p>
+                          </div>
+                          <Badge label={q.status} className={q.status === 'Resolved' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : q.status === 'Responded' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : 'bg-amber-900/60 text-amber-300 border border-amber-700/40'} />
+                        </div>
+
+                        {q.responseText && (
+                          <div className="p-2.5 bg-emerald-950/40 border border-emerald-700/30 rounded-lg">
+                            <p className="text-emerald-400 text-[10px] font-bold flex items-center gap-1">
+                              <CheckCircle className="w-3 h-3" /> Applicant Response ({q.responseDate || 'Recently submitted'}):
+                            </p>
+                            <p className="text-slate-200 text-[11px] mt-1 italic leading-relaxed font-medium">"{q.responseText}"</p>
+                          </div>
+                        )}
+
+                        {q.status !== 'Resolved' && (
+                          <div className="flex justify-end pt-1">
+                            <button
+                              type="button"
+                              onClick={() => handleResolveQuery(selectedApp.id, q.id)}
+                              className="px-3 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-[#07182C] text-[10px] font-extrabold transition cursor-pointer flex items-center gap-1 shadow-sm"
+                            >
+                              <CheckCircle className="w-3 h-3" /> Mark Query as Resolved
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Timeline */}
+              <div className="p-3 bg-[#07182C] rounded-xl border border-white/5">
+                <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-3">Application Timeline</p>
+                <div className="flex items-center gap-0">
+                  {selectedApp.timeline.map((step, i) => (
+                    <React.Fragment key={step.label}>
+                      <div className="flex flex-col items-center gap-1 min-w-[60px]">
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${step.done && !step.current ? 'bg-emerald-500 border-emerald-500' : step.current ? 'bg-amber-400 border-amber-400 ring-2 ring-amber-400/30' : 'border-slate-600 bg-transparent'}`}>
+                          {step.done && !step.current && <CheckCircle className="w-3 h-3 text-white" />}
+                          {step.current && <div className="w-2 h-2 rounded-full bg-[#07182C]" />}
+                        </div>
+                        <p className="text-[9px] text-center text-slate-400 leading-tight max-w-[55px]">{step.label}</p>
+                        {step.date && <p className="text-[8px] text-slate-600 text-center">{step.date}</p>}
+                      </div>
+                      {i < selectedApp.timeline.length - 1 && <div className={`flex-1 h-0.5 mb-6 ${step.done ? 'bg-emerald-500' : 'bg-slate-700'}`} />}
+                    </React.Fragment>
+                  ))}
+                </div>
+              </div>
+
+              {/* Status Change */}
+              <div className="p-3 bg-[#07182C] rounded-xl border border-white/5">
+                <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">Change Application Status</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {(['Under Review', 'Query Raised', 'Approved', 'Rejected'] as AppStatusAdmin[]).map(s => (
+                    <button key={s} onClick={() => changeAppStatus(selectedApp.id, s)}
+                      className={`px-3 py-1.5 rounded-xl text-[10px] font-bold transition cursor-pointer ${statusColor(s)} ${selectedApp.currentStatus === s ? 'opacity-40 cursor-not-allowed' : 'hover:opacity-90'}`}
+                      disabled={selectedApp.currentStatus === s}>
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex justify-between gap-2 flex-wrap">
+                <ActionBtn label="Raise Query" icon={MessageSquare} onClick={() => setQueryModalOpen(true)} variant="ghost" />
+                <ActionBtn label="Close" onClick={() => { setSelectedApp(null); setSelectedAppFull(null); }} />
               </div>
             </div>
+          );
+        })()}
+      </Modal>
 
-            <div className="flex justify-end">
-              <ActionBtn label="Close" onClick={() => setSelectedApp(null)} />
-            </div>
+      {/* Raise Query Modal */}
+      <Modal open={queryModalOpen} onClose={() => { setQueryModalOpen(false); setQueryText(''); }} title="Raise Query to Applicant">
+        <form onSubmit={handleRaiseQuery} className="space-y-4">
+          <p className="text-xs text-slate-400 leading-relaxed">
+            This query will be sent to <span className="text-white font-bold">{selectedApp?.applicantName}</span> ({selectedApp?.email || 'applicant'}).
+            The application status will change to <span className="text-amber-400 font-bold">Query Raised</span>.
+          </p>
+          <FormTextarea
+            label="Query / Clarification Required"
+            value={queryText}
+            onChange={setQueryText}
+            rows={4}
+            placeholder="Describe the information or document you require from the applicant..."
+          />
+          <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
+            <ActionBtn label="Cancel" onClick={() => { setQueryModalOpen(false); setQueryText(''); }} />
+            <button type="submit" disabled={!queryText.trim()}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-[#07182C] text-xs font-extrabold transition cursor-pointer disabled:opacity-50 shadow-lg shadow-amber-400/20">
+              <Send className="w-3.5 h-3.5" /> Send Query
+            </button>
           </div>
-        )}
+        </form>
+      </Modal>
+
+      {/* Document Action Modal (Remarks / Corrections / Rejection) */}
+      <Modal open={docModalOpen} onClose={() => setDocModalOpen(false)} title={`Document Action: ${docModalAction}`}>
+        <form onSubmit={handleDocActionSubmit} className="space-y-4">
+          <div>
+            <span className="text-slate-400 text-xs block mb-1">Target Document:</span>
+            <span className="text-white font-bold text-sm block bg-[#07182C] p-2.5 rounded-xl border border-white/10">
+              {selectedDocName}
+            </span>
+          </div>
+
+          <div>
+            <span className="text-slate-400 text-xs block mb-1">Action:</span>
+            <span className={`px-2.5 py-1 rounded-full text-xs font-bold inline-block ${
+              docModalAction === 'Approved' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+              docModalAction === 'Correction Required' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' :
+              'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+            }`}>
+              {docModalAction}
+            </span>
+          </div>
+
+          <FormTextarea
+            label="Department / Scrutiny Remark to Applicant *"
+            value={docModalRemark}
+            onChange={setDocModalRemark}
+            rows={3}
+            placeholder="Specify reason or instructions for the applicant..."
+          />
+
+          <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
+            <ActionBtn label="Cancel" onClick={() => setDocModalOpen(false)} />
+            <button
+              type="submit"
+              disabled={!docModalRemark.trim()}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[#07182C] text-xs font-extrabold transition cursor-pointer disabled:opacity-50 shadow-md ${
+                docModalAction === 'Approved' ? 'bg-emerald-400 hover:bg-emerald-300' :
+                docModalAction === 'Correction Required' ? 'bg-amber-400 hover:bg-amber-300' :
+                'bg-rose-400 hover:bg-rose-300'
+              }`}
+            >
+              <CheckCircle className="w-3.5 h-3.5" /> Confirm {docModalAction}
+            </button>
+          </div>
+        </form>
       </Modal>
     </div>
   );

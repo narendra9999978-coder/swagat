@@ -120,9 +120,35 @@ export interface ApplicationQuery {
   attachedDocs?: string[];
 }
 
+export type ApprovalItemStatus = 'Pending' | 'Under Review' | 'Approved' | 'Rejected' | 'Query Raised';
+
+export interface ApplicationApprovalItem {
+  id: string;
+  approvalName: string;
+  department: string;
+  centralOrState: CentralOrState;
+  status: ApprovalItemStatus;
+  submittedDate: string;
+  lastUpdated: string;
+  remarks?: string;
+}
+
+export type DocumentVerificationStatus = 'Pending Upload' | 'Uploaded' | 'Under Review' | 'Approved' | 'Rejected' | 'Correction Required';
+
+export interface ApplicationDocumentItem {
+  id: string;
+  documentName: string;
+  category: string;
+  fileUrl?: string;
+  uploadDate: string;
+  verificationStatus: DocumentVerificationStatus;
+  adminRemark?: string;
+}
+
 export interface Application {
   id: string;
   trackingNumber: string;
+  userId?: string;
   approvalId: string;
   approvalName: string;
   department: string;
@@ -135,7 +161,10 @@ export interface Application {
   nextAction: string;
   timeline: TimelineStep[];
   applicantName: string;
+  applicantEmail?: string;
+  applicantPhone?: string;
   companyName: string;
+  businessType?: string;
   panNumber: string;
   gstNumber: string;
   cinNumber?: string;
@@ -146,6 +175,8 @@ export interface Application {
   estimatedCompletionDays: number;
   statutoryFeePaid: string;
   documentsAttached: { name: string; category: string; verified: boolean; url?: string }[];
+  documentsList?: ApplicationDocumentItem[];
+  approvalsList?: ApplicationApprovalItem[];
   queries: ApplicationQuery[];
   remarks?: string;
   certificateUrl?: string;
@@ -177,6 +208,19 @@ export interface RenewalItem {
   status: 'Active' | 'Expiring Soon' | 'Critical / Expired';
   renewalFee: string;
   statutoryDaysAllowed: number;
+}
+
+export interface AppNotification {
+  id: string;
+  userId?: string;
+  applicationId?: string;
+  trackingNumber?: string;
+  role: 'USER' | 'ADMIN' | 'ALL';
+  type: 'Application Submitted' | 'Status Changed' | 'Document Approved' | 'Document Rejected' | 'Correction Requested' | 'Query Raised' | 'Query Resolved' | 'Response Submitted' | 'System';
+  title: string;
+  message: string;
+  timestamp: string;
+  read: boolean;
 }
 
 // ── User Role Types ──────────────────────────────────────────────────────────

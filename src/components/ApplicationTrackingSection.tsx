@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Activity, 
   Search, 
@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useSwagat } from '../context/SwagatContext';
 import { Application, ApplicationStatus } from '../types/swagat';
+import { loadAllApplications } from '../lib/applicationStore';
 
 export const ApplicationTrackingSection: React.FC = () => {
   const { 
@@ -27,20 +28,36 @@ export const ApplicationTrackingSection: React.FC = () => {
     userProfile,
     setIsAuthModalOpen,
     setCurrentView,
-    setDashboardActiveTab
+    setDashboardActiveTab,
+    refreshApplications
   } = useSwagat();
 
+  const [allApps, setAllApps] = useState<Application[]>(() => loadAllApplications());
   const [searchTrackingId, setSearchTrackingId] = useState<string>('');
-  const [selectedAppId, setSelectedAppId] = useState<string>(applications[0]?.id || '');
+  const [selectedAppId, setSelectedAppId] = useState<string>(() => loadAllApplications()[0]?.id || '');
 
-  const activeApp = applications.find(a => a.id === selectedAppId) || applications[0];
+  // Refresh allApps when store updates
+  useEffect(() => {
+    const handleSync = () => setAllApps(loadAllApplications());
+    window.addEventListener('swagat_applications_updated', handleSync);
+    window.addEventListener('storage', handleSync);
+    return () => {
+      window.removeEventListener('swagat_applications_updated', handleSync);
+      window.removeEventListener('storage', handleSync);
+    };
+  }, []);
+
+  const activeApp = allApps.find(a => a.id === selectedAppId) || allApps[0];
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchTrackingId.trim()) return;
-    const found = applications.find(a => 
+    const currentList = loadAllApplications();
+    setAllApps(currentList);
+    const found = currentList.find(a => 
       a.trackingNumber.toLowerCase().includes(searchTrackingId.toLowerCase().trim()) ||
-      a.approvalName.toLowerCase().includes(searchTrackingId.toLowerCase().trim())
+      a.approvalName.toLowerCase().includes(searchTrackingId.toLowerCase().trim()) ||
+      (a.companyName && a.companyName.toLowerCase().includes(searchTrackingId.toLowerCase().trim()))
     );
     if (found) {
       setSelectedAppId(found.id);
