@@ -67,9 +67,9 @@
 
 .swagat-header-grid {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
   align-items: center;
-  column-gap: clamp(10px, 1.5vw, 24px);
+  column-gap: clamp(12px, 1.5vw, 24px);
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
@@ -81,6 +81,7 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .swagat-primary-nav {
@@ -88,8 +89,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: clamp(6px, 1.1vw, 20px);
+  gap: clamp(4px, 1vw, 18px);
   white-space: nowrap;
+  overflow: hidden;
 }
 
 .swagat-actions {
@@ -97,6 +99,7 @@
   align-items: center;
   gap: clamp(4px, 0.8vw, 10px);
   flex-shrink: 0;
+  min-width: max-content;
 }
 
 /* Custom scrollbar */

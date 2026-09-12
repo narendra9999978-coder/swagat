@@ -317,7 +317,7 @@ export const HeaderNavbar: React.FC = () => {
               <button
                 id="global-search-btn"
                 onClick={() => setIsSearchModalOpen(true)}
-                className="p-2 min-[1200px]:py-2 min-[1200px]:px-3 text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/90 rounded-xl transition-all flex items-center space-x-1.5 text-xs font-medium shrink-0 cursor-pointer w-auto min-[1200px]:w-[150px] min-[1400px]:w-[180px]"
+                className="p-2 min-[1200px]:py-2 min-[1200px]:px-2.5 min-[1400px]:px-3 text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/90 rounded-xl transition-all flex items-center space-x-1.5 text-xs font-medium shrink-0 cursor-pointer w-auto min-[1200px]:w-[130px] min-[1400px]:w-[160px]"
                 title="Search Approvals, Schemes, Departments (Ctrl+K or /)"
               >
                 <Search className="w-4 h-4 text-slate-700 shrink-0" />
