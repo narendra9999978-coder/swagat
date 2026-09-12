@@ -28,6 +28,7 @@ import {
   ApprovalRule, AdminDocumentType, AppStatusAdmin,
 } from '../lib/adminMockData';
 import { allIndianStatesList } from '../data/indiaStatesData';
+import { LiquidChrome } from './reactbits/LiquidChrome';
 import {
   LayoutDashboard, Users, FileText, Building2, Map, Layers, Building,
   FileCheck, Brain, Clock, HelpCircle, DollarSign, RefreshCw, Bell,
@@ -54,16 +55,16 @@ type AdminTab =
 // ─────────────────────────────────────────────────────────────────────────────
 const statusColor = (s: string) => {
   const m: Record<string, string> = {
-    'Draft': 'bg-slate-700 text-slate-300',
-    'Submitted': 'bg-blue-900/60 text-blue-300 border border-blue-700/40',
-    'Under Review': 'bg-sky-900/60 text-sky-300 border border-sky-700/40',
-    'Query Raised': 'bg-amber-900/60 text-amber-300 border border-amber-700/40',
-    'Response Submitted': 'bg-violet-900/60 text-violet-300 border border-violet-700/40',
-    'Approved': 'bg-emerald-900/60 text-emerald-300 border border-emerald-700/40',
-    'Rejected': 'bg-rose-900/60 text-rose-300 border border-rose-700/40',
-    'Pending': 'bg-slate-800 text-slate-400 border border-white/10',
+    'Draft': 'bg-slate-800/80 text-slate-300 border border-white/[0.08]',
+    'Submitted': 'bg-blue-500/15 text-blue-300 border border-blue-500/30',
+    'Under Review': 'bg-sky-500/15 text-sky-300 border border-sky-500/30',
+    'Query Raised': 'bg-amber-500/15 text-amber-300 border border-amber-500/30',
+    'Response Submitted': 'bg-violet-500/15 text-violet-300 border border-violet-500/30',
+    'Approved': 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30',
+    'Rejected': 'bg-rose-500/15 text-rose-300 border border-rose-500/30',
+    'Pending': 'bg-slate-800/80 text-slate-400 border border-white/[0.08]',
   };
-  return m[s] || 'bg-slate-700 text-slate-300';
+  return m[s] || 'bg-slate-800/80 text-slate-300 border border-white/[0.08]';
 };
 
 const slaColor = (s: string) => {
@@ -125,8 +126,8 @@ const Modal: React.FC<{ open: boolean; onClose: () => void; title: string; child
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className={`w-full ${maxW} my-4 bg-[#0D2242] rounded-2xl border border-white/15 shadow-2xl animate-in zoom-in-95 duration-150`}>
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
+      <div className={`w-full ${maxW} my-4 bg-[#0D1829] rounded-2xl border border-white/[0.12] shadow-2xl animate-in zoom-in-95 duration-150`}>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.08]">
           <h3 className="text-sm font-extrabold text-white">{title}</h3>
           <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition cursor-pointer">
             <X className="w-4 h-4" />
@@ -150,7 +151,7 @@ const FormInput: React.FC<{ label: string; value: string; onChange: (v: string) 
       onChange={e => onChange(e.target.value)}
       placeholder={placeholder}
       required={required}
-      className="w-full px-3 py-2 rounded-xl bg-[#07182C] border border-white/10 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-amber-400 transition"
+      className="w-full px-3 py-2 rounded-xl bg-[#08111F] border border-white/[0.08] text-white text-xs placeholder-slate-500 focus:outline-none focus:border-amber-400 transition"
     />
   </div>
 );
@@ -162,7 +163,7 @@ const FormSelect: React.FC<{ label: string; value: string; onChange: (v: string)
       value={value}
       onChange={e => onChange(e.target.value)}
       required={required}
-      className="w-full px-3 py-2 rounded-xl bg-[#07182C] border border-white/10 text-white text-xs focus:outline-none focus:border-amber-400 transition"
+      className="w-full px-3 py-2 rounded-xl bg-[#08111F] border border-white/[0.08] text-white text-xs focus:outline-none focus:border-amber-400 transition"
     >
       {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
     </select>
@@ -177,7 +178,7 @@ const FormTextarea: React.FC<{ label: string; value: string; onChange: (v: strin
       onChange={e => onChange(e.target.value)}
       rows={rows}
       placeholder={placeholder}
-      className="w-full px-3 py-2 rounded-xl bg-[#07182C] border border-white/10 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-amber-400 transition resize-none"
+      className="w-full px-3 py-2 rounded-xl bg-[#08111F] border border-white/[0.08] text-white text-xs placeholder-slate-500 focus:outline-none focus:border-amber-400 transition resize-none"
     />
   </div>
 );
@@ -186,7 +187,7 @@ const FormTextarea: React.FC<{ label: string; value: string; onChange: (v: strin
 // TABLE HEADER
 // ─────────────────────────────────────────────────────────────────────────────
 const TH: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className }) => (
-  <th className={`px-4 py-3 text-left text-[10px] font-extrabold uppercase tracking-widest text-slate-400 bg-[#07182C] ${className || ''}`}>
+  <th className={`px-4 py-3 text-left text-[10px] font-extrabold uppercase tracking-widest text-slate-400 bg-[#08111F] ${className || ''}`}>
     {children}
   </th>
 );
@@ -203,16 +204,16 @@ const KPICard: React.FC<{
 }> = ({ label, value, sub, color = 'text-white', icon: Icon, onClick, trend }) => (
   <div
     onClick={onClick}
-    className={`p-4 rounded-2xl bg-[#0B2545]/80 border border-white/10 relative overflow-hidden group ${onClick ? 'cursor-pointer hover:border-amber-400/40 hover:bg-[#0D2A55]/80 transition-all' : ''}`}
+    className={`p-4 rounded-xl bg-[#0D1829]/90 backdrop-blur-md border border-white/[0.08] relative overflow-hidden group shadow-md hover:shadow-xl hover:border-amber-400/40 hover:bg-[#11213A] transition-all duration-200 ${onClick ? 'cursor-pointer' : ''}`}
   >
     <div className="flex items-start justify-between">
       <div className="flex-1 min-w-0">
-        <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide truncate">{label}</p>
-        <p className={`text-2xl font-extrabold mt-1 ${color}`}>{typeof value === 'number' ? value.toLocaleString('en-IN') : value}</p>
-        {sub && <p className={`text-[10px] mt-1 ${color} opacity-80 flex items-center gap-1`}>{sub}</p>}
-        {trend && <p className="text-[10px] mt-1 text-emerald-400 font-semibold">{trend}</p>}
+        <p className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider truncate">{label}</p>
+        <p className={`text-2xl font-black mt-1.5 ${color}`}>{typeof value === 'number' ? value.toLocaleString('en-IN') : value}</p>
+        {sub && <p className={`text-[10px] mt-1 ${color} opacity-80 flex items-center gap-1 font-medium`}>{sub}</p>}
+        {trend && <p className="text-[10px] mt-1 text-emerald-400 font-bold font-mono">{trend}</p>}
       </div>
-      <div className={`w-9 h-9 rounded-xl flex items-center justify-center bg-white/5 group-hover:bg-white/10 transition shrink-0 ml-2`}>
+      <div className={`w-9 h-9 rounded-lg flex items-center justify-center bg-white/[0.04] border border-white/[0.08] group-hover:bg-white/[0.08] transition shrink-0 ml-2`}>
         <Icon className={`w-4 h-4 ${color}`} />
       </div>
     </div>
@@ -243,7 +244,7 @@ const SectionHeader: React.FC<{
 // SEARCH & FILTER BAR
 // ─────────────────────────────────────────────────────────────────────────────
 const SearchBar: React.FC<{ value: string; onChange: (v: string) => void; placeholder?: string; children?: React.ReactNode }> = ({ value, onChange, placeholder, children }) => (
-  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-3 bg-[#0B2545]/60 rounded-2xl border border-white/10 mb-4">
+  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-3 bg-[#0D1829]/60 rounded-2xl border border-white/[0.08] mb-4">
     <div className="relative flex-1 min-w-0">
       <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
       <input
@@ -251,7 +252,7 @@ const SearchBar: React.FC<{ value: string; onChange: (v: string) => void; placeh
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder || 'Search...'}
-        className="w-full pl-9 pr-3 py-2 bg-[#07182C] border border-white/10 rounded-xl text-xs text-white placeholder-slate-400 focus:outline-none focus:border-amber-400"
+        className="w-full pl-9 pr-3 py-2 bg-[#08111F] border border-white/[0.08] rounded-xl text-xs text-white placeholder-slate-400 focus:outline-none focus:border-amber-400"
       />
     </div>
     {children}
@@ -277,7 +278,7 @@ const ActionBtn: React.FC<{ label: string; icon?: React.ComponentType<{ classNam
     primary: 'bg-amber-400 hover:bg-amber-300 text-[#07182C] font-extrabold shadow-lg shadow-amber-400/20',
     danger: 'bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/30',
     secondary: 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border border-emerald-500/30',
-    ghost: 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10',
+    ghost: 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/[0.08]',
   }[variant];
   return (
     <button onClick={onClick} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer ${cls}`}>
@@ -327,25 +328,54 @@ function mapToAdminApplication(app: Application): AdminApplication {
 // ─────────────────────────────────────────────────────────────────────────────
 // SIDEBAR NAV ITEMS
 // ─────────────────────────────────────────────────────────────────────────────
-const navItems: { id: AdminTab; label: string; icon: React.ComponentType<{ className?: string }>; badge?: number }[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'users', label: 'Users', icon: Users },
-  { id: 'applications', label: 'Applications', icon: FileText },
-  { id: 'approvals', label: 'Approvals', icon: Building2 },
-  { id: 'states', label: 'States & UTs', icon: Map },
-  { id: 'sectors', label: 'Sectors', icon: Layers },
-  { id: 'departments', label: 'Departments', icon: Building },
-  { id: 'documents', label: 'Documents', icon: FileCheck },
-  { id: 'rules', label: 'Approval Rules', icon: Brain },
-  { id: 'sla', label: 'SLA & Escalations', icon: Clock },
-  { id: 'queries', label: 'Queries & Grievances', icon: HelpCircle },
-  { id: 'schemes', label: 'Govt Schemes', icon: DollarSign },
-  { id: 'renewals', label: 'Renewals', icon: RefreshCw },
-  { id: 'notifications', label: 'Notifications', icon: Bell },
-  { id: 'analytics', label: 'Analytics & Reports', icon: BarChart3 },
-  { id: 'audit', label: 'Audit Logs', icon: ClipboardList },
-  { id: 'settings', label: 'Settings', icon: Settings },
+interface NavItemDef {
+  id: AdminTab;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  badge?: number;
+}
+
+interface NavSection {
+  title: string;
+  items: NavItemDef[];
+}
+
+const navSections: NavSection[] = [
+  {
+    title: 'OPERATIONS & WORKFLOW',
+    items: [
+      { id: 'dashboard', label: 'Overview', icon: LayoutDashboard },
+      { id: 'applications', label: 'Applications', icon: FileText },
+      { id: 'documents', label: 'Document Review', icon: FileCheck },
+      { id: 'queries', label: 'Queries & Grievances', icon: HelpCircle },
+      { id: 'sla', label: 'SLA & Escalations', icon: Clock },
+    ]
+  },
+  {
+    title: 'STATUTORY CATALOG',
+    items: [
+      { id: 'approvals', label: 'Approvals Master', icon: Building2 },
+      { id: 'states', label: 'States & UTs', icon: Map },
+      { id: 'sectors', label: 'Sectors', icon: Layers },
+      { id: 'departments', label: 'Departments', icon: Building },
+      { id: 'rules', label: 'Approval Rules', icon: Brain },
+      { id: 'schemes', label: 'Govt Schemes', icon: DollarSign },
+    ]
+  },
+  {
+    title: 'GOVERNANCE & SYSTEM',
+    items: [
+      { id: 'users', label: 'User Directory', icon: Users },
+      { id: 'renewals', label: 'Renewals', icon: RefreshCw },
+      { id: 'analytics', label: 'Analytics & Reports', icon: BarChart3 },
+      { id: 'audit', label: 'Audit Logs', icon: ClipboardList },
+      { id: 'notifications', label: 'Notifications', icon: Bell },
+      { id: 'settings', label: 'Settings', icon: Settings },
+    ]
+  }
 ];
+
+const navItems: NavItemDef[] = navSections.flatMap(s => s.items);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MAIN COMPONENT
@@ -932,16 +962,16 @@ export const AdminDashboard: React.FC = () => {
   // RENDER SIDEBAR
   // ─────────────────────────────────────────────────────────────────────────
   const renderSidebar = () => (
-    <aside className={`fixed lg:relative inset-y-0 left-0 z-30 lg:z-auto w-60 xl:w-64 flex flex-col bg-[#071929] border-r border-white/8 transition-transform duration-200 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+    <aside className={`fixed lg:relative inset-y-0 left-0 z-30 lg:z-auto w-64 xl:w-68 flex flex-col bg-[#091120] border-r border-white/[0.08] transition-transform duration-200 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
       {/* Brand */}
-      <div className="px-4 py-4 border-b border-white/8 flex items-center justify-between">
+      <div className="px-4 py-4 border-b border-white/[0.08] flex items-center justify-between bg-[#070D18]">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shrink-0 shadow-lg shadow-amber-500/30">
+          <div className="w-8 h-8 rounded-lg bg-amber-400 flex items-center justify-center shrink-0 shadow-md shadow-amber-400/20">
             <ShieldCheck className="w-4.5 h-4.5 text-[#07182C]" />
           </div>
           <div>
-            <p className="text-xs font-extrabold text-white tracking-wider">SWAGAT ADMIN</p>
-            <p className="text-[9px] text-amber-400 font-semibold">Governance Console</p>
+            <p className="text-xs font-black text-white tracking-widest uppercase">SWAGAT ADMIN</p>
+            <p className="text-[9px] text-amber-400 font-mono font-medium">National Gateway</p>
           </div>
         </div>
         <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-slate-400 hover:text-white p-1 cursor-pointer">
@@ -949,47 +979,61 @@ export const AdminDashboard: React.FC = () => {
         </button>
       </div>
 
-      {/* Nav Items */}
-      <nav className="flex-1 overflow-y-auto py-3 space-y-0.5 px-2 scrollbar-thin">
-        {navItems.map(item => {
-          const Icon = item.icon;
-          const active = activeTab === item.id;
-          const dynamicBadge =
-            item.id === 'sla' ? (liveKPIs.overdueApplications || 0) :
-            item.id === 'queries' ? (liveKPIs.queriesRaised || 0) :
-            item.id === 'renewals' ? (liveKPIs.upcomingRenewals || 0) :
-            item.id === 'notifications' ? notifList.filter(n => !n.read).length :
-            0;
-          return (
-            <button
-              key={item.id}
-              onClick={() => { setActiveTab(item.id); setSidebarOpen(false); }}
-              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[11px] font-semibold transition-all cursor-pointer text-left ${active ? 'bg-amber-400 text-[#07182C] font-extrabold shadow-md shadow-amber-400/25' : 'text-slate-300 hover:text-white hover:bg-white/8'}`}
-            >
-              <Icon className="w-3.5 h-3.5 shrink-0" />
-              <span className="flex-1 truncate">{item.label}</span>
-              {dynamicBadge > 0 && !active && (
-                <span className="px-1.5 py-0.5 rounded-full bg-rose-500 text-white text-[9px] font-bold shrink-0">{dynamicBadge}</span>
-              )}
-            </button>
-          );
-        })}
+      {/* Categorized Nav Items */}
+      <nav className="flex-1 overflow-y-auto py-3 px-2.5 space-y-4 scrollbar-thin">
+        {navSections.map((sec) => (
+          <div key={sec.title} className="space-y-1">
+            <p className="text-[9px] font-mono font-bold tracking-widest text-slate-500 px-2.5 uppercase">
+              {sec.title}
+            </p>
+            {sec.items.map(item => {
+              const Icon = item.icon;
+              const active = activeTab === item.id;
+              const dynamicBadge =
+                item.id === 'sla' ? (liveKPIs.overdueApplications || 0) :
+                item.id === 'queries' ? (liveKPIs.queriesRaised || 0) :
+                item.id === 'renewals' ? (liveKPIs.upcomingRenewals || 0) :
+                item.id === 'notifications' ? notifList.filter(n => !n.read).length :
+                0;
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => { setActiveTab(item.id); setSidebarOpen(false); }}
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer text-left ${
+                    active
+                      ? 'bg-amber-400 text-[#07182C] font-black shadow-md shadow-amber-400/20'
+                      : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'
+                  }`}
+                >
+                  <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-[#07182C]' : 'text-slate-400'}`} />
+                  <span className="flex-1 truncate">{item.label}</span>
+                  {dynamicBadge > 0 && !active && (
+                    <span className="px-1.5 py-0.2 rounded-full bg-rose-500 text-white text-[9px] font-mono font-bold shrink-0">
+                      {dynamicBadge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        ))}
       </nav>
 
       {/* Admin Profile Bottom */}
-      <div className="p-3 border-t border-white/8">
-        <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-white/5 mb-2">
-          <div className="w-7 h-7 rounded-lg bg-amber-400 text-[#07182C] font-extrabold text-xs flex items-center justify-center shrink-0">
+      <div className="p-3 border-t border-white/[0.08] bg-[#070D18]">
+        <div className="flex items-center gap-2.5 p-2 rounded-lg bg-white/[0.03] border border-white/[0.06] mb-2">
+          <div className="w-7 h-7 rounded-md bg-amber-400 text-[#07182C] font-black text-xs flex items-center justify-center shrink-0">
             {(userProfile?.avatarInitials || 'AD')}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-xs font-bold text-white truncate">{userProfile?.name || 'Administrator'}</p>
-            <p className="text-[9px] text-amber-400 font-semibold uppercase tracking-wide">ADMIN</p>
+            <p className="text-[9px] text-amber-400 font-mono font-semibold uppercase tracking-wider">ROLE: ADMIN</p>
           </div>
         </div>
         <button
           onClick={logout}
-          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold transition cursor-pointer border border-rose-500/20"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold transition cursor-pointer border border-rose-500/20"
         >
           <LogOut className="w-3.5 h-3.5" />
           <span>Sign Out</span>
@@ -1004,30 +1048,36 @@ export const AdminDashboard: React.FC = () => {
   const renderTopBar = () => {
     const currentNav = navItems.find(n => n.id === activeTab);
     return (
-      <header className="bg-[#0B2040]/95 backdrop-blur-md border-b border-white/8 px-4 py-3 flex items-center justify-between sticky top-0 z-20 gap-3 shrink-0">
+      <header className="bg-[#091120]/95 backdrop-blur-md border-b border-white/[0.08] px-4 py-3 flex items-center justify-between sticky top-0 z-20 gap-3 shrink-0">
         <div className="flex items-center gap-3 min-w-0">
-          <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 text-slate-400 hover:text-white rounded-xl hover:bg-white/10 transition cursor-pointer shrink-0">
+          <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-white/10 transition cursor-pointer shrink-0">
             <Menu className="w-4 h-4" />
           </button>
-          <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-400 min-w-0">
-            <span className="text-slate-500">SWAGAT ADMIN</span>
+          <div className="hidden sm:flex items-center gap-2 text-xs text-slate-400 min-w-0">
+            <span className="text-slate-500 font-mono">SWAGAT</span>
             <ChevronRight className="w-3 h-3 text-slate-600 shrink-0" />
-            <span className="font-bold text-white truncate">{currentNav?.label || 'Dashboard'}</span>
+            <span className="font-bold text-white truncate">{currentNav?.label || 'Overview'}</span>
           </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white/5 border border-white/8 text-xs text-slate-300">
-            <CalendarDays className="w-3 h-3 text-amber-400" />
+        <div className="flex items-center gap-3 shrink-0">
+          {/* Live National System Telemetry Badge */}
+          <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-mono text-emerald-400">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span>National Gateway Online</span>
+          </div>
+
+          <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-xs font-mono text-slate-300">
+            <CalendarDays className="w-3.5 h-3.5 text-amber-400" />
             <span>{now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
           </div>
-          <div className="relative">
-            <button onClick={() => setActiveTab('notifications')} className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-white/10 transition cursor-pointer relative">
-              <Bell className="w-4 h-4" />
-              <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-            </button>
-          </div>
-          <div className="px-2.5 py-1 rounded-xl border border-amber-400/40 bg-amber-400/10 text-amber-400 text-[10px] font-extrabold uppercase tracking-widest">
-            ADMIN
+
+          <button onClick={() => setActiveTab('notifications')} className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-white/[0.06] transition cursor-pointer relative">
+            <Bell className="w-4 h-4" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-400 ring-2 ring-[#091120]"></span>
+          </button>
+
+          <div className="px-2.5 py-1 rounded-md border border-amber-400/40 bg-amber-400/10 text-amber-400 text-[10px] font-mono font-bold tracking-widest uppercase">
+            ADMINISTRATOR
           </div>
         </div>
       </header>
@@ -1038,10 +1088,75 @@ export const AdminDashboard: React.FC = () => {
   // TAB: DASHBOARD OVERVIEW
   // ─────────────────────────────────────────────────────────────────────────
   const renderDashboard = () => (
-    <div className="space-y-5 animate-in fade-in duration-200">
+    <div className="space-y-6 animate-in fade-in duration-200">
+      {/* Executive LiquidChrome Command Center Hero Banner */}
+      <div className="relative overflow-hidden rounded-2xl border border-white/[0.12] bg-[#0A1220] p-6 shadow-2xl">
+        <div className="absolute inset-0 z-0 opacity-40 pointer-events-auto">
+          <LiquidChrome
+            baseColor={[0.07, 0.12, 0.22]}
+            speed={0.16}
+            amplitude={0.32}
+            interactive={true}
+          />
+        </div>
+        <div className="absolute inset-0 z-[1] bg-gradient-to-r from-[#071322]/95 via-[#071322]/80 to-transparent pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="flex h-2 w-2 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-emerald-400">
+                National Governance Command Center • Live Telemetry
+              </span>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+              Single-Window Statutory Operations & Regulatory Gateways
+            </h1>
+            <p className="text-xs text-slate-300 max-w-2xl mt-1 leading-relaxed">
+              Real-time pan-India statutory approval orchestration across 36 States &amp; UTs, central ministries, and nodal regulatory authorities.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-2.5 mt-4">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/[0.06] border border-white/[0.1] text-xs font-mono text-slate-200">
+                <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                <span>36 States &amp; UTs Connected</span>
+              </div>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/[0.06] border border-white/[0.1] text-xs font-mono text-slate-200">
+                <Clock className="w-3.5 h-3.5 text-emerald-400" />
+                <span>98.6% SLA Compliance</span>
+              </div>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/[0.06] border border-white/[0.1] text-xs font-mono text-slate-200">
+                <Zap className="w-3.5 h-3.5 text-sky-400" />
+                <span>Gateway Core v2.6.0</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-row lg:flex-col gap-2.5 shrink-0">
+            <button
+              onClick={() => setActiveTab('applications')}
+              className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-[#07182C] font-extrabold text-xs rounded-xl shadow-lg shadow-amber-400/20 transition-all flex items-center gap-2 cursor-pointer"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span>Inspect Applications</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('queries')}
+              className="px-4 py-2 bg-white/[0.08] hover:bg-white/[0.15] text-white border border-white/[0.12] text-xs font-semibold rounded-xl transition-all flex items-center gap-2 cursor-pointer"
+            >
+              <HelpCircle className="w-3.5 h-3.5 text-amber-400" />
+              <span>Grievances ({liveKPIs.queriesRaised || 0})</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <SectionHeader
-        title="Admin Overview"
-        subtitle="Real-time statistics across national approval pipelines"
+        title="Pipeline Overview"
+        subtitle="Real-time statistics across national statutory pipelines"
         actions={
           <div className="flex gap-1">
             {['Today', '7 Days', '30 Days', '6 Months'].map(f => (
@@ -1070,7 +1185,7 @@ export const AdminDashboard: React.FC = () => {
       {/* Charts Row 1 - Dynamic from Database */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Applications by State */}
-        <div className="p-5 rounded-2xl bg-[#0B2545]/80 border border-white/10">
+        <div className="p-5 rounded-2xl bg-[#0D1829]/90 border border-white/[0.08]">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xs font-extrabold text-white flex items-center gap-2"><Globe className="w-4 h-4 text-emerald-400" /> Applications by State</h3>
             <span className="text-[10px] text-slate-400 font-mono">Live Aggregation</span>
@@ -1084,7 +1199,7 @@ export const AdminDashboard: React.FC = () => {
         </div>
 
         {/* Applications by Sector */}
-        <div className="p-5 rounded-2xl bg-[#0B2545]/80 border border-white/10">
+        <div className="p-5 rounded-2xl bg-[#0D1829]/90 border border-white/[0.08]">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xs font-extrabold text-white flex items-center gap-2"><Layers className="w-4 h-4 text-amber-400" /> Applications by Sector</h3>
             <span className="text-[10px] text-slate-400 font-mono">Real Proportion</span>
@@ -1101,7 +1216,7 @@ export const AdminDashboard: React.FC = () => {
       {/* Charts Row 2 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Pipeline SLA Health */}
-        <div className="p-5 rounded-2xl bg-[#0B2545]/80 border border-white/10 flex flex-col justify-between">
+        <div className="p-5 rounded-2xl bg-[#0D1829]/90 border border-white/[0.08] flex flex-col justify-between">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xs font-extrabold text-white flex items-center gap-2"><TrendingUp className="w-4 h-4 text-sky-400" /> Pipeline Processing Speed & SLA</h3>
             <span className="text-[10px] text-slate-400 font-mono">Live Tracker</span>
@@ -1126,7 +1241,7 @@ export const AdminDashboard: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="flex gap-4 mt-4 pt-3 border-t border-white/5">
+          <div className="flex gap-4 mt-4 pt-3 border-t border-white/[0.05]">
             <div className="flex items-center gap-1.5">
               <div className="w-2.5 h-2.5 rounded-sm bg-emerald-500" />
               <span className="text-[11px] text-slate-400">On Track</span>
@@ -1139,14 +1254,14 @@ export const AdminDashboard: React.FC = () => {
         </div>
 
         {/* Status Distribution - Computed Dynamically */}
-        <div className="p-5 rounded-2xl bg-[#0B2545]/80 border border-white/10">
+        <div className="p-5 rounded-2xl bg-[#0D1829]/90 border border-white/[0.08]">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xs font-extrabold text-white flex items-center gap-2"><BarChart3 className="w-4 h-4 text-purple-400" /> Application Status Distribution</h3>
             <span className="text-[10px] text-slate-400 font-mono">Live Split</span>
           </div>
           <div className="grid grid-cols-2 gap-2">
             {dynamicStatusData.map(item => (
-              <div key={item.label} className="p-3 bg-[#07182C] rounded-xl border border-white/5">
+              <div key={item.label} className="p-3 bg-[#08111F] rounded-xl border border-white/[0.05]">
                 <p className="text-[10px] text-slate-400 font-semibold">{item.label}</p>
                 <div className="flex items-baseline justify-between mt-0.5">
                   <p className={`text-lg font-bold ${item.color.replace('bg-', 'text-')}`}>{item.pct}%</p>
@@ -1161,14 +1276,14 @@ export const AdminDashboard: React.FC = () => {
 
           {/* SLA & Avg Processing */}
           <div className="mt-3 space-y-2">
-            <div className="flex items-center justify-between p-3 bg-[#07182C] rounded-xl border border-white/5">
+            <div className="flex items-center justify-between p-3 bg-[#08111F] rounded-xl border border-white/[0.05]">
               <div>
                 <p className="text-xs font-bold text-white">Avg Processing Time</p>
                 <p className="text-[10px] text-slate-400">Target: 30 days statutory</p>
               </div>
               <span className="text-sm font-extrabold text-emerald-400">{liveKPIs.avgProcessingDays} Days</span>
             </div>
-            <div className="flex items-center justify-between p-3 bg-[#07182C] rounded-xl border border-white/5">
+            <div className="flex items-center justify-between p-3 bg-[#08111F] rounded-xl border border-white/[0.05]">
               <div>
                 <p className="text-xs font-bold text-white">SLA Compliance Rate</p>
                 <p className="text-[10px] text-slate-400">Across all departments</p>
@@ -1180,8 +1295,8 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Recent Applications */}
-      <div className="rounded-2xl bg-[#0B2545]/80 border border-white/10 overflow-hidden">
-        <div className="px-5 py-3 border-b border-white/10 flex items-center justify-between">
+      <div className="rounded-2xl bg-[#0D1829]/90 border border-white/[0.08] overflow-hidden">
+        <div className="px-5 py-3 border-b border-white/[0.08] flex items-center justify-between">
           <h3 className="text-xs font-extrabold text-white">Recent Applications</h3>
           <button onClick={() => setActiveTab('applications')} className="text-[10px] text-amber-400 font-bold hover:text-amber-300 transition cursor-pointer flex items-center gap-1">View All <ArrowRight className="w-3 h-3" /></button>
         </div>
@@ -1229,14 +1344,14 @@ export const AdminDashboard: React.FC = () => {
       />
       <SearchBar value={userSearch} onChange={setUserSearch} placeholder="Search by name or email...">
         <select value={userRoleFilter} onChange={e => setUserRoleFilter(e.target.value as any)}
-          className="px-3 py-2 bg-[#07182C] border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
+          className="px-3 py-2 bg-[#08111F] border border-white/[0.08] rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
           <option value="All">All Roles</option>
           <option value="USER">USER Only</option>
           <option value="ADMIN">ADMIN Only</option>
         </select>
       </SearchBar>
 
-      <div className="rounded-2xl bg-[#0B2545]/80 border border-white/10 overflow-hidden">
+      <div className="rounded-2xl bg-[#0D1829]/90 border border-white/[0.08] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
@@ -1274,7 +1389,7 @@ export const AdminDashboard: React.FC = () => {
                     <TD><Badge label={u.role} className={u.role === 'ADMIN' ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'} /></TD>
                     <TD><span className="text-slate-400 text-xs">{new Date(u.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span></TD>
                     <TD>
-                      <span className="px-2 py-0.5 rounded-md bg-[#07182C] border border-white/10 text-amber-400 font-bold text-xs">
+                      <span className="px-2 py-0.5 rounded-md bg-[#08111F] border border-white/[0.08] text-amber-400 font-bold text-xs">
                         {userApps.length} {userApps.length === 1 ? 'Application' : 'Applications'}
                       </span>
                     </TD>
@@ -1302,7 +1417,7 @@ export const AdminDashboard: React.FC = () => {
           );
           return (
             <div className="space-y-4 text-xs">
-              <div className="flex items-center gap-3 p-3 bg-[#07182C] rounded-xl border border-white/10">
+              <div className="flex items-center gap-3 p-3 bg-[#08111F] rounded-xl border border-white/[0.08]">
                 <div className={`w-12 h-12 rounded-2xl font-extrabold text-lg flex items-center justify-center ${selectedUser.role === 'ADMIN' ? 'bg-amber-400 text-[#07182C]' : 'bg-emerald-700 text-white'}`}>{selectedUser.name.slice(0, 2).toUpperCase()}</div>
                 <div>
                   <p className="font-extrabold text-white text-sm">{selectedUser.name}</p>
@@ -1319,7 +1434,7 @@ export const AdminDashboard: React.FC = () => {
                   { l: 'Registration Date', v: new Date(selectedUser.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) },
                   { l: 'Applications Created', v: `${userApps.length} Applications` },
                 ].map(row => (
-                  <div key={row.l} className="p-2.5 bg-[#07182C] rounded-xl border border-white/5">
+                  <div key={row.l} className="p-2.5 bg-[#08111F] rounded-xl border border-white/[0.05]">
                     <p className="text-[10px] text-slate-400 font-semibold">{row.l}</p>
                     <p className="font-bold text-white mt-0.5">{row.v}</p>
                   </div>
@@ -1328,13 +1443,13 @@ export const AdminDashboard: React.FC = () => {
 
               {/* User's Applications */}
               {userApps.length > 0 && (
-                <div className="p-3 bg-[#07182C] rounded-xl border border-white/10">
+                <div className="p-3 bg-[#08111F] rounded-xl border border-white/[0.08]">
                   <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">
                     Applications Submitted by this User ({userApps.length})
                   </p>
                   <div className="space-y-1.5">
                     {userApps.map(a => (
-                      <div key={a.id} className="p-2 bg-[#0B2545]/60 rounded-lg border border-white/5 flex items-center justify-between">
+                      <div key={a.id} className="p-2 bg-[#0D1829]/60 rounded-lg border border-white/[0.05] flex items-center justify-between">
                         <div>
                           <span className="font-mono text-amber-400 font-bold text-xs">{a.trackingNumber}</span>
                           <span className="text-slate-300 text-xs ml-2">{a.state} • {a.sector}</span>
@@ -1358,7 +1473,7 @@ export const AdminDashboard: React.FC = () => {
                 </div>
               )}
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
+              <div className="flex justify-end gap-2 pt-2 border-t border-white/[0.08]">
                 <ActionBtn label="Close" onClick={() => setSelectedUser(null)} />
                 <ActionBtn label={selectedUser.status === 'Active' ? 'Deactivate Account' : 'Activate Account'} icon={selectedUser.status === 'Active' ? UserX : UserCheck} onClick={() => { handleToggleUser(selectedUser.id, selectedUser.name); setSelectedUser(null); }} variant={selectedUser.status === 'Active' ? 'danger' : 'secondary'} />
               </div>
@@ -1382,7 +1497,7 @@ export const AdminDashboard: React.FC = () => {
           <FormInput label="Mobile Number" value={adminForm.mobile} onChange={v => setAdminForm(f => ({ ...f, mobile: v }))} placeholder="+91 98200 XXXXX" />
           <FormInput label="Department / Organization" value={adminForm.dept} onChange={v => setAdminForm(f => ({ ...f, dept: v }))} placeholder="e.g. MPCB, KSPCB, DPIIT" />
           <FormInput label="Initial Password (default: admin123)" value={adminForm.password} onChange={v => setAdminForm(f => ({ ...f, password: v }))} type="password" placeholder="Leave blank for admin123" />
-          <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
+          <div className="flex justify-end gap-2 pt-2 border-t border-white/[0.08]">
             <ActionBtn label="Cancel" onClick={() => setCreateAdminOpen(false)} />
             <button type="submit" disabled={adminFormLoading} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-[#07182C] text-xs font-extrabold transition cursor-pointer disabled:opacity-60 shadow-lg shadow-amber-400/20">
               {adminFormLoading ? 'Creating...' : 'Create Admin Account'}
@@ -1404,17 +1519,17 @@ export const AdminDashboard: React.FC = () => {
         actions={<ActionBtn label="Refresh" icon={RefreshCw} onClick={reloadAll} variant="ghost" />}
       />
       <SearchBar value={appSearch} onChange={setAppSearch} placeholder="Search by applicant, tracking # or company...">
-        <select value={appStateFilter} onChange={e => setAppStateFilter(e.target.value)} className="px-3 py-2 bg-[#07182C] border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
+        <select value={appStateFilter} onChange={e => setAppStateFilter(e.target.value)} className="px-3 py-2 bg-[#08111F] border border-white/[0.08] rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
           <option value="All">All States</option>
           {[...new Set(appList.map(a => a.state))].sort().map(s => <option key={s} value={s}>{s}</option>)}
         </select>
-        <select value={appStatusFilter} onChange={e => setAppStatusFilter(e.target.value)} className="px-3 py-2 bg-[#07182C] border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
+        <select value={appStatusFilter} onChange={e => setAppStatusFilter(e.target.value)} className="px-3 py-2 bg-[#08111F] border border-white/[0.08] rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
           <option value="All">All Statuses</option>
           {['Draft', 'Submitted', 'Under Review', 'Query Raised', 'Response Submitted', 'Approved', 'Rejected'].map(s => <option key={s} value={s}>{s}</option>)}
         </select>
       </SearchBar>
 
-      <div className="rounded-2xl bg-[#0B2545]/80 border border-white/10 overflow-hidden">
+      <div className="rounded-2xl bg-[#0D1829]/90 border border-white/[0.08] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead><tr>
@@ -1460,7 +1575,7 @@ export const AdminDashboard: React.FC = () => {
           const full = fullApps.find(a => a.id === selectedApp.id);
           return (
             <div className="space-y-4 text-xs">
-              <div className="flex items-start justify-between gap-3 p-3 bg-[#07182C] rounded-xl border border-white/10">
+              <div className="flex items-start justify-between gap-3 p-3 bg-[#08111F] rounded-xl border border-white/[0.08]">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-mono text-amber-400 font-extrabold text-sm">{selectedApp.trackingNumber}</span>
@@ -1476,7 +1591,7 @@ export const AdminDashboard: React.FC = () => {
               </div>
 
               {/* ── 1. APPLICANT DETAILS ── */}
-              <div className="p-3 bg-[#07182C] rounded-xl border border-emerald-700/30">
+              <div className="p-3 bg-[#08111F] rounded-xl border border-emerald-700/30">
                 <p className="text-[11px] font-extrabold text-emerald-400 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
                   <Users className="w-3.5 h-3.5" /> 1. Applicant Details
                 </p>
@@ -1488,7 +1603,7 @@ export const AdminDashboard: React.FC = () => {
                     { l: 'Company', v: selectedApp.companyName },
                     { l: 'Business Type', v: full?.businessType || selectedApp.sector || 'Private Limited Company' },
                   ].map(r => (
-                    <div key={r.l} className="p-2 bg-[#0B2545]/60 rounded-xl border border-white/5">
+                    <div key={r.l} className="p-2 bg-[#0D1829]/60 rounded-xl border border-white/[0.05]">
                       <p className="text-[10px] text-slate-400 font-semibold">{r.l}</p>
                       <p className="font-bold text-white mt-0.5 truncate text-[11px]">{r.v}</p>
                     </div>
@@ -1497,7 +1612,7 @@ export const AdminDashboard: React.FC = () => {
               </div>
 
               {/* ── 2. PROJECT DETAILS ── */}
-              <div className="p-3 bg-[#07182C] rounded-xl border border-sky-700/30">
+              <div className="p-3 bg-[#08111F] rounded-xl border border-sky-700/30">
                 <p className="text-[11px] font-extrabold text-sky-400 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
                   <Building2 className="w-3.5 h-3.5" /> 2. Project Details
                 </p>
@@ -1510,7 +1625,7 @@ export const AdminDashboard: React.FC = () => {
                     { l: 'Project Type', v: full?.projectCategory || 'Greenfield Manufacturing' },
                     { l: 'Business Description', v: full?.businessActivity || 'Advanced high-precision electronic manufacturing facility' },
                   ].map(r => (
-                    <div key={r.l} className="p-2 bg-[#0B2545]/60 rounded-xl border border-white/5">
+                    <div key={r.l} className="p-2 bg-[#0D1829]/60 rounded-xl border border-white/[0.05]">
                       <p className="text-[10px] text-slate-400 font-semibold">{r.l}</p>
                       <p className="font-bold text-white mt-0.5 text-[11px] leading-snug">{r.v}</p>
                     </div>
@@ -1519,7 +1634,7 @@ export const AdminDashboard: React.FC = () => {
               </div>
 
               {/* ── 3. SELECTED APPROVALS ── */}
-              <div className="p-3 bg-[#07182C] rounded-xl border border-blue-500/20">
+              <div className="p-3 bg-[#08111F] rounded-xl border border-blue-500/20">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-[11px] font-extrabold text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
                     <ShieldCheck className="w-3.5 h-3.5" /> 3. Selected Approvals ({full?.approvalsList?.length || 1})
@@ -1538,7 +1653,7 @@ export const AdminDashboard: React.FC = () => {
                       lastUpdated: selectedApp.lastUpdated,
                     }
                   ]).map((appr) => (
-                    <div key={appr.id} className="p-2.5 bg-[#0B2545]/60 rounded-xl border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div key={appr.id} className="p-2.5 bg-[#0D1829]/60 rounded-xl border border-white/[0.05] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="text-white font-bold text-[11px]">{appr.approvalName}</span>
@@ -1553,7 +1668,7 @@ export const AdminDashboard: React.FC = () => {
                         <select
                           value={appr.status}
                           onChange={(e) => handleUpdateApproval(selectedApp.id, appr.id, e.target.value as ApprovalItemStatus, `Scrutiny officer set status to ${e.target.value}`)}
-                          className="text-[10px] bg-[#07182C] border border-white/15 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-amber-400"
+                          className="text-[10px] bg-[#08111F] border border-white/15 rounded-lg px-2 py-1 text-slate-200 focus:outline-none focus:border-amber-400"
                         >
                           <option value="Pending">Pending</option>
                           <option value="Under Review">Under Review</option>
@@ -1568,7 +1683,7 @@ export const AdminDashboard: React.FC = () => {
               </div>
 
               {/* ── 4. DOCUMENTS ── */}
-              <div className="p-3 bg-[#07182C] rounded-xl border border-white/10">
+              <div className="p-3 bg-[#08111F] rounded-xl border border-white/[0.08]">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-[11px] font-extrabold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
                     <FileText className="w-3.5 h-3.5" /> 4. Documents ({full?.documentsList?.length || 0})
@@ -1577,7 +1692,7 @@ export const AdminDashboard: React.FC = () => {
                 </div>
                 <div className="space-y-2">
                   {(full?.documentsList || []).map((doc) => (
-                    <div key={doc.id} className="p-2.5 bg-[#0B2545]/60 rounded-xl border border-white/5 space-y-1.5">
+                    <div key={doc.id} className="p-2.5 bg-[#0D1829]/60 rounded-xl border border-white/[0.05] space-y-1.5">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
                           <div className="flex items-center gap-2">
@@ -1610,7 +1725,7 @@ export const AdminDashboard: React.FC = () => {
                       </div>
 
                       {doc.adminRemark && (
-                        <div className="ml-5 p-1.5 rounded bg-[#07182C]/80 border border-white/5 text-[10px] text-slate-300">
+                        <div className="ml-5 p-1.5 rounded bg-[#08111F]/80 border border-white/[0.05] text-[10px] text-slate-300">
                           <span className="text-slate-500 font-semibold">Admin Remark: </span>{doc.adminRemark}
                         </div>
                       )}
@@ -1645,13 +1760,13 @@ export const AdminDashboard: React.FC = () => {
 
               {/* ── 5. QUERIES ── */}
               {full && full.queries && full.queries.length > 0 && (
-                <div className="p-3 bg-[#07182C] rounded-xl border border-amber-700/30">
+                <div className="p-3 bg-[#08111F] rounded-xl border border-amber-700/30">
                   <p className="text-[11px] font-extrabold text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                     <MessageSquare className="w-3.5 h-3.5" /> 5. Queries ({full.queries.length})
                   </p>
                   <div className="space-y-2.5">
                     {full.queries.map(q => (
-                      <div key={q.id} className="p-3 bg-[#0B2545]/60 rounded-xl border border-white/5 space-y-2">
+                      <div key={q.id} className="p-3 bg-[#0D1829]/60 rounded-xl border border-white/[0.05] space-y-2">
                         <div className="flex items-start justify-between gap-2">
                           <div>
                             <p className="text-white font-semibold text-[11px] leading-relaxed">"{q.message}"</p>
@@ -1687,7 +1802,7 @@ export const AdminDashboard: React.FC = () => {
               )}
 
               {/* ── 6. ACTIVITY TIMELINE ── */}
-              <div className="p-3 bg-[#07182C] rounded-xl border border-white/5">
+              <div className="p-3 bg-[#08111F] rounded-xl border border-white/[0.05]">
                 <p className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
                   <Clock className="w-3.5 h-3.5" /> 6. Activity Timeline
                 </p>
@@ -1697,7 +1812,7 @@ export const AdminDashboard: React.FC = () => {
                       <div className="flex flex-col items-center gap-1 min-w-[70px]">
                         <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${step.done && !step.current ? 'bg-emerald-500 border-emerald-500' : step.current ? 'bg-amber-400 border-amber-400 ring-2 ring-amber-400/30' : 'border-slate-600 bg-transparent'}`}>
                           {step.done && !step.current && <CheckCircle className="w-3 h-3 text-white" />}
-                          {step.current && <div className="w-2 h-2 rounded-full bg-[#07182C]" />}
+                          {step.current && <div className="w-2 h-2 rounded-full bg-[#08111F]" />}
                         </div>
                         <p className="text-[9px] text-center text-slate-300 font-medium leading-tight max-w-[65px]">{step.label}</p>
                         {step.date && <p className="text-[8px] text-slate-500 text-center">{step.date}</p>}
@@ -1709,7 +1824,7 @@ export const AdminDashboard: React.FC = () => {
               </div>
 
               {/* Status Change Controls */}
-              <div className="p-3 bg-[#07182C] rounded-xl border border-white/5">
+              <div className="p-3 bg-[#08111F] rounded-xl border border-white/[0.05]">
                 <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">Change Overall Application Status</p>
                 <div className="flex flex-wrap gap-1.5">
                   {(['Under Review', 'Query Raised', 'Approved', 'Rejected'] as AppStatusAdmin[]).map(s => (
@@ -1722,7 +1837,7 @@ export const AdminDashboard: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex justify-between gap-2 flex-wrap pt-2 border-t border-white/10">
+              <div className="flex justify-between gap-2 flex-wrap pt-2 border-t border-white/[0.08]">
                 <ActionBtn label="Raise Query to Applicant" icon={MessageSquare} onClick={() => setQueryModalOpen(true)} variant="primary" />
                 <ActionBtn label="Close" onClick={() => { setSelectedApp(null); setSelectedAppFull(null); }} />
               </div>
@@ -1746,7 +1861,7 @@ export const AdminDashboard: React.FC = () => {
             rows={4}
             placeholder="Describe the information or document you require from the applicant..."
           />
-          <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
+          <div className="flex justify-end gap-2 pt-2 border-t border-white/[0.08]">
             <ActionBtn label="Cancel" onClick={() => { setQueryModalOpen(false); setQueryText(''); }} />
             <button type="submit" disabled={!queryText.trim()}
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-[#07182C] text-xs font-extrabold transition cursor-pointer disabled:opacity-50 shadow-lg shadow-amber-400/20">
@@ -1770,7 +1885,7 @@ export const AdminDashboard: React.FC = () => {
       />
       <SearchBar value={approvalSearch} onChange={setApprovalSearch} placeholder="Search approvals by name, sector or department..." />
 
-      <div className="rounded-2xl bg-[#0B2545]/80 border border-white/10 overflow-hidden">
+      <div className="rounded-2xl bg-[#0D1829]/90 border border-white/[0.08] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead><tr><TH>Approval Name</TH><TH>Type</TH><TH>Sector</TH><TH>Department</TH><TH>Processing</TH><TH>Fee</TH><TH>Apps</TH><TH>Status</TH><TH className="text-right">Actions</TH></tr></thead>
@@ -1816,7 +1931,7 @@ export const AdminDashboard: React.FC = () => {
           <FormInput label="Statutory Fee" value={newApproval.statutoryFee} onChange={v => setNewApproval(f => ({ ...f, statutoryFee: v }))} placeholder="e.g. ₹5,000 – ₹50,000" />
           <FormTextarea label="Description" value={newApproval.description} onChange={v => setNewApproval(f => ({ ...f, description: v }))} placeholder="Brief description of this approval..." />
           <FormInput label="Application URL" value={newApproval.applicationUrl} onChange={v => setNewApproval(f => ({ ...f, applicationUrl: v }))} placeholder="https://..." type="url" />
-          <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
+          <div className="flex justify-end gap-2 pt-2 border-t border-white/[0.08]">
             <ActionBtn label="Cancel" onClick={() => setApprovalModal(false)} />
             <button type="submit" className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-[#07182C] text-xs font-extrabold transition cursor-pointer shadow-lg shadow-amber-400/20">
               <Plus className="w-3.5 h-3.5" /> Add Approval
@@ -1845,14 +1960,14 @@ export const AdminDashboard: React.FC = () => {
                 { l: 'Renewal Required', v: selectedApproval.renewalRequired ? `Yes — Every ${selectedApproval.renewalPeriodYears}yr` : 'No' },
                 { l: 'Statutory Fee', v: selectedApproval.statutoryFee || '—' },
               ].map(r => (
-                <div key={r.l} className="p-2.5 bg-[#07182C] rounded-xl border border-white/5">
+                <div key={r.l} className="p-2.5 bg-[#08111F] rounded-xl border border-white/[0.05]">
                   <p className="text-[10px] text-slate-400">{r.l}</p>
                   <p className="font-bold text-white mt-0.5">{String(r.v)}</p>
                 </div>
               ))}
             </div>
             {selectedApproval.requiredDocuments.length > 0 && (
-              <div className="p-3 bg-[#07182C] rounded-xl border border-white/5">
+              <div className="p-3 bg-[#08111F] rounded-xl border border-white/[0.05]">
                 <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">Required Documents</p>
                 <ul className="space-y-1">
                   {selectedApproval.requiredDocuments.map(d => <li key={d} className="flex items-start gap-1.5 text-slate-300"><span className="text-amber-400 mt-0.5">•</span>{d}</li>)}
@@ -1879,7 +1994,7 @@ export const AdminDashboard: React.FC = () => {
         <div className="flex gap-1">
           {(['All', 'State', 'UT'] as const).map(f => (
             <button key={f} onClick={() => setStateTypeFilter(f)}
-              className={`px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${stateTypeFilter === f ? 'bg-amber-400 text-[#07182C]' : 'bg-[#07182C] border border-white/10 text-slate-400 hover:text-white'}`}>
+              className={`px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${stateTypeFilter === f ? 'bg-amber-400 text-[#07182C]' : 'bg-[#08111F] border border-white/[0.08] text-slate-400 hover:text-white'}`}>
               {f === 'All' ? 'All (36)' : f === 'State' ? 'States (28)' : 'UTs (8)'}
             </button>
           ))}
@@ -1887,7 +2002,7 @@ export const AdminDashboard: React.FC = () => {
       </SearchBar>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5">
         {filteredStates.map(s => (
-          <div key={s.code} className="p-3 rounded-xl bg-[#0B2545]/80 border border-white/10 hover:border-amber-400/40 hover:bg-[#0D2A55]/80 transition cursor-pointer group">
+          <div key={s.code} className="p-3 rounded-xl bg-[#0D1829]/90 border border-white/[0.08] hover:border-amber-400/40 hover:bg-[#0D2A55]/80 transition cursor-pointer group">
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest">{s.code}</span>
               <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded ${s.type === 'State' ? 'bg-emerald-900/60 text-emerald-400' : 'bg-amber-900/60 text-amber-400'}`}>{s.type}</span>
@@ -1915,7 +2030,7 @@ export const AdminDashboard: React.FC = () => {
       <SearchBar value={sectorSearch} onChange={setSectorSearch} placeholder="Search sectors..." />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {filteredSectors.map(s => (
-          <div key={s.id} className={`p-4 rounded-2xl border ${s.status === 'Active' ? 'bg-[#0B2545]/80 border-white/10 hover:border-amber-400/30' : 'bg-[#07182C]/60 border-white/5 opacity-60'} transition`}>
+          <div key={s.id} className={`p-4 rounded-2xl border ${s.status === 'Active' ? 'bg-[#0D1829]/90 border-white/[0.08] hover:border-amber-400/30' : 'bg-[#08111F]/60 border-white/[0.05] opacity-60'} transition`}>
             <div className="flex items-start justify-between mb-2">
               <div className="flex items-center gap-2">
                 <span className="text-2xl">{s.icon}</span>
@@ -1927,15 +2042,15 @@ export const AdminDashboard: React.FC = () => {
             </div>
             <p className="text-[11px] text-slate-400 leading-relaxed mb-3">{s.description}</p>
             <div className="grid grid-cols-3 gap-1.5 mb-3">
-              <div className="p-2 bg-[#07182C] rounded-lg text-center">
+              <div className="p-2 bg-[#08111F] rounded-lg text-center">
                 <p className="text-xs font-extrabold text-amber-400">{s.approvalsCount}</p>
                 <p className="text-[9px] text-slate-500">Approvals</p>
               </div>
-              <div className="p-2 bg-[#07182C] rounded-lg text-center">
+              <div className="p-2 bg-[#08111F] rounded-lg text-center">
                 <p className="text-xs font-extrabold text-sky-400">{s.activeApplications}</p>
                 <p className="text-[9px] text-slate-500">Active</p>
               </div>
-              <div className="p-2 bg-[#07182C] rounded-lg text-center">
+              <div className="p-2 bg-[#08111F] rounded-lg text-center">
                 <p className="text-xs font-extrabold text-emerald-400">{s.avgProcessingDays}d</p>
                 <p className="text-[9px] text-slate-500">Avg SLA</p>
               </div>
@@ -1952,7 +2067,7 @@ export const AdminDashboard: React.FC = () => {
           <FormInput label="Sector Name" value={newSector.name} onChange={v => setNewSector(f => ({ ...f, name: v }))} placeholder="e.g. Defence & Aerospace" required />
           <FormInput label="Emoji Icon" value={newSector.icon} onChange={v => setNewSector(f => ({ ...f, icon: v }))} placeholder="e.g. 🚀" />
           <FormTextarea label="Description" value={newSector.description} onChange={v => setNewSector(f => ({ ...f, description: v }))} placeholder="Brief sector description..." />
-          <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
+          <div className="flex justify-end gap-2 pt-2 border-t border-white/[0.08]">
             <ActionBtn label="Cancel" onClick={() => setSectorModal(false)} />
             <button type="submit" className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-[#07182C] text-xs font-extrabold transition cursor-pointer">Add Sector</button>
           </div>
@@ -1972,7 +2087,7 @@ export const AdminDashboard: React.FC = () => {
         actions={<ActionBtn label="Add Department" icon={Plus} onClick={() => setDeptModal(true)} variant="primary" />}
       />
       <SearchBar value={deptSearch} onChange={setDeptSearch} placeholder="Search departments..." />
-      <div className="rounded-2xl bg-[#0B2545]/80 border border-white/10 overflow-hidden">
+      <div className="rounded-2xl bg-[#0D1829]/90 border border-white/[0.08] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead><tr><TH>Department</TH><TH>Ministry</TH><TH>Level</TH><TH>Approvals</TH><TH>Active Apps</TH><TH>SLA %</TH><TH>Status</TH><TH className="text-right">Actions</TH></tr></thead>
@@ -2021,7 +2136,7 @@ export const AdminDashboard: React.FC = () => {
           </div>
           <FormInput label="Contact Email" value={newDept.contactEmail} onChange={v => setNewDept(f => ({ ...f, contactEmail: v }))} type="email" placeholder="helpdesk@dept.gov.in" />
           <FormInput label="Helpline Number" value={newDept.helpline} onChange={v => setNewDept(f => ({ ...f, helpline: v }))} placeholder="1800-XXX-XXXX" />
-          <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
+          <div className="flex justify-end gap-2 pt-2 border-t border-white/[0.08]">
             <ActionBtn label="Cancel" onClick={() => setDeptModal(false)} />
             <button type="submit" className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-[#07182C] text-xs font-extrabold transition cursor-pointer">Add Department</button>
           </div>
@@ -2047,7 +2162,7 @@ export const AdminDashboard: React.FC = () => {
           subtitle={`${docQueue.length} user-submitted documents requiring statutory scrutiny`}
           actions={
             <div className="flex items-center gap-2">
-              <div className="flex p-1 bg-[#0B2545] rounded-xl border border-white/10">
+              <div className="flex p-1 bg-[#0D1829] rounded-xl border border-white/[0.08]">
                 <button
                   type="button"
                   onClick={() => setDocViewTab('queue')}
@@ -2079,14 +2194,14 @@ export const AdminDashboard: React.FC = () => {
             {/* Real KPI Cards for Documents */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
               {[
-                { label: 'Total Docs', count: docQueue.length, color: 'text-white', bg: 'bg-[#0B2545]/80' },
+                { label: 'Total Docs', count: docQueue.length, color: 'text-white', bg: 'bg-[#0D1829]/90' },
                 { label: 'Pending', count: pendingCount, color: 'text-amber-400', bg: 'bg-amber-950/30' },
                 { label: 'Under Review', count: underReviewCount, color: 'text-sky-400', bg: 'bg-sky-950/30' },
                 { label: 'Approved', count: approvedCount, color: 'text-emerald-400', bg: 'bg-emerald-950/30' },
                 { label: 'Correction', count: correctionCount, color: 'text-amber-300', bg: 'bg-amber-900/30' },
                 { label: 'Rejected', count: rejectedCount, color: 'text-rose-400', bg: 'bg-rose-950/30' },
               ].map(item => (
-                <div key={item.label} className={`p-3 rounded-xl border border-white/10 ${item.bg}`}>
+                <div key={item.label} className={`p-3 rounded-xl border border-white/[0.08] ${item.bg}`}>
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{item.label}</p>
                   <p className={`text-xl font-extrabold mt-0.5 ${item.color}`}>{item.count}</p>
                 </div>
@@ -2098,7 +2213,7 @@ export const AdminDashboard: React.FC = () => {
               <select
                 value={docFilterStatus}
                 onChange={e => setDocFilterStatus(e.target.value)}
-                className="px-3 py-2 bg-[#07182C] border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-amber-400"
+                className="px-3 py-2 bg-[#08111F] border border-white/[0.08] rounded-xl text-xs text-white focus:outline-none focus:border-amber-400"
               >
                 <option value="All">All Statuses ({docQueue.length})</option>
                 <option value="Pending">Pending ({pendingCount})</option>
@@ -2110,7 +2225,7 @@ export const AdminDashboard: React.FC = () => {
             </SearchBar>
 
             {/* Real Document Review Table */}
-            <div className="rounded-2xl bg-[#0B2545]/80 border border-white/10 overflow-hidden">
+            <div className="rounded-2xl bg-[#0D1829]/90 border border-white/[0.08] overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
                   <thead>
@@ -2155,7 +2270,7 @@ export const AdminDashboard: React.FC = () => {
                                 href={doc.fileUrl}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-amber-400 text-[10px] font-semibold border border-white/10"
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-amber-400 text-[10px] font-semibold border border-white/[0.08]"
                               >
                                 <Eye className="w-3 h-3" /> View
                               </a>
@@ -2174,7 +2289,7 @@ export const AdminDashboard: React.FC = () => {
                                 doc.verificationStatus === 'Correction Required' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' :
                                 doc.verificationStatus === 'Rejected' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
                                 doc.verificationStatus === 'Under Review' ? 'bg-sky-500/20 text-sky-400 border border-sky-500/30' :
-                                'bg-slate-800 text-slate-400 border border-white/10'
+                                'bg-slate-800 text-slate-400 border border-white/[0.08]'
                               }
                             />
                           </TD>
@@ -2222,7 +2337,7 @@ export const AdminDashboard: React.FC = () => {
         ) : (
           <>
             <SearchBar value={docSearch} onChange={setDocSearch} placeholder="Search document types..." />
-            <div className="rounded-2xl bg-[#0B2545]/80 border border-white/10 overflow-hidden">
+            <div className="rounded-2xl bg-[#0D1829]/90 border border-white/[0.08] overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
                   <thead><tr><TH>Document Name</TH><TH>Category</TH><TH>Required?</TH><TH>Validity</TH><TH>Formats</TH><TH>Max Size</TH><TH>Submissions</TH><TH className="text-right">Status</TH></tr></thead>
@@ -2258,7 +2373,7 @@ export const AdminDashboard: React.FC = () => {
               <FormInput label="Validity (months, 0=permanent)" value={newDoc.validityPeriodMonths} onChange={v => setNewDoc(f => ({ ...f, validityPeriodMonths: v }))} type="number" placeholder="0" />
             </div>
             <FormInput label="Max File Size (MB)" value={newDoc.maxSizeMB} onChange={v => setNewDoc(f => ({ ...f, maxSizeMB: v }))} type="number" placeholder="10" />
-            <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
+            <div className="flex justify-end gap-2 pt-2 border-t border-white/[0.08]">
               <ActionBtn label="Cancel" onClick={() => setDocModal(false)} />
               <button type="submit" className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-[#07182C] text-xs font-extrabold transition cursor-pointer">Add Document Type</button>
             </div>
@@ -2279,7 +2394,7 @@ export const AdminDashboard: React.FC = () => {
       />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {ruleList.map(rule => (
-          <div key={rule.id} className={`p-4 rounded-2xl border ${rule.status === 'Active' ? 'bg-[#0B2545]/80 border-white/10' : 'bg-[#07182C]/60 border-white/5 opacity-60'} transition`}>
+          <div key={rule.id} className={`p-4 rounded-2xl border ${rule.status === 'Active' ? 'bg-[#0D1829]/90 border-white/[0.08]' : 'bg-[#08111F]/60 border-white/[0.05] opacity-60'} transition`}>
             <div className="flex items-start justify-between mb-2.5">
               <div className="flex-1 min-w-0">
                 <p className="font-extrabold text-white text-sm">{rule.name}</p>
@@ -2289,7 +2404,7 @@ export const AdminDashboard: React.FC = () => {
             </div>
 
             {/* Conditions */}
-            <div className="p-2.5 bg-[#07182C] rounded-xl border border-white/5 mb-2.5">
+            <div className="p-2.5 bg-[#08111F] rounded-xl border border-white/[0.05] mb-2.5">
               <p className="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest mb-1.5">IF Conditions</p>
               <div className="space-y-1">
                 {rule.conditions.map((c, i) => (
@@ -2302,7 +2417,7 @@ export const AdminDashboard: React.FC = () => {
             </div>
 
             {/* Recommendations */}
-            <div className="p-2.5 bg-[#07182C] rounded-xl border border-white/5 mb-2.5">
+            <div className="p-2.5 bg-[#08111F] rounded-xl border border-white/[0.05] mb-2.5">
               <p className="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest mb-1.5">THEN Recommend</p>
               <div className="flex flex-wrap gap-1">
                 {rule.thenRecommend.map(r => <span key={r} className="px-2 py-0.5 rounded-lg bg-blue-900/50 text-blue-300 border border-blue-700/30 text-[9px] font-semibold">{r}</span>)}
@@ -2311,7 +2426,7 @@ export const AdminDashboard: React.FC = () => {
 
             {/* Dependencies */}
             {rule.dependencies.length > 0 && (
-              <div className="p-2.5 bg-[#07182C] rounded-xl border border-white/5 mb-2.5">
+              <div className="p-2.5 bg-[#08111F] rounded-xl border border-white/[0.05] mb-2.5">
                 <p className="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest mb-1.5">Dependency Chain</p>
                 <div className="space-y-1">
                   {rule.dependencies.map((d, i) => (
@@ -2355,7 +2470,7 @@ export const AdminDashboard: React.FC = () => {
           { label: 'Due Today', count: slaList.filter(s => s.slaStatus === 'Due Today').length, color: 'text-orange-400', icon: AlertCircle },
           { label: 'Overdue', count: slaList.filter(s => s.slaStatus === 'Overdue').length, color: 'text-rose-400', icon: AlertTriangle },
         ] as const).map(c => (
-          <div key={c.label} className="p-4 rounded-2xl bg-[#0B2545]/80 border border-white/10">
+          <div key={c.label} className="p-4 rounded-2xl bg-[#0D1829]/90 border border-white/[0.08]">
             <div className="flex items-center gap-2 mb-1">
               <c.icon className={`w-4 h-4 ${c.color}`} />
               <span className="text-[11px] font-semibold text-slate-400">{c.label}</span>
@@ -2375,7 +2490,7 @@ export const AdminDashboard: React.FC = () => {
         ))}
       </div>
 
-      <div className="rounded-2xl bg-[#0B2545]/80 border border-white/10 overflow-hidden">
+      <div className="rounded-2xl bg-[#0D1829]/90 border border-white/[0.08] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead><tr><TH>Application</TH><TH>Applicant</TH><TH>Department</TH><TH>State</TH><TH>SLA Days</TH><TH>Remaining</TH><TH>Deadline</TH><TH>Officer</TH><TH>Status</TH><TH>Escalation</TH></tr></thead>
@@ -2411,7 +2526,7 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* SLA Escalation Workflow */}
-      <div className="p-4 rounded-2xl bg-[#0B2545]/80 border border-white/10">
+      <div className="p-4 rounded-2xl bg-[#0D1829]/90 border border-white/[0.08]">
         <p className="text-xs font-extrabold text-white uppercase tracking-wider mb-3 flex items-center gap-2"><Zap className="w-4 h-4 text-amber-400" /> Escalation Workflow</p>
         <div className="flex items-center gap-0 overflow-x-auto">
           {[
@@ -2441,17 +2556,17 @@ export const AdminDashboard: React.FC = () => {
     <div className="space-y-4 animate-in fade-in duration-200">
       <SectionHeader title="Queries & Grievances" subtitle={`${queryList.filter(q => q.status !== 'Resolved').length} open queries requiring attention`} />
       <SearchBar value={querySearch} onChange={setQuerySearch} placeholder="Search by query number or applicant...">
-        <select value={queryStatusFilter} onChange={e => setQueryStatusFilter(e.target.value)} className="px-3 py-2 bg-[#07182C] border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
+        <select value={queryStatusFilter} onChange={e => setQueryStatusFilter(e.target.value)} className="px-3 py-2 bg-[#08111F] border border-white/[0.08] rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
           <option value="All">All Status</option>
           {['Open', 'Assigned', 'Under Review', 'Responded', 'Resolved'].map(s => <option key={s} value={s}>{s}</option>)}
         </select>
-        <select value={queryPriorityFilter} onChange={e => setQueryPriorityFilter(e.target.value)} className="px-3 py-2 bg-[#07182C] border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
+        <select value={queryPriorityFilter} onChange={e => setQueryPriorityFilter(e.target.value)} className="px-3 py-2 bg-[#08111F] border border-white/[0.08] rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
           <option value="All">All Priorities</option>
           {['Low', 'Medium', 'High', 'Urgent'].map(p => <option key={p} value={p}>{p}</option>)}
         </select>
       </SearchBar>
 
-      <div className="rounded-2xl bg-[#0B2545]/80 border border-white/10 overflow-hidden">
+      <div className="rounded-2xl bg-[#0D1829]/90 border border-white/[0.08] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead><tr><TH>Query ID</TH><TH>Applicant</TH><TH>Department</TH><TH>State</TH><TH>Raised</TH><TH>Priority</TH><TH>Status</TH><TH>Assigned</TH><TH className="text-right">Actions</TH></tr></thead>
@@ -2494,7 +2609,7 @@ export const AdminDashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-3 bg-[#07182C] rounded-xl border border-white/5">
+            <div className="p-3 bg-[#08111F] rounded-xl border border-white/[0.05]">
               <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-1.5">Query / Clarification Required</p>
               <p className="text-slate-200 leading-relaxed">{selectedQuery.queryText}</p>
             </div>
@@ -2517,7 +2632,7 @@ export const AdminDashboard: React.FC = () => {
                 { l: 'Assigned To', v: selectedQuery.assignedTo || 'Not assigned' },
                 { l: 'Escalation Level', v: `Level ${selectedQuery.escalationLevel}` },
               ].map(r => (
-                <div key={r.l} className="p-2 bg-[#07182C] rounded-xl border border-white/5">
+                <div key={r.l} className="p-2 bg-[#08111F] rounded-xl border border-white/[0.05]">
                   <p className="text-[10px] text-slate-400">{r.l}</p>
                   <p className="font-semibold text-white mt-0.5">{r.v}</p>
                 </div>
@@ -2530,7 +2645,7 @@ export const AdminDashboard: React.FC = () => {
               </div>
             )}
 
-            <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
+            <div className="flex justify-end gap-2 pt-2 border-t border-white/[0.08]">
               <ActionBtn label="Close" onClick={() => setSelectedQuery(null)} />
               {selectedQuery.status !== 'Assigned' && selectedQuery.status !== 'Resolved' && (
                 <ActionBtn label="Assign to Me" icon={UserCheck} onClick={() => assignQuery(selectedQuery.id)} variant="secondary" />
@@ -2559,7 +2674,7 @@ export const AdminDashboard: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         {filteredSchemes.map(s => (
-          <div key={s.id} className="p-4 rounded-2xl bg-[#0B2545]/80 border border-white/10 hover:border-amber-400/30 transition">
+          <div key={s.id} className="p-4 rounded-2xl bg-[#0D1829]/90 border border-white/[0.08] hover:border-amber-400/30 transition">
             <div className="flex items-start justify-between mb-2">
               <div className="flex-1 min-w-0">
                 <p className="font-extrabold text-white text-sm leading-tight">{s.name}</p>
@@ -2571,19 +2686,19 @@ export const AdminDashboard: React.FC = () => {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-1.5 mb-3 text-[10px]">
-              <div className="p-2 bg-[#07182C] rounded-lg">
+              <div className="p-2 bg-[#08111F] rounded-lg">
                 <p className="text-slate-500">Max Support</p>
                 <p className="font-bold text-emerald-400">{s.maxSupport}</p>
               </div>
-              <div className="p-2 bg-[#07182C] rounded-lg">
+              <div className="p-2 bg-[#08111F] rounded-lg">
                 <p className="text-slate-500">Applicants</p>
                 <p className="font-bold text-amber-400">{s.applicantsCount.toLocaleString('en-IN')}</p>
               </div>
-              <div className="p-2 bg-[#07182C] rounded-lg">
+              <div className="p-2 bg-[#08111F] rounded-lg">
                 <p className="text-slate-500">Budget</p>
                 <p className="font-bold text-sky-400">{s.budgetAllocated}</p>
               </div>
-              <div className="p-2 bg-[#07182C] rounded-lg">
+              <div className="p-2 bg-[#08111F] rounded-lg">
                 <p className="text-slate-500">Since</p>
                 <p className="font-bold text-slate-300">{s.startDate}</p>
               </div>
@@ -2606,7 +2721,7 @@ export const AdminDashboard: React.FC = () => {
           <FormTextarea label="Benefits" value={newScheme.benefits} onChange={v => setNewScheme(f => ({ ...f, benefits: v }))} placeholder="Describe the benefits of this scheme..." />
           <FormInput label="Max Financial Support" value={newScheme.maxSupport} onChange={v => setNewScheme(f => ({ ...f, maxSupport: v }))} placeholder="e.g. ₹50 Lakhs per startup" />
           <FormInput label="Application URL" value={newScheme.applicationUrl} onChange={v => setNewScheme(f => ({ ...f, applicationUrl: v }))} type="url" placeholder="https://..." />
-          <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
+          <div className="flex justify-end gap-2 pt-2 border-t border-white/[0.08]">
             <ActionBtn label="Cancel" onClick={() => setSchemeModal(false)} />
             <button type="submit" className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-[#07182C] text-xs font-extrabold transition cursor-pointer">Add Scheme</button>
           </div>
@@ -2622,7 +2737,7 @@ export const AdminDashboard: React.FC = () => {
     <div className="space-y-4 animate-in fade-in duration-200">
       <SectionHeader title="Renewal Center" subtitle={`${renewalList.filter(r => ['Due Soon', 'Expired'].includes(r.renewalStatus)).length} renewals require immediate attention`} />
       <SearchBar value={renewalSearch} onChange={setRenewalSearch} placeholder="Search renewals...">
-        <select value={renewalStatusFilter} onChange={e => setRenewalStatusFilter(e.target.value)} className="px-3 py-2 bg-[#07182C] border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
+        <select value={renewalStatusFilter} onChange={e => setRenewalStatusFilter(e.target.value)} className="px-3 py-2 bg-[#08111F] border border-white/[0.08] rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
           <option value="All">All Status</option>
           {['Upcoming', 'Due Soon', 'Expired', 'Renewed'].map(s => <option key={s} value={s}>{s}</option>)}
         </select>
@@ -2636,14 +2751,14 @@ export const AdminDashboard: React.FC = () => {
           { l: 'Expired', count: renewalList.filter(r => r.renewalStatus === 'Expired').length, color: 'text-rose-400', bg: 'bg-rose-900/20' },
           { l: 'Renewed', count: renewalList.filter(r => r.renewalStatus === 'Renewed').length, color: 'text-emerald-400', bg: 'bg-emerald-900/20' },
         ].map(c => (
-          <div key={c.l} className={`p-4 rounded-2xl ${c.bg} border border-white/10`}>
+          <div key={c.l} className={`p-4 rounded-2xl ${c.bg} border border-white/[0.08]`}>
             <p className="text-[11px] font-semibold text-slate-400">{c.l}</p>
             <p className={`text-2xl font-extrabold ${c.color} mt-1`}>{c.count}</p>
           </div>
         ))}
       </div>
 
-      <div className="rounded-2xl bg-[#0B2545]/80 border border-white/10 overflow-hidden">
+      <div className="rounded-2xl bg-[#0D1829]/90 border border-white/[0.08] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead><tr><TH>Approval</TH><TH>Applicant</TH><TH>License #</TH><TH>State</TH><TH>Dept</TH><TH>Expiry Date</TH><TH>Days Left</TH><TH>Fee</TH><TH>Status</TH></tr></thead>
@@ -2693,7 +2808,7 @@ export const AdminDashboard: React.FC = () => {
             <EmptyState message="No notifications available" sub="All statutory updates, document verifications, and query responses will appear here." icon={Bell} />
           ) : (
             notifList.map(n => (
-              <div key={n.id} className={`p-4 rounded-2xl bg-[#0B2545]/80 border ${n.read ? 'border-white/10' : 'border-amber-400/40 bg-amber-950/10'} hover:border-amber-400/20 transition`}>
+              <div key={n.id} className={`p-4 rounded-2xl bg-[#0D1829]/90 border ${n.read ? 'border-white/[0.08]' : 'border-amber-400/40 bg-amber-950/10'} hover:border-amber-400/20 transition`}>
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -2712,7 +2827,7 @@ export const AdminDashboard: React.FC = () => {
                   </div>
                 </div>
                 <p className="text-[11px] text-slate-300 leading-relaxed">{n.message}</p>
-                <div className="mt-2.5 pt-2 border-t border-white/5 flex items-center justify-between text-[10px] text-slate-500">
+                <div className="mt-2.5 pt-2 border-t border-white/[0.05] flex items-center justify-between text-[10px] text-slate-500">
                   <div className="flex items-center gap-2">
                     <span className="text-slate-500">Audience:</span>
                     <span className="text-slate-300 font-semibold">{n.role}</span>
@@ -2756,7 +2871,7 @@ export const AdminDashboard: React.FC = () => {
             ]} />
             {newNotif.target !== 'All Users' && <FormInput label="Target Value" value={newNotif.targetValue} onChange={v => setNewNotif(f => ({ ...f, targetValue: v }))} placeholder="State / Sector / Email" />}
           </div>
-          <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
+          <div className="flex justify-end gap-2 pt-2 border-t border-white/[0.08]">
             <ActionBtn label="Cancel" onClick={() => setNotifModal(false)} />
             <button type="submit" className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-[#07182C] text-xs font-extrabold transition cursor-pointer">
               <Send className="w-3.5 h-3.5" /> Send Now
@@ -2819,7 +2934,7 @@ export const AdminDashboard: React.FC = () => {
                   </button>
                 ))}
               </div>
-              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-xs font-semibold transition cursor-pointer border border-white/10">
+              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-xs font-semibold transition cursor-pointer border border-white/[0.08]">
                 <Download className="w-3.5 h-3.5" /> Export CSV
               </button>
             </div>
@@ -2833,7 +2948,7 @@ export const AdminDashboard: React.FC = () => {
             { l: 'Active In-Review', v: pendingCount.toString(), change: 'Live', color: 'text-sky-400' },
             { l: 'Rejected', v: rejectedCount.toString(), change: 'Live', color: 'text-amber-400' },
           ].map(c => (
-            <div key={c.l} className="p-4 rounded-2xl bg-[#0B2545]/80 border border-white/10">
+            <div key={c.l} className="p-4 rounded-2xl bg-[#0D1829]/90 border border-white/[0.08]">
               <p className="text-[11px] font-semibold text-slate-400">{c.l}</p>
               <p className={`text-2xl font-extrabold ${c.color} mt-1`}>{c.v}</p>
               <p className="text-[10px] font-bold mt-0.5 text-slate-400">{c.change} tracked in database</p>
@@ -2850,7 +2965,7 @@ export const AdminDashboard: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Applications by State */}
-            <div className="p-5 rounded-2xl bg-[#0B2545]/80 border border-white/10">
+            <div className="p-5 rounded-2xl bg-[#0D1829]/90 border border-white/[0.08]">
               <h3 className="text-xs font-extrabold text-white flex items-center gap-2 mb-4"><Globe className="w-4 h-4 text-emerald-400" /> Applications by State</h3>
               <div className="space-y-2">
                 {dynamicStateData.map((item, i) => (
@@ -2862,7 +2977,7 @@ export const AdminDashboard: React.FC = () => {
             </div>
 
             {/* Applications by Sector */}
-            <div className="p-5 rounded-2xl bg-[#0B2545]/80 border border-white/10">
+            <div className="p-5 rounded-2xl bg-[#0D1829]/90 border border-white/[0.08]">
               <h3 className="text-xs font-extrabold text-white flex items-center gap-2 mb-4"><Layers className="w-4 h-4 text-amber-400" /> Applications by Sector</h3>
               <div className="space-y-2">
                 {dynamicSectorData.map((item, i) => (
@@ -2873,7 +2988,7 @@ export const AdminDashboard: React.FC = () => {
             </div>
 
             {/* State Performance Table */}
-            <div className="p-5 rounded-2xl bg-[#0B2545]/80 border border-white/10">
+            <div className="p-5 rounded-2xl bg-[#0D1829]/90 border border-white/[0.08]">
               <h3 className="text-xs font-extrabold text-white flex items-center gap-2 mb-4"><BarChart3 className="w-4 h-4 text-purple-400" /> State Performance Report</h3>
               <table className="w-full text-left">
                 <thead><tr><TH>State</TH><TH>Total</TH><TH>Approved</TH><TH>Rejected</TH><TH>Avg Days</TH></tr></thead>
@@ -2892,7 +3007,7 @@ export const AdminDashboard: React.FC = () => {
             </div>
 
             {/* Status Breakdown */}
-            <div className="p-5 rounded-2xl bg-[#0B2545]/80 border border-white/10 flex flex-col justify-between">
+            <div className="p-5 rounded-2xl bg-[#0D1829]/90 border border-white/[0.08] flex flex-col justify-between">
               <h3 className="text-xs font-extrabold text-white flex items-center gap-2 mb-4"><TrendingUp className="w-4 h-4 text-sky-400" /> Current Status Distribution</h3>
               <div className="flex items-center justify-around py-8">
                 <div className="text-center">
@@ -2937,7 +3052,7 @@ export const AdminDashboard: React.FC = () => {
       <SectionHeader title="Audit Log" subtitle="Complete chronological record of all admin actions" />
       <SearchBar value={auditSearch} onChange={setAuditSearch} placeholder="Search by action, admin or module..." />
 
-      <div className="rounded-2xl bg-[#0B2545]/80 border border-white/10 overflow-hidden">
+      <div className="rounded-2xl bg-[#0D1829]/90 border border-white/[0.08] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead><tr><TH>Timestamp</TH><TH>Admin</TH><TH>Action</TH><TH>Module</TH><TH>Target</TH><TH>Result</TH><TH>IP Address</TH></tr></thead>
@@ -2968,7 +3083,7 @@ export const AdminDashboard: React.FC = () => {
       <SectionHeader title="System Settings" subtitle="SWAGAT Platform Configuration & Administration" />
 
       {/* System Status */}
-      <div className="p-5 rounded-2xl bg-[#0B2545]/80 border border-white/10">
+      <div className="p-5 rounded-2xl bg-[#0D1829]/90 border border-white/[0.08]">
         <h3 className="text-xs font-extrabold text-white flex items-center gap-2 mb-4"><Server className="w-4 h-4 text-emerald-400" /> System Status</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
@@ -2977,7 +3092,7 @@ export const AdminDashboard: React.FC = () => {
             { label: 'Approval Engine', value: 'Operational', icon: Brain, color: 'text-emerald-400' },
             { label: 'Notification Service', value: 'Operational', icon: Bell, color: 'text-emerald-400' },
           ].map(s => (
-            <div key={s.label} className="p-3 bg-[#07182C] rounded-xl border border-white/5">
+            <div key={s.label} className="p-3 bg-[#08111F] rounded-xl border border-white/[0.05]">
               <div className="flex items-center gap-2 mb-1.5">
                 <s.icon className={`w-4 h-4 ${s.color}`} />
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -2990,7 +3105,7 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Platform Settings */}
-      <div className="p-5 rounded-2xl bg-[#0B2545]/80 border border-white/10">
+      <div className="p-5 rounded-2xl bg-[#0D1829]/90 border border-white/[0.08]">
         <h3 className="text-xs font-extrabold text-white flex items-center gap-2 mb-4"><Settings className="w-4 h-4 text-amber-400" /> Platform Settings</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {[
@@ -3003,7 +3118,7 @@ export const AdminDashboard: React.FC = () => {
             { label: 'Default SLA', value: '30 Working Days' },
             { label: 'Escalation Threshold', value: '>90% SLA Elapsed' },
           ].map(s => (
-            <div key={s.label} className="flex items-center justify-between p-3 bg-[#07182C] rounded-xl border border-white/5">
+            <div key={s.label} className="flex items-center justify-between p-3 bg-[#08111F] rounded-xl border border-white/[0.05]">
               <span className="text-xs text-slate-400">{s.label}</span>
               <span className="text-xs font-bold text-white">{s.value}</span>
             </div>
@@ -3012,7 +3127,7 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Security Settings */}
-      <div className="p-5 rounded-2xl bg-[#0B2545]/80 border border-white/10">
+      <div className="p-5 rounded-2xl bg-[#0D1829]/90 border border-white/[0.08]">
         <h3 className="text-xs font-extrabold text-white flex items-center gap-2 mb-4"><Lock className="w-4 h-4 text-rose-400" /> Security Policy</h3>
         <div className="space-y-2.5">
           {[
@@ -3023,7 +3138,7 @@ export const AdminDashboard: React.FC = () => {
             { label: 'Google OAuth', value: 'Supported via Supabase (when configured)', ok: true },
             { label: 'Audit Logging', value: 'All admin actions logged with timestamp & IP', ok: true },
           ].map(s => (
-            <div key={s.label} className="flex items-center justify-between p-3 bg-[#07182C] rounded-xl border border-white/5">
+            <div key={s.label} className="flex items-center justify-between p-3 bg-[#08111F] rounded-xl border border-white/[0.05]">
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
                 <span className="text-xs text-slate-300">{s.label}</span>
@@ -3035,14 +3150,14 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Role Management */}
-      <div className="p-5 rounded-2xl bg-[#0B2545]/80 border border-white/10">
+      <div className="p-5 rounded-2xl bg-[#0D1829]/90 border border-white/[0.08]">
         <h3 className="text-xs font-extrabold text-white flex items-center gap-2 mb-4"><ShieldCheck className="w-4 h-4 text-amber-400" /> Role Management</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {[
             { role: 'USER', description: 'Business applicants, investors, entrepreneurs. Access to user dashboard, KYA, approvals, applications, documents and queries.', badge: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' },
             { role: 'ADMIN', description: 'System administrators, ministry officers. Full access to admin dashboard, user management, approval configuration, analytics and audit logs.', badge: 'bg-amber-400/20 text-amber-300 border border-amber-400/30' },
           ].map(r => (
-            <div key={r.role} className="p-4 bg-[#07182C] rounded-xl border border-white/5">
+            <div key={r.role} className="p-4 bg-[#08111F] rounded-xl border border-white/[0.05]">
               <div className="flex items-center gap-2 mb-2">
                 <Badge label={r.role} className={r.badge} />
               </div>
@@ -3090,7 +3205,7 @@ export const AdminDashboard: React.FC = () => {
   // MAIN RENDER
   // ─────────────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-[#07182C] text-slate-100 flex font-sans selection:bg-amber-400 selection:text-[#07182C]">
+    <div className="min-h-screen bg-[#070D18] text-slate-100 flex font-sans selection:bg-amber-400 selection:text-[#07182C]">
 
       {/* Sidebar Overlay (mobile) */}
       {sidebarOpen && (
@@ -3117,7 +3232,7 @@ export const AdminDashboard: React.FC = () => {
         <form onSubmit={handleDocActionSubmit} className="space-y-4">
           <div>
             <span className="text-slate-400 text-xs block mb-1">Target Document:</span>
-            <span className="text-white font-bold text-sm block bg-[#07182C] p-2.5 rounded-xl border border-white/10">
+            <span className="text-white font-bold text-sm block bg-[#08111F] p-2.5 rounded-xl border border-white/[0.08]">
               {selectedDocName}
             </span>
           </div>
@@ -3141,7 +3256,7 @@ export const AdminDashboard: React.FC = () => {
             placeholder="Specify reason or instructions for the applicant..."
           />
 
-          <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
+          <div className="flex justify-end gap-2 pt-2 border-t border-white/[0.08]">
             <ActionBtn label="Cancel" onClick={() => setDocModalOpen(false)} />
             <button
               type="submit"
