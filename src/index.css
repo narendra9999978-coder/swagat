@@ -5,12 +5,18 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
   
   body {
     background-color: #F8FAFC;
     color: #0F172A;
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 }
 
@@ -43,42 +49,54 @@
   border-image: linear-gradient(to right, #E05A10, #0B2545, #057A55) 1;
 }
 
-/* SWAGAT Sticky & Responsive Navbar Layout */
-.swagat-navbar-header {
+/* ─────────────────────────────────────────────────────────────────────────────
+   SWAGAT HEADER & NAVBAR — 3-COLUMN CSS GRID ARCHITECTURE
+   Column 1: Brand (auto, flex-shrink: 0)
+   Column 2: Primary Navigation (minmax(0, 1fr) - bounded, cannot overlap actions)
+   Column 3: Actions & Menu (auto, flex-shrink: 0)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.swagat-header {
   position: sticky;
   top: 0;
   z-index: 1000;
-}
-
-.swagat-navbar-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   width: 100%;
-  gap: clamp(8px, 1.5vw, 24px);
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
-.swagat-nav-logo {
-  flex-shrink: 0;
-  display: flex;
+.swagat-header-grid {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
+  column-gap: clamp(10px, 1.5vw, 24px);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  height: 80px;
 }
 
-.swagat-nav-links {
-  display: flex;
-  align-items: center;
-  gap: clamp(8px, 1.4vw, 20px);
-  flex: 1;
-  justify-content: center;
+.swagat-brand {
   min-width: 0;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.swagat-primary-nav {
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(6px, 1.1vw, 20px);
   white-space: nowrap;
 }
 
-.swagat-nav-right {
+.swagat-actions {
   display: flex;
   align-items: center;
+  gap: clamp(4px, 0.8vw, 10px);
   flex-shrink: 0;
-  gap: clamp(6px, 1vw, 10px);
 }
 
 /* Custom scrollbar */

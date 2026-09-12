@@ -155,12 +155,12 @@ export const HeaderNavbar: React.FC = () => {
       {/* Main Navigation Bar — Fixed & High Z-Index */}
       <header className="sticky top-0 z-[1000] swagat-navbar-header bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
         <div className="w-full px-3 sm:px-6 lg:px-8">
-          <div className="swagat-navbar-container flex items-center justify-between h-20 w-full gap-2 sm:gap-3 lg:gap-4">
+          <div className="swagat-header-grid h-20 w-full">
             
             {/* ─────────────────────────────────────────────────────────────
-                SECTION 1: SWAGAT Brand Logo (Left, flex-shrink: 0)
+                COLUMN 1: SWAGAT Brand Logo (swagat-brand)
                 ───────────────────────────────────────────────────────────── */}
-            <div className="swagat-nav-logo shrink-0 flex items-center">
+            <div className="swagat-brand">
               <button
                 id="swagat-brand-home-btn"
                 onClick={handleLogoClick}
@@ -172,13 +172,14 @@ export const HeaderNavbar: React.FC = () => {
             </div>
 
             {/* ─────────────────────────────────────────────────────────────
-                SECTION 2: Navigation Links (Center, flex: 1, dynamic clamp)
-                - >= 1400px: Shows all 7 links
-                - 1200px - 1399px: Slightly tighter spacing, secondary in More dropdown if needed
-                - 1000px - 1199px: Shows priority links (Home, Approvals, Sectors, KYA) + More ▾
-                - < 1000px: Hidden (handled by Hamburger panel)
+                COLUMN 2: Primary Navigation Links (swagat-primary-nav)
+                - Strictly bounded between Column 1 and Column 3
+                - >= 1400px: Shows all links (Home, Approvals, Sectors, KYA, State Approvals, Resources, Help)
+                - 1200px - 1399px: Shows Home, Approvals, Sectors, KYA, State Approvals; Resources & Help in More ▾
+                - 901px - 1199px: Shows Home, Approvals, Sectors, KYA; State Approvals, Resources & Help in More ▾
+                - <= 900px: Hidden (handled by Hamburger panel)
                 ───────────────────────────────────────────────────────────── */}
-            <nav className="swagat-nav-links hidden min-[1000px]:flex items-center justify-center flex-1 min-w-0 font-medium text-xs min-[1400px]:text-sm text-slate-700 whitespace-nowrap">
+            <nav className="swagat-primary-nav hidden min-[901px]:flex items-center justify-center font-medium text-xs min-[1400px]:text-sm text-slate-700 whitespace-nowrap">
               
               {/* 1. Home (Priority 1) */}
               <button
@@ -223,7 +224,7 @@ export const HeaderNavbar: React.FC = () => {
                 <span>{t('nav_kya')}</span>
               </button>
 
-              {/* 5. State Approvals (Visible on >= 1200px, in More on 1000px-1199px) */}
+              {/* 5. State Approvals (Visible on >= 1200px, in More on 901px-1199px) */}
               <button
                 id="nav-link-states"
                 onClick={() => handleNavClick('home', 'section-states')}
@@ -232,7 +233,7 @@ export const HeaderNavbar: React.FC = () => {
                 {t('state_approvals')}
               </button>
 
-              {/* 6. Resources (Visible on >= 1400px, in More on 1000px-1399px) */}
+              {/* 6. Resources (Visible on >= 1400px, in More on 901px-1399px) */}
               <button
                 id="nav-link-about"
                 onClick={() => handleNavClick('home', 'section-about')}
@@ -241,7 +242,7 @@ export const HeaderNavbar: React.FC = () => {
                 Resources
               </button>
 
-              {/* 7. Help (Visible on >= 1400px, in More on 1000px-1399px) */}
+              {/* 7. Help (Visible on >= 1400px, in More on 901px-1399px) */}
               <button
                 id="nav-link-help"
                 onClick={() => handleNavClick('home', 'section-help')}
@@ -250,7 +251,7 @@ export const HeaderNavbar: React.FC = () => {
                 {t('nav_help')}
               </button>
 
-              {/* Responsive "More ▾" menu (Visible on 1000px to 1399px) */}
+              {/* Responsive "More ▾" dropdown menu (Visible on 901px to 1399px) */}
               <div className="relative min-[1400px]:hidden shrink-0" ref={moreRef}>
                 <button
                   id="nav-link-more"
@@ -308,24 +309,24 @@ export const HeaderNavbar: React.FC = () => {
             </nav>
 
             {/* ─────────────────────────────────────────────────────────────
-                SECTION 3: Right-Side Actions & Three-Dot Menu (flex-shrink: 0)
+                COLUMN 3: Action Controls & Three-Dot Menu (swagat-actions)
                 ───────────────────────────────────────────────────────────── */}
-            <div className="swagat-nav-right shrink-0 flex items-center space-x-1 sm:space-x-1.5 min-[1200px]:space-x-2">
+            <div className="swagat-actions">
               
               {/* Global Search Button */}
               <button
                 id="global-search-btn"
                 onClick={() => setIsSearchModalOpen(true)}
-                className="p-2 min-[1200px]:p-2.5 text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/90 rounded-xl transition-colors flex items-center space-x-1.5 text-xs font-medium shrink-0 cursor-pointer"
+                className="p-2 min-[1200px]:py-2 min-[1200px]:px-3 text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/90 rounded-xl transition-all flex items-center space-x-1.5 text-xs font-medium shrink-0 cursor-pointer w-auto min-[1200px]:w-[150px] min-[1400px]:w-[180px]"
                 title="Search Approvals, Schemes, Departments (Ctrl+K or /)"
               >
                 <Search className="w-4 h-4 text-slate-700 shrink-0" />
-                <span className="hidden min-[1400px]:inline text-slate-500">Quick Search...</span>
-                <kbd className="hidden min-[1400px]:inline px-1.5 py-0.5 text-[10px] bg-white rounded border border-slate-300 text-slate-400 font-mono">/</kbd>
+                <span className="hidden min-[1200px]:inline text-slate-500 truncate">Search...</span>
+                <kbd className="hidden min-[1400px]:inline px-1.5 py-0.5 text-[10px] bg-white rounded border border-slate-300 text-slate-400 font-mono shrink-0 ml-auto">/</kbd>
               </button>
 
-              {/* State Selector Dropdown (Visible on >= 1000px) */}
-              <div className="relative shrink-0 hidden min-[1000px]:block" ref={stateRef}>
+              {/* State Selector Dropdown (Visible on >= 901px) */}
+              <div className="relative shrink-0 hidden min-[901px]:block" ref={stateRef}>
                 <button
                   id="navbar-state-selector-toggle"
                   onClick={() => setIsStateDropdownOpen(!isStateDropdownOpen)}
@@ -407,8 +408,8 @@ export const HeaderNavbar: React.FC = () => {
                 )}
               </div>
 
-              {/* Language Selector Dropdown (Visible on >= 1000px) */}
-              <div className="relative shrink-0 hidden min-[1000px]:block" ref={langRef}>
+              {/* Language Selector Dropdown (Visible on >= 901px) */}
+              <div className="relative shrink-0 hidden min-[901px]:block" ref={langRef}>
                 <button
                   id="language-selector-toggle"
                   onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
@@ -444,12 +445,12 @@ export const HeaderNavbar: React.FC = () => {
                 )}
               </div>
 
-              {/* User Profile Badge (if logged in) */}
+              {/* User Profile Badge (if logged in on >= 901px) */}
               {userProfile ? (
                 <button
                   id="header-user-badge"
                   onClick={() => handleNavClick(userProfile.role === 'ADMIN' ? 'admin-dashboard' : 'dashboard')}
-                  className="hidden min-[1000px]:flex items-center space-x-2 px-2.5 sm:px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100/90 border border-emerald-200 rounded-xl transition-colors text-left shrink-0 cursor-pointer"
+                  className="hidden min-[901px]:flex items-center space-x-2 px-2.5 sm:px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100/90 border border-emerald-200 rounded-xl transition-colors text-left shrink-0 cursor-pointer"
                 >
                   <div className={`w-7 h-7 rounded-lg text-white flex items-center justify-center text-xs font-bold shadow-2xs shrink-0 ${
                     userProfile.role === 'ADMIN' ? 'bg-[#07182C]' : 'bg-emerald-700'
@@ -464,8 +465,8 @@ export const HeaderNavbar: React.FC = () => {
                   </div>
                 </button>
               ) : (
-                /* Login Dropdown Button (shown when not logged in on >= 1000px) */
-                <div className="relative shrink-0 hidden min-[1000px]:block" ref={loginDropdownRef}>
+                /* Login Dropdown Button (shown when not logged in on >= 901px) */
+                <div className="relative shrink-0 hidden min-[901px]:block" ref={loginDropdownRef}>
                   <button
                     id="login-dropdown-btn"
                     onClick={() => setIsLoginDropdownOpen(!isLoginDropdownOpen)}
@@ -667,11 +668,11 @@ export const HeaderNavbar: React.FC = () => {
                 )}
               </div>
 
-              {/* Mobile Hamburger Menu Toggle Button (Visible on screens < 1000px) */}
+              {/* Mobile Hamburger Menu Toggle Button (Visible on screens <= 900px) */}
               <button
                 id="mobile-menu-hamburger-btn"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-xl min-[1000px]:hidden shrink-0 cursor-pointer"
+                className="p-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-xl min-[901px]:hidden shrink-0 cursor-pointer"
                 aria-label="Toggle Navigation Menu"
               >
                 {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -683,11 +684,10 @@ export const HeaderNavbar: React.FC = () => {
 
         {/* ─────────────────────────────────────────────────────────────
             SECTION 4: Mobile Navigation Panel (Clean, Full, Scrollable)
-            Contains Home, Approvals, Sectors, KYA, State Approvals,
-            Resources, Help, Login, Sign Up, Admin Login, State & Lang Pickers
+            Visible on screens <= 900px
             ───────────────────────────────────────────────────────────── */}
         {isMobileMenuOpen && (
-          <div className="min-[1000px]:hidden fixed inset-x-0 top-[80px] bg-white border-t border-slate-200 shadow-2xl z-[1050] max-h-[calc(100vh-80px)] overflow-y-auto px-4 pt-4 pb-8 space-y-4 animate-in fade-in slide-in-from-top-2">
+          <div className="min-[901px]:hidden fixed inset-x-0 top-[80px] bg-white border-t border-slate-200 shadow-2xl z-[1050] max-h-[calc(100vh-80px)] overflow-y-auto px-4 pt-4 pb-8 space-y-4 animate-in fade-in slide-in-from-top-2">
             
             {/* Primary Mobile Navigation Links */}
             <nav className="flex flex-col space-y-1 font-medium text-sm text-slate-800">
