@@ -19,7 +19,9 @@ export const isSupabaseConfigured = (): boolean => {
  * If Supabase client has a configured public anon key and Google provider is active,
  * this redirects to accounts.google.com.
  */
-export const signInWithGoogleOAuth = async (role: 'investor' | 'officer' | 'super_admin' = 'investor') => {
+import { UserRole } from '../types/swagat';
+
+export const signInWithGoogleOAuth = async (role: UserRole = 'USER') => {
   localStorage.setItem('swagat_oauth_role', role);
 
   if (isSupabaseConfigured()) {

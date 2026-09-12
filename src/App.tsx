@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SwagatProvider, useSwagat } from './context/SwagatContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { SplashAnimation } from './components/SplashAnimation';
@@ -18,8 +18,7 @@ import { HelpCenterSection } from './components/HelpCenterSection';
 import { CallToActionBanner } from './components/CallToActionBanner';
 import { Footer } from './components/Footer';
 import { DashboardView } from './components/DashboardView';
-import { DeptAdminDashboard } from './components/DeptAdminDashboard';
-import { SuperAdminDashboard } from './components/SuperAdminDashboard';
+import { AdminDashboard } from './components/AdminDashboard';
 import { SectorWizard } from './components/SectorWizard';
 import { AuthModal } from './components/AuthModal';
 import { ApplyModal } from './components/ApplyModal';
@@ -33,32 +32,60 @@ import { CheckCircle2 } from 'lucide-react';
 
 const AppContent: React.FC = () => {
   const [showSplash, setShowSplash] = useState(true);
-  const { currentView, toastMessage, userProfile, wizardSession } = useSwagat();
+  const { currentView, setCurrentView, toastMessage, userProfile, wizardSession, showToast } = useSwagat();
 
   const handleSplashComplete = React.useCallback(() => {
     setShowSplash(false);
   }, []);
 
+  // ── Protected Route Guarding & URL Synchronization ──────────────────────────
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const path = window.location.pathname;
+
+    if (path === '/admin/dashboard' || currentView === 'admin-dashboard') {
+      if (!userProfile) {
+        showToast("Access Denied — You don't have administrator permissions.");
+        setCurrentView('home');
+        window.history.replaceState({}, '', '/');
+      } else if (userProfile.role !== 'ADMIN') {
+        showToast("Access Denied — You don't have administrator permissions.");
+        setCurrentView('dashboard');
+        window.history.replaceState({}, '', '/dashboard');
+      }
+    } else if (path === '/dashboard' || currentView === 'dashboard') {
+      if (!userProfile) {
+        setCurrentView('home');
+        window.history.replaceState({}, '', '/');
+      } else if (userProfile.role === 'ADMIN') {
+        setCurrentView('admin-dashboard');
+        window.history.replaceState({}, '', '/admin/dashboard');
+      }
+    }
+  }, [currentView, userProfile]);
+
   // ── Role-based dashboard routing ────────────────────────────────────────────
 
   const renderDashboard = () => {
     if (!userProfile) return null;
-    switch (userProfile.role) {
-      case 'super_admin':
-        return <SuperAdminDashboard />;
-      case 'officer':
-        return <DeptAdminDashboard />;
-      case 'investor':
-      default:
-        // If wizard session is active, show wizard instead of dashboard
-        if (currentView === 'wizard' && wizardSession) {
-          return <SectorWizard />;
-        }
-        return <DashboardView />;
+
+    if (userProfile.role === 'ADMIN') {
+      return <AdminDashboard />;
     }
+
+    if (userProfile.role === 'USER') {
+      if (currentView === 'wizard' && wizardSession) {
+        return <SectorWizard />;
+      }
+      return <DashboardView />;
+    }
+
+    // Default fallback
+    return <DashboardView />;
   };
 
-  const isInDashboard = currentView === 'dashboard' || currentView === 'wizard';
+  const isInDashboard = (currentView === 'dashboard' || currentView === 'admin-dashboard' || currentView === 'wizard') && userProfile !== null;
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#07182C] flex flex-col font-sans selection:bg-amber-400/30 selection:text-[#07182C]">
@@ -69,7 +96,7 @@ const AppContent: React.FC = () => {
       )}
 
       {/* Main App Layout */}
-      {isInDashboard && userProfile ? (
+      {isInDashboard ? (
         renderDashboard()
       ) : (
         <>

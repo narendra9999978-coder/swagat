@@ -96,7 +96,7 @@ export const HeaderNavbar: React.FC = () => {
   const [isLoginDropdownOpen, setIsLoginDropdownOpen] = useState(false);
   const loginDropdownRef = useRef<HTMLDivElement>(null);
 
-  const openAuthWithMode = (mode: 'signin-investor' | 'signup-investor' | 'signin-officer' | 'signup-officer' | 'signin-super') => {
+  const openAuthWithMode = (mode: 'signin-user' | 'signup-user' | 'signin-admin' | 'signin-super') => {
     setAuthModalMode(mode);
     setIsAuthModalOpen(true);
     setIsThreeDotOpen(false);
@@ -380,19 +380,18 @@ export const HeaderNavbar: React.FC = () => {
               {userProfile ? (
                 <button
                   id="header-user-badge"
-                  onClick={() => handleNavClick('dashboard')}
+                  onClick={() => handleNavClick(userProfile.role === 'ADMIN' ? 'admin-dashboard' : 'dashboard')}
                   className="hidden sm:flex items-center space-x-2 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100/90 border border-emerald-200 rounded-xl transition-colors text-left"
                 >
                   <div className={`w-7 h-7 rounded-lg text-white flex items-center justify-center text-xs font-bold shadow-2xs ${
-                    userProfile.role === 'super_admin' ? 'bg-purple-700' :
-                    userProfile.role === 'officer' ? 'bg-[#07182C]' : 'bg-emerald-700'
+                    userProfile.role === 'ADMIN' ? 'bg-[#07182C]' : 'bg-emerald-700'
                   }`}>
                     {userProfile.avatarInitials}
                   </div>
                   <div className="leading-tight">
                     <div className="text-xs font-bold text-emerald-950 truncate max-w-[110px]">{userProfile.name}</div>
                     <div className="text-[10px] text-emerald-700 font-medium capitalize">
-                      {userProfile.role === 'super_admin' ? 'Super Admin' : userProfile.role === 'officer' ? 'Officer Portal' : 'Business User'}
+                      {userProfile.role === 'ADMIN' ? 'Admin Portal' : 'Business User'}
                     </div>
                   </div>
                 </button>
@@ -416,8 +415,8 @@ export const HeaderNavbar: React.FC = () => {
                       </div>
 
                       <button
-                        id="login-as-investor-btn"
-                        onClick={() => openAuthWithMode('signin-investor')}
+                        id="login-as-user-btn"
+                        onClick={() => openAuthWithMode('signin-user')}
                         className="w-full text-left px-4 py-3 hover:bg-emerald-50 transition group"
                       >
                         <div className="flex items-center space-x-3">
@@ -432,17 +431,17 @@ export const HeaderNavbar: React.FC = () => {
                       </button>
 
                       <button
-                        id="login-as-officer-btn"
-                        onClick={() => openAuthWithMode('signin-officer')}
-                        className="w-full text-left px-4 py-3 hover:bg-slate-50 transition group"
+                        id="login-as-admin-btn"
+                        onClick={() => openAuthWithMode('signin-admin')}
+                        className="w-full text-left px-4 py-3 hover:bg-slate-50 transition group border-t border-slate-100"
                       >
                         <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition">
-                            <ShieldCheck className="w-4 h-4 text-[#07182C]" />
+                          <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center group-hover:bg-amber-200 transition">
+                            <ShieldCheck className="w-4 h-4 text-amber-700" />
                           </div>
                           <div>
-                            <div className="text-xs font-bold text-slate-900">Ministry Officer Login</div>
-                            <div className="text-[10px] text-slate-500">Department Admin</div>
+                            <div className="text-xs font-bold text-slate-900">Admin Login</div>
+                            <div className="text-[10px] text-slate-500">Ministry / Dept Administrator</div>
                           </div>
                         </div>
                       </button>
@@ -473,7 +472,7 @@ export const HeaderNavbar: React.FC = () => {
                         <div className="text-[11px] text-slate-500 truncate">{userProfile.companyName}</div>
                         <div className="mt-1 flex items-center space-x-1.5 text-[10px] text-emerald-700 font-semibold">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                          <span>{userProfile.role === 'investor' ? 'Investor / Business Portal' : 'Ministry Officer Portal'}</span>
+                          <span>{userProfile.role === 'ADMIN' ? 'Admin Portal' : 'Business User Portal'}</span>
                         </div>
                       </div>
                     ) : null}
@@ -509,30 +508,30 @@ export const HeaderNavbar: React.FC = () => {
                       ) : (
                         <>
                           <button
-                            id="menu-action-login-investor"
-                            onClick={() => openAuthWithMode('signin-investor')}
+                            id="menu-action-login"
+                            onClick={() => openAuthWithMode('signin-user')}
                             className="w-full text-left px-4 py-2.5 text-xs font-bold text-[#07182C] hover:bg-slate-100 flex items-center space-x-2.5"
                           >
-                            <Building2 className="w-4 h-4 text-emerald-600" />
-                            <span>Business User Login</span>
+                            <LogIn className="w-4 h-4 text-emerald-600" />
+                            <span>Login</span>
                           </button>
 
                           <button
-                            id="menu-action-login-officer"
-                            onClick={() => openAuthWithMode('signin-officer')}
+                            id="menu-action-signup"
+                            onClick={() => openAuthWithMode('signup-user')}
                             className="w-full text-left px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100 flex items-center space-x-2.5"
                           >
-                            <ShieldCheck className="w-4 h-4 text-blue-600" />
-                            <span>Ministry Officer Login</span>
+                            <UserPlus className="w-4 h-4 text-blue-600" />
+                            <span>Sign Up</span>
                           </button>
 
                           <button
-                            id="menu-action-signup-investor"
-                            onClick={() => openAuthWithMode('signup-investor')}
-                            className="w-full text-left px-4 py-2 text-xs font-medium text-slate-500 hover:bg-slate-100 flex items-center space-x-2.5"
+                            id="menu-action-admin-login"
+                            onClick={() => openAuthWithMode('signin-admin')}
+                            className="w-full text-left px-4 py-2 text-xs font-semibold text-slate-900 hover:bg-slate-100 flex items-center space-x-2.5 border-t border-slate-100"
                           >
-                            <UserPlus className="w-4 h-4 text-slate-400" />
-                            <span>New Business Account</span>
+                            <ShieldCheck className="w-4 h-4 text-amber-600" />
+                            <span>Admin Login</span>
                           </button>
                         </>
                       )}
@@ -545,10 +544,10 @@ export const HeaderNavbar: React.FC = () => {
                           Current Role
                         </div>
                         <div className="px-4 py-2 text-xs text-slate-700 flex items-center space-x-2">
-                          {userProfile.role === 'super_admin' ? <ShieldCheck className="w-4 h-4 text-purple-600" /> :
-                           userProfile.role === 'officer' ? <ShieldCheck className="w-4 h-4 text-[#0B2545]" /> :
-                           <Building2 className="w-4 h-4 text-emerald-600" />}
-                          <span className="font-semibold">{userProfile.role === 'super_admin' ? 'Super Administrator' : userProfile.role === 'officer' ? 'Ministry / Dept Officer' : 'Business / Investor'}</span>
+                          {userProfile.role === 'ADMIN'
+                            ? <ShieldCheck className="w-4 h-4 text-amber-600" />
+                            : <Building2 className="w-4 h-4 text-emerald-600" />}
+                          <span className="font-semibold">{userProfile.role === 'ADMIN' ? 'System Administrator' : 'Business User'}</span>
                         </div>
                       </div>
                     )}
@@ -672,7 +671,7 @@ export const HeaderNavbar: React.FC = () => {
                 </button>
               ) : (
                 <button
-                  onClick={() => openAuthWithMode('signin-investor')}
+                  onClick={() => openAuthWithMode('signin-user')}
                   className="w-full flex items-center justify-center space-x-2 px-4 py-3 text-sm font-bold text-white bg-gradient-to-r from-[#07182C] to-[#0B2545] rounded-xl shadow-md"
                 >
                   <LogIn className="w-4 h-4 text-emerald-400" />

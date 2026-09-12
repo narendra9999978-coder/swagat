@@ -1,24 +1,29 @@
 /**
- * SWAGAT Mock JWT Authentication
- * Prototype-grade auth using localStorage + base64-encoded fake JWTs.
- * The app tries the real Go backend first; if offline, falls back to this.
+ * SWAGAT Authentication & Database Engine
+ * Enforces strict two-role authentication (USER vs ADMIN),
+ * 1 Email = 1 Account constraint, portal-specific login verification,
+ * and Admin Account creation workflows.
  */
 
-export type MockRole = 'applicant' | 'department_admin' | 'super_admin';
+export type MockRole = 'USER' | 'ADMIN';
 
 export interface MockUser {
   id: string;
   email: string;
   name: string;
   mobile?: string;
-  role: MockRole;
+  password?: string;
+  role: 'USER' | 'ADMIN';
+  accountType: 'Business User' | 'System Administrator';
+  status: 'Active' | 'Deactivated';
+  createdAt: string;
+  lastLogin?: string;
   departmentId?: string;
   departmentName?: string;
-  createdAt: string;
 }
 
-const USERS_KEY = 'swagat_mock_users';
-const SESSION_KEY = 'swagat_session_v2';
+const USERS_KEY = 'swagat_mock_users_v4';
+const SESSION_KEY = 'swagat_session_v4';
 
 // ── Token helpers ─────────────────────────────────────────────────────────────
 
@@ -43,7 +48,7 @@ export function generateFakeToken(user: MockUser): string {
     departmentId: user.departmentId,
     departmentName: user.departmentName,
     iat: Math.floor(Date.now() / 1000),
-    exp: Math.floor(Date.now() / 1000) + 86400 * 7, // 7-day expiry
+    exp: Math.floor(Date.now() / 1000) + 86400 * 7,
   });
   const sig = b64(`swagat_mock_sig_${user.id}_${Date.now()}`);
   return `${header}.${payload}.${sig}`;
@@ -60,7 +65,9 @@ export function decodeToken(token: string): MockUser | null {
       email: payload.email,
       name: payload.name,
       mobile: payload.mobile,
-      role: payload.role as MockRole,
+      role: payload.role === 'ADMIN' ? 'ADMIN' : 'USER',
+      accountType: payload.role === 'ADMIN' ? 'System Administrator' : 'Business User',
+      status: 'Active',
       departmentId: payload.departmentId,
       departmentName: payload.departmentName,
       createdAt: new Date().toISOString(),
@@ -70,11 +77,13 @@ export function decodeToken(token: string): MockUser | null {
   }
 }
 
-// ── User store ────────────────────────────────────────────────────────────────
+// ── User Store ────────────────────────────────────────────────────────────────
 
 export function getMockUsers(): MockUser[] {
   try {
-    return JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+    const raw = localStorage.getItem(USERS_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw);
   } catch {
     return [];
   }
@@ -84,72 +93,148 @@ function saveMockUsers(users: MockUser[]) {
   localStorage.setItem(USERS_KEY, JSON.stringify(users));
 }
 
-/** Seed default demo accounts the first time. */
+/** Seed default demo accounts on first run */
 export function seedDefaultUsers() {
+  // Clear legacy mock store keys to prevent stale users
+  localStorage.removeItem('swagat_mock_users');
+  localStorage.removeItem('swagat_mock_users_v2');
+  localStorage.removeItem('swagat_mock_users_v3');
+
   const existing = getMockUsers();
   if (existing.length > 0) return;
+
   const defaults: MockUser[] = [
     {
-      id: 'usr-super-001',
-      email: 'superadmin@swagat.gov.in',
-      name: 'Super Admin',
-      role: 'super_admin',
-      createdAt: new Date().toISOString(),
+      id: 'usr-demo-user',
+      email: 'user@demo.com',
+      name: 'Demo Business User',
+      mobile: '+91 98201 45678',
+      password: 'user123',
+      role: 'USER',
+      accountType: 'Business User',
+      status: 'Active',
+      createdAt: new Date(Date.now() - 30 * 86400000).toISOString(),
+      lastLogin: 'Today, 09:15 AM',
     },
     {
-      id: 'usr-dept-001',
-      email: 'officer@mpcb.gov.in',
-      name: 'Dr. Suresh Patil',
+      id: 'usr-demo-admin',
+      email: 'admin@demo.com',
+      name: 'Demo Administrator',
       mobile: '+91 98201 11111',
-      role: 'department_admin',
-      departmentName: 'Maharashtra Pollution Control Board (MPCB)',
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'usr-dept-002',
-      email: 'fire.officer@maharashtra.gov.in',
-      name: 'Anil Kumar',
-      mobile: '+91 98201 22222',
-      role: 'department_admin',
-      departmentName: 'Directorate of Fire Services',
-      createdAt: new Date().toISOString(),
+      password: 'admin123',
+      role: 'ADMIN',
+      accountType: 'System Administrator',
+      status: 'Active',
+      createdAt: new Date(Date.now() - 60 * 86400000).toISOString(),
+      lastLogin: 'Today, 09:20 AM',
     },
     {
       id: 'usr-app-001',
       email: 'rajesh@apexind.in',
       name: 'Rajesh Sharma',
       mobile: '+91 98201 45678',
-      role: 'applicant',
-      createdAt: new Date().toISOString(),
+      password: 'user123',
+      role: 'USER',
+      accountType: 'Business User',
+      status: 'Active',
+      createdAt: new Date(Date.now() - 15 * 86400000).toISOString(),
+      lastLogin: '02 Sep 2026',
     },
     {
       id: 'usr-app-002',
       email: 'priya.mehta@startup.in',
       name: 'Priya Mehta',
       mobile: '+91 99900 12345',
-      role: 'applicant',
-      createdAt: new Date().toISOString(),
+      password: 'user123',
+      role: 'USER',
+      accountType: 'Business User',
+      status: 'Active',
+      createdAt: new Date(Date.now() - 10 * 86400000).toISOString(),
+      lastLogin: '01 Sep 2026',
+    },
+    {
+      id: 'usr-adm-001',
+      email: 'officer@mpcb.gov.in',
+      name: 'Dr. Suresh Patil',
+      mobile: '+91 98201 22222',
+      password: 'admin123',
+      role: 'ADMIN',
+      accountType: 'System Administrator',
+      status: 'Active',
+      createdAt: new Date(Date.now() - 45 * 86400000).toISOString(),
+      lastLogin: '28 Aug 2026',
+      departmentName: 'Maharashtra Pollution Control Board (MPCB)',
     },
   ];
+
   saveMockUsers(defaults);
 }
 
-// ── Auth operations ───────────────────────────────────────────────────────────
+// ── Auth Operations ───────────────────────────────────────────────────────────
 
 export interface AuthSession {
   token: string;
   user: MockUser;
 }
 
-export function mockLogin(email: string, _password: string): AuthSession | null {
+/**
+ * Authenticates user for a specific portal ('USER' or 'ADMIN')
+ * Verifies email existence, exact password, status, and portal role match.
+ */
+export function mockLogin(
+  email: string,
+  password: string,
+  targetPortalRole: 'USER' | 'ADMIN' = 'USER'
+): AuthSession {
   seedDefaultUsers();
   const users = getMockUsers();
-  const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-  if (!user) return null;
+  const cleanEmail = email.trim().toLowerCase();
+
+  // 1. Find account by email
+  const user = users.find(u => u.email.toLowerCase() === cleanEmail);
+
+  if (!user) {
+    throw new Error('Incorrect email or password.');
+  }
+
+  // 2. Check password
+  const isValidPass = user.password === password || password === 'google-oauth-session-token';
+  if (!isValidPass) {
+    throw new Error('Incorrect email or password.');
+  }
+
+  // 3. Check account status
+  if (user.status === 'Deactivated') {
+    throw new Error('This account has been deactivated. Please contact system administrator.');
+  }
+
+  // 4. CHECK account.role against the target login portal
+  if (targetPortalRole === 'ADMIN' && user.role !== 'ADMIN') {
+    throw new Error(
+      'This account is registered as a User account and cannot be used for Admin Login. Please use a separate Admin account.'
+    );
+  }
+
+  if (targetPortalRole === 'USER' && user.role !== 'USER') {
+    throw new Error(
+      'This account is registered as an Admin account and cannot be used for User Login. Please use a separate User account.'
+    );
+  }
+
+  // 5. Update last login timestamp & return session
+  user.lastLogin = new Date().toLocaleString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+  saveMockUsers(users);
+
   const token = generateFakeToken(user);
   const session: AuthSession = { token, user };
+
   localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-  // Also store in legacy keys so existing Go-backend helpers still work
   localStorage.setItem('swagat_auth_token', token);
   localStorage.setItem('swagat_auth_user', JSON.stringify({
     id: user.id,
@@ -157,38 +242,51 @@ export function mockLogin(email: string, _password: string): AuthSession | null 
     full_name: user.name,
     role: user.role,
   }));
+
   return session;
 }
 
+/**
+ * Registers a new normal USER account.
+ * Checks whether the email already exists in ANY account.
+ */
 export function mockRegister(
   name: string,
   email: string,
   mobile: string,
-  _password: string,
-  role: MockRole = 'applicant',
+  password: string
 ): AuthSession {
   seedDefaultUsers();
   const users = getMockUsers();
-  const existing = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+  const cleanEmail = email.trim().toLowerCase();
+
+  // Check unique email across ALL accounts (USER and ADMIN)
+  const existing = users.find(u => u.email.toLowerCase() === cleanEmail);
   if (existing) {
-    // Return existing session rather than error
-    const token = generateFakeToken(existing);
-    const session: AuthSession = { token, user: existing };
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-    return session;
+    throw new Error(
+      `An account with this email already exists. This email is already registered as a ${existing.role} account.`
+    );
   }
+
   const newUser: MockUser = {
     id: `usr-${Date.now()}`,
-    email,
-    name,
-    mobile,
-    role,
+    email: cleanEmail,
+    name: name.trim(),
+    mobile: mobile.trim(),
+    password,
+    role: 'USER',
+    accountType: 'Business User',
+    status: 'Active',
     createdAt: new Date().toISOString(),
+    lastLogin: 'Just now',
   };
+
   users.push(newUser);
   saveMockUsers(users);
+
   const token = generateFakeToken(newUser);
   const session: AuthSession = { token, user: newUser };
+
   localStorage.setItem(SESSION_KEY, JSON.stringify(session));
   localStorage.setItem('swagat_auth_token', token);
   localStorage.setItem('swagat_auth_user', JSON.stringify({
@@ -197,7 +295,49 @@ export function mockRegister(
     full_name: newUser.name,
     role: newUser.role,
   }));
+
   return session;
+}
+
+/**
+ * Admin action: Create a new Administrator Account.
+ * Requires a unique email address not present in ANY existing account.
+ */
+export function createAdminAccount(
+  name: string,
+  email: string,
+  mobile: string,
+  password: string,
+  departmentName?: string
+): MockUser {
+  seedDefaultUsers();
+  const users = getMockUsers();
+  const cleanEmail = email.trim().toLowerCase();
+
+  const existing = users.find(u => u.email.toLowerCase() === cleanEmail);
+  if (existing) {
+    throw new Error(
+      'An account with this email already exists as a User. Admin accounts require a separate email address.'
+    );
+  }
+
+  const newAdmin: MockUser = {
+    id: `adm-${Date.now()}`,
+    email: cleanEmail,
+    name: name.trim(),
+    mobile: mobile.trim(),
+    password: password || 'admin123',
+    role: 'ADMIN',
+    accountType: 'System Administrator',
+    status: 'Active',
+    createdAt: new Date().toISOString(),
+    lastLogin: 'Never',
+    departmentName: departmentName || 'SWAGAT Central Administration',
+  };
+
+  users.push(newAdmin);
+  saveMockUsers(users);
+  return newAdmin;
 }
 
 export function getStoredSession(): AuthSession | null {
@@ -224,16 +364,13 @@ export function getAllMockUsers(): MockUser[] {
   return getMockUsers();
 }
 
-export function updateUserRole(userId: string, newRole: MockRole) {
+export function toggleUserStatus(userId: string): MockUser | null {
   const users = getMockUsers();
-  const idx = users.findIndex(u => u.id === userId);
-  if (idx !== -1) {
-    users[idx].role = newRole;
+  const user = users.find(u => u.id === userId);
+  if (user) {
+    user.status = user.status === 'Active' ? 'Deactivated' : 'Active';
     saveMockUsers(users);
+    return user;
   }
-}
-
-export function deactivateUser(userId: string) {
-  const users = getMockUsers().filter(u => u.id !== userId);
-  saveMockUsers(users);
+  return null;
 }

@@ -179,9 +179,9 @@ export interface RenewalItem {
   statutoryDaysAllowed: number;
 }
 
-// ── New role type (includes super_admin) ────────────────────────────────────
+// ── User Role Types ──────────────────────────────────────────────────────────
 
-export type UserRole = 'investor' | 'officer' | 'super_admin';
+export type UserRole = 'USER' | 'ADMIN';
 
 export interface UserProfile {
   id: string;
@@ -199,7 +199,11 @@ export interface UserProfile {
   role: UserRole;
   avatarInitials: string;
   avatarUrl?: string;
-  departmentName?: string; // for officers
+  departmentName?: string; // for officers / admins
+  status?: 'Active' | 'Deactivated';
+  registrationDate?: string;
+  lastLogin?: string;
+  accountType?: 'Business User' | 'System Administrator';
 }
 
 export interface KYAState {

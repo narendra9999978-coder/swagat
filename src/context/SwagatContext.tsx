@@ -35,6 +35,7 @@ import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 type AppView = 
   | 'home'
   | 'dashboard'
+  | 'admin-dashboard'
   | 'wizard'
   | 'approvals'
   | 'schemes'
@@ -51,7 +52,7 @@ interface SwagatContextType {
   userProfile: UserProfile | null;
   login: (
     mode: 'signin' | 'signup',
-    role: 'investor' | 'officer' | 'super_admin',
+    role: 'USER' | 'ADMIN',
     data: { email: string; password: string; name?: string; mobile?: string }
   ) => Promise<void>;
   logout: () => void;
@@ -60,8 +61,8 @@ interface SwagatContextType {
   // Auth Modal
   isAuthModalOpen: boolean;
   setIsAuthModalOpen: (open: boolean) => void;
-  authModalMode: 'signin-investor' | 'signup-investor' | 'signin-officer' | 'signup-officer' | 'signin-super';
-  setAuthModalMode: (mode: 'signin-investor' | 'signup-investor' | 'signin-officer' | 'signup-officer' | 'signin-super') => void;
+  authModalMode: 'signin-user' | 'signup-user' | 'signin-admin' | 'signin-super';
+  setAuthModalMode: (mode: 'signin-user' | 'signup-user' | 'signin-admin' | 'signin-super') => void;
 
   // View & Navigation
   currentView: AppView;
@@ -216,7 +217,7 @@ const SwagatContext = createContext<SwagatContextType | undefined>(undefined);
 export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [authModalMode, setAuthModalMode] = useState<SwagatContextType['authModalMode']>('signin-investor');
+  const [authModalMode, setAuthModalMode] = useState<SwagatContextType['authModalMode']>('signin-user');
   const [currentView, setCurrentView] = useState<AppView>('home');
   const [dashboardActiveTab, setDashboardActiveTab] = useState('overview');
 
@@ -263,9 +264,7 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const session = getStoredSession();
     if (session) {
       const { user } = session;
-      const frontendRole: UserRole =
-        user.role === 'super_admin' ? 'super_admin' :
-        user.role === 'department_admin' ? 'officer' : 'investor';
+      const frontendRole: UserRole = user.role === 'ADMIN' ? 'ADMIN' : 'USER';
 
       setUserProfile({
         id: user.id,
@@ -274,7 +273,7 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         phone: user.mobile || '',
         pan: '',
         gstNumber: '',
-        companyName: user.departmentName || user.name,
+        companyName: user.departmentName || (frontendRole === 'ADMIN' ? 'SWAGAT System Administration' : `${user.name}'s Enterprise`),
         cin: '',
         entityType: 'Private Limited',
         state: 'India',
@@ -283,7 +282,14 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         role: frontendRole,
         avatarInitials: user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2),
         departmentName: user.departmentName,
+        status: user.status || 'Active',
+        accountType: user.accountType || (frontendRole === 'ADMIN' ? 'System Administrator' : 'Business User'),
       });
+
+      // Synchronize view with restored session role if on dashboard path
+      if (frontendRole === 'ADMIN') {
+        setCurrentView('admin-dashboard');
+      }
     }
 
     // ── Supabase Google OAuth callback handler ────────────────────────────────
@@ -293,7 +299,7 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           const su = supaSession.user;
           const gName = su.user_metadata?.full_name || su.user_metadata?.name || su.email?.split('@')[0] || 'User';
           const gEmail = su.email || '';
-          const oauthRole = (localStorage.getItem('swagat_oauth_role') || 'investor') as UserRole;
+          const oauthRole: UserRole = (localStorage.getItem('swagat_oauth_role') || 'USER') as UserRole;
           const initials = gName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
           setUserProfile({
             id: su.id,
@@ -312,7 +318,7 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             avatarInitials: initials,
           });
           setIsAuthModalOpen(false);
-          setCurrentView('dashboard');
+          setCurrentView(oauthRole === 'ADMIN' ? 'admin-dashboard' : 'dashboard');
         }
       });
       return () => subscription.unsubscribe();
@@ -330,84 +336,79 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const login = async (
     mode: 'signin' | 'signup',
-    role: 'investor' | 'officer' | 'super_admin',
+    role: 'USER' | 'ADMIN',
     data: { email: string; password: string; name?: string; mobile?: string }
   ) => {
-    const backendRole =
-      role === 'super_admin' ? 'super_admin' :
-      role === 'officer' ? 'department_admin' : 'applicant';
+    const targetRole: 'USER' | 'ADMIN' = role === 'ADMIN' ? 'ADMIN' : 'USER';
 
-    let resolvedUser: { id: string; name: string; email: string; mobile?: string; departmentName?: string } | null = null;
+    let resolvedSession;
 
-    // 1. Try real backend
-    try {
-      if (mode === 'signup') {
-        await authApi.register(data.email, data.password, data.name || data.email.split('@')[0], backendRole);
-      } else {
-        await authApi.login(data.email, data.password);
-      }
-      setIsBackendOnline(true);
-    } catch {
-      // 2. Fall back to mock JWT
-      let session;
-      if (mode === 'signup') {
-        const mockRole: MockRole = role === 'super_admin' ? 'super_admin' : role === 'officer' ? 'department_admin' : 'applicant';
-        session = mockRegister(data.name || data.email.split('@')[0], data.email, data.mobile || '', data.password, mockRole);
-      } else {
-        session = mockLogin(data.email, data.password);
-        if (!session) {
-          // Auto-register on first sign-in attempt (prototype convenience)
-          const mockRole: MockRole = role === 'super_admin' ? 'super_admin' : role === 'officer' ? 'department_admin' : 'applicant';
-          session = mockRegister(data.name || data.email.split('@')[0], data.email, data.mobile || '', data.password, mockRole);
-        }
-      }
-      if (session) {
-        resolvedUser = {
-          id: session.user.id,
-          name: session.user.name,
-          email: session.user.email,
-          mobile: session.user.mobile,
-          departmentName: session.user.departmentName,
-        };
-      }
+    if (mode === 'signup') {
+      resolvedSession = mockRegister(
+        data.name || data.email.split('@')[0],
+        data.email,
+        data.mobile || '',
+        data.password
+      );
+    } else {
+      resolvedSession = mockLogin(data.email, data.password, targetRole);
     }
 
-    const name = resolvedUser?.name || data.name || data.email.split('@')[0];
+    const { user } = resolvedSession;
+    const finalRole: UserRole = user.role === 'ADMIN' ? 'ADMIN' : 'USER';
+    const name = user.name || data.name || data.email.split('@')[0];
+
     const profile: UserProfile = {
-      id: resolvedUser?.id || `usr-${Date.now()}`,
+      id: user.id,
       name,
-      email: data.email,
-      phone: resolvedUser?.mobile || data.mobile || '',
+      email: user.email,
+      phone: user.mobile || data.mobile || '',
       pan: '',
       gstNumber: '',
-      companyName: resolvedUser?.departmentName || (role === 'officer' ? 'Government Department' : `${name}'s Enterprise`),
+      companyName: user.departmentName || (finalRole === 'ADMIN' ? 'SWAGAT System Administration' : `${name}'s Enterprise`),
       cin: '',
       entityType: 'Private Limited',
       state: 'India',
       address: '',
       isDigiLockerVerified: false,
-      role,
+      role: finalRole,
       avatarInitials: name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2),
-      departmentName: resolvedUser?.departmentName,
+      departmentName: user.departmentName,
+      status: user.status || 'Active',
+      accountType: user.accountType || (finalRole === 'ADMIN' ? 'System Administrator' : 'Business User'),
     };
 
     setUserProfile(profile);
     setIsAuthModalOpen(false);
-    setCurrentView('dashboard');
-    showToast(`Welcome, ${name}! Signed in to SWAGAT Portal.`);
 
-    if (pendingApprovalToApply) {
-      setIsApplyModalOpen(true);
+    if (finalRole === 'ADMIN') {
+      setCurrentView('admin-dashboard');
+      if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/dashboard');
+      showToast(`Welcome, ${name}! Signed in to SWAGAT ADMIN Portal.`);
+    } else {
+      setCurrentView('dashboard');
+      if (typeof window !== 'undefined') window.history.pushState({}, '', '/dashboard');
+      showToast(`Welcome, ${name}! Signed in to My SWAGAT Dashboard.`);
+
+      // Process Preservation
+      if (pendingApprovalToApply) {
+        setIsApplyModalOpen(true);
+      }
     }
   };
 
   const logout = () => {
-    authApi.logout();
+    try {
+      authApi.logout();
+    } catch {
+      // ignore offline errors
+    }
     clearSession();
     setUserProfile(null);
-    setCurrentView('home');
     setWizardSession(null);
-    showToast('Signed out from SWAGAT session.');
+    setCurrentView('home');
+    if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
+    showToast('Signed out successfully from SWAGAT session.');
   };
 
   // ── Wizard ────────────────────────────────────────────────────────────────
@@ -445,7 +446,7 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const startApplication = (approval: Approval) => {
     setPendingApprovalToApply(approval);
     if (!userProfile) {
-      setAuthModalMode('signin-investor');
+      setAuthModalMode('signin-user');
       setIsAuthModalOpen(true);
       showToast('Please sign in to proceed.');
     } else {

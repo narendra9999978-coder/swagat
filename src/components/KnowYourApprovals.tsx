@@ -22,6 +22,7 @@ import { useSwagat } from '../context/SwagatContext';
 import { useLanguage } from '../context/LanguageContext';
 import { allIndianStatesList } from '../data/indiaStatesData';
 import { Approval } from '../types/swagat';
+import { generateApprovalRoadmapPdf } from '../lib/pdfGenerator';
 
 export const KnowYourApprovals: React.FC = () => {
   const { 
@@ -40,6 +41,7 @@ export const KnowYourApprovals: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [stateSearch, setStateSearch] = useState<string>('');
   const [activeTab, setActiveTab] = useState<'all' | 'central' | 'state'>('all');
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState<boolean>(false);
 
   const planningOptions = [
     { id: 'Start a new business', label: 'Start a new business', desc: 'Incorporate an enterprise and obtain all pre-establishment statutory permits' },
@@ -81,12 +83,27 @@ export const KnowYourApprovals: React.FC = () => {
     s.name.toLowerCase().includes(stateSearch.toLowerCase())
   );
 
+  // Normalize sector labels to match approval catalog
+  const getNormalizedSectorVariants = (sec: string) => {
+    if (sec === 'IT & BPM') return ['IT & BPM', 'IT & Technology', 'Telecom & IT'];
+    if (sec === 'Textile') return ['Textile', 'Textiles'];
+    if (sec === 'Electronics') return ['Electronics', 'Electronics & Semiconductors'];
+    if (sec === 'Construction') return ['Construction', 'Construction & Infrastructure'];
+    return [sec];
+  };
+
   // Filter approvals matching KYA answers
   const recommendedApprovals = approvals.filter(app => {
-    // Check sector applicability
-    const sectorMatch = app.sectorApplicability.includes(kyaState.sector) || app.sectorApplicability.includes('Other');
-    // Check state applicability if state approval
-    const stateMatch = app.centralOrState === 'Central' || app.stateName === kyaState.state || !app.stateName;
+    const variants = getNormalizedSectorVariants(kyaState.sector);
+    const sectorMatch = app.sectorApplicability.some(s => variants.includes(s) || s === 'Other' || s === 'All');
+    const stateMatch = 
+      app.centralOrState === 'Central' || 
+      !kyaState.state ||
+      app.state === 'All States' ||
+      (app.statesApplicable && app.statesApplicable.includes(kyaState.state)) ||
+      app.stateName === kyaState.state || 
+      !app.stateName;
+
     return sectorMatch && stateMatch;
   });
 
@@ -107,6 +124,30 @@ export const KnowYourApprovals: React.FC = () => {
 
   const handleAddToDashboard = (approval: Approval) => {
     showToast(`Added "${approval.name}" to your dashboard checklist.`);
+  };
+
+  const handleDownloadPdf = async () => {
+    if (isGeneratingPdf) return;
+    try {
+      setIsGeneratingPdf(true);
+      showToast('Generating official SWAGAT Approval Roadmap PDF...');
+      await generateApprovalRoadmapPdf({
+        projectDetails: {
+          sector: kyaState.sector,
+          state: kyaState.state,
+          investmentSize: kyaState.investmentSize,
+          planningStage: kyaState.planningType,
+          businessType: kyaState.planningType
+        },
+        approvals: recommendedApprovals
+      });
+      showToast(`Downloaded SWAGAT_${kyaState.state}_${kyaState.sector}_Approval_Roadmap.pdf`);
+    } catch (err) {
+      console.error('PDF generation error:', err);
+      showToast('Failed to generate PDF. Please try again.');
+    } finally {
+      setIsGeneratingPdf(false);
+    }
   };
 
   return (
@@ -543,13 +584,13 @@ export const KnowYourApprovals: React.FC = () => {
                   </div>
 
                   <button
-                    onClick={() => {
-                      showToast('Exported official SWAGAT Approval Checklist (PDF).');
-                    }}
-                    className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-[#07182C] text-xs font-bold shadow-md flex items-center space-x-1.5"
+                    id="kya-download-pdf-btn"
+                    onClick={handleDownloadPdf}
+                    disabled={isGeneratingPdf}
+                    className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-[#07182C] text-xs font-bold shadow-md flex items-center space-x-1.5 transition active:scale-95 disabled:opacity-75 disabled:cursor-not-allowed cursor-pointer"
                   >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>Download PDF</span>
+                    <Download className={`w-3.5 h-3.5 ${isGeneratingPdf ? 'animate-bounce' : ''}`} />
+                    <span>{isGeneratingPdf ? 'Generating PDF...' : 'Download PDF'}</span>
                   </button>
                 </div>
               </div>
