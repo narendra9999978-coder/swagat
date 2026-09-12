@@ -50,6 +50,7 @@ func main() {
 	// ---- public auth ----
 	r.POST("/auth/register", authH.Register)
 	r.POST("/auth/login", authH.Login)
+	r.POST("/auth/google", authH.GoogleAuth)
 
 	// ---- Super Admin ----
 	admin := r.Group("/admin", handlers.AuthRequired(), handlers.RequireRole("super_admin"))

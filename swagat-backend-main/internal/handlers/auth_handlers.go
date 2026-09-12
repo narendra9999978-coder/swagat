@@ -90,3 +90,75 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"token": token, "user_id": id, "role": role})
 }
+
+type googleAuthReq struct {
+	Email    string `json:"email" binding:"required,email"`
+	FullName string `json:"full_name"`
+	Role     string `json:"role" binding:"required,oneof=super_admin department_admin applicant"`
+}
+
+// GoogleAuth handles Google authentication with strict 1 Email = 1 Role binding.
+func (h *AuthHandler) GoogleAuth(c *gin.Context) {
+	var req googleAuthReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var existingID, existingRole, fullName string
+	err := h.DB.QueryRow(c, `SELECT id, role, full_name FROM users WHERE email=$1`, req.Email).Scan(&existingID, &existingRole, &fullName)
+	if err == nil {
+		// User already exists. Verify role match (strict role binding)
+		if existingRole != req.Role {
+			c.JSON(http.StatusForbidden, gin.H{
+				"error":           "This Google account is already registered with a different role and cannot cross-login.",
+				"registered_role": existingRole,
+			})
+			return
+		}
+
+		token, err := signToken(existingID, existingRole)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "token signing failed"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"token":     token,
+			"user_id":   existingID,
+			"role":      existingRole,
+			"full_name": fullName,
+		})
+		return
+	}
+
+	// New user registration with target role
+	id := uuid.New().String()
+	name := req.FullName
+	if name == "" {
+		name = req.Email
+	}
+
+	_, err = h.DB.Exec(c, `
+		INSERT INTO users (id, email, password_hash, full_name, role) VALUES ($1,$2,$3,$4,$5)
+	`, id, req.Email, "google-oauth", name, req.Role)
+	if err != nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "registration failed: " + err.Error()})
+		return
+	}
+
+	if req.Role == "applicant" {
+		_, _ = h.DB.Exec(c, `INSERT INTO applicants (id, user_id) VALUES ($1, $2)`, uuid.New().String(), id)
+	}
+
+	token, err := signToken(id, req.Role)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "token signing failed"})
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{
+		"token":     token,
+		"user_id":   id,
+		"role":      req.Role,
+		"full_name": name,
+	})
+}

@@ -21,7 +21,8 @@ import { schemesData } from '../data/schemesData';
 import { getStateDataByCode, allIndianStatesList } from '../data/indiaStatesData';
 import { 
   authApi, 
-  checkBackendHealth 
+  checkBackendHealth,
+  clearStoredAuth,
 } from '../services/api';
 import {
   loadUserApplications,
@@ -37,7 +38,9 @@ import {
   mockRegister,
   mockGoogleLogin,
   getStoredSession,
+  setStoredSession,
   clearSession,
+  getMockUsers,
   MockRole,
   seedDefaultUsers,
 } from '../lib/mockAuth';
@@ -237,10 +240,56 @@ const initialRenewals: RenewalItem[] = [
 const SwagatContext = createContext<SwagatContextType | undefined>(undefined);
 
 export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(() => {
+    try {
+      const session = getStoredSession();
+      if (session?.user) {
+        const { user } = session;
+        const frontendRole: UserRole = user.role === 'ADMIN' ? 'ADMIN' : 'USER';
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          phone: user.mobile || '',
+          pan: '',
+          gstNumber: '',
+          companyName: user.departmentName || (frontendRole === 'ADMIN' ? 'SWAGAT System Administration' : `${user.name}'s Enterprise`),
+          cin: '',
+          entityType: 'Private Limited',
+          state: 'India',
+          address: '',
+          isDigiLockerVerified: false,
+          role: frontendRole,
+          avatarInitials: user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2),
+          departmentName: user.departmentName,
+          status: user.status || 'Active',
+          accountType: user.accountType || (frontendRole === 'ADMIN' ? 'System Administrator' : 'Business User'),
+        };
+      }
+    } catch {}
+    return null;
+  });
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<SwagatContextType['authModalMode']>('signin-user');
-  const [currentView, setCurrentView] = useState<AppView>('home');
+  const [currentView, setCurrentView] = useState<AppView>(() => {
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname;
+      const hash = window.location.hash;
+      const oauthRole = localStorage.getItem('swagat_oauth_role') || sessionStorage.getItem('swagat_oauth_role');
+
+      // If returning from Google OAuth redirect (hash containing tokens)
+      if (hash && (hash.includes('access_token') || hash.includes('id_token') || hash.includes('refresh_token'))) {
+        return oauthRole === 'ADMIN' ? 'admin-dashboard' : 'dashboard';
+      }
+
+      if (path === '/admin/dashboard') return 'admin-dashboard';
+      if (path === '/dashboard') return 'dashboard';
+    }
+    const session = getStoredSession();
+    if (session?.user?.role === 'ADMIN') return 'admin-dashboard';
+    if (session?.user?.role === 'USER') return 'dashboard';
+    return 'home';
+  });
   const [dashboardActiveTab, setDashboardActiveTab] = useState('overview');
 
   const [approvals] = useState<Approval[]>(approvalsData);
@@ -352,31 +401,115 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   // ── Supabase Google OAuth callback handler ────────────────────────────────
   useEffect(() => {
     if (isSupabaseConfigured()) {
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, supaSession) => {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, supaSession) => {
         if (supaSession?.user) {
           const su = supaSession.user;
           const gName = su.user_metadata?.full_name || su.user_metadata?.name || su.email?.split('@')[0] || 'User';
-          const gEmail = su.email || '';
-          const oauthRole: UserRole = (localStorage.getItem('swagat_oauth_role') || 'USER') as UserRole;
+          const gEmail = (su.email || '').toLowerCase().trim();
+          
+          // Role requested during OAuth sign-in flow
+          const rawRole = (sessionStorage.getItem('swagat_oauth_role') || localStorage.getItem('swagat_oauth_role') || 'USER').toUpperCase();
+          const requestedRole: UserRole = rawRole === 'ADMIN' ? 'ADMIN' : 'USER';
+
+          // Check if account already has a bound role in cloud Supabase user_metadata or local mockUsers
+          const cloudBoundRole = su.user_metadata?.swagat_role as UserRole | undefined;
+          const existingMockUser = getMockUsers().find(u => u.email.toLowerCase() === gEmail);
+          const boundRole: UserRole | undefined = cloudBoundRole || (existingMockUser?.role as UserRole);
+
+          // STRICT ROLE-BINDING ENFORCEMENT
+          if (boundRole && boundRole !== requestedRole) {
+            console.error(`[Google Auth] Role conflict for ${gEmail}: Account is registered as ${boundRole}, attempted login as ${requestedRole}`);
+            
+            // Immediately sign out from Supabase & clear OAuth states
+            await supabase.auth.signOut();
+            clearSession();
+            clearStoredAuth();
+            localStorage.removeItem('swagat_oauth_role');
+            sessionStorage.removeItem('swagat_oauth_role');
+            
+            // Clean URL hash
+            if (window.location.hash.includes('access_token') || window.location.hash.includes('id_token')) {
+              window.history.replaceState(null, '', '/');
+            }
+            
+            const msg = `Access Denied: This Google account (${gEmail}) is registered as ${boundRole === 'ADMIN' ? 'Officer / Admin' : 'Business'}. You cannot log in via the ${requestedRole === 'ADMIN' ? 'Admin' : 'Business'} portal.`;
+            showToast(msg);
+            alert(`Access Denied!\n\nThis Google account (${gEmail}) is permanently registered as ${boundRole === 'ADMIN' ? 'Officer / Admin' : 'Business'}.\n\nYou cannot use it to log in to the ${requestedRole === 'ADMIN' ? 'Admin' : 'Business'} portal.`);
+            setCurrentView('home');
+            return;
+          }
+
+          const finalRole: UserRole = boundRole || requestedRole;
+
+          // If not bound in cloud Supabase metadata yet, bind it permanently in Supabase
+          if (!cloudBoundRole) {
+            try {
+              await supabase.auth.updateUser({
+                data: { swagat_role: finalRole }
+              });
+            } catch (e) {
+              console.warn('[Google Auth] Failed to bind swagat_role in cloud metadata:', e);
+            }
+          }
+
+          // Register / sync in backend PostgreSQL via /auth/google
+          try {
+            await authApi.googleAuth(gEmail, gName, finalRole);
+          } catch (backendErr: any) {
+            console.warn('[Google Auth] Backend sync response:', backendErr?.message);
+            if (backendErr?.message?.includes('registered as') || backendErr?.message?.includes('different role')) {
+              await supabase.auth.signOut();
+              clearSession();
+              clearStoredAuth();
+              localStorage.removeItem('swagat_oauth_role');
+              sessionStorage.removeItem('swagat_oauth_role');
+              alert(`Access Denied: ${backendErr.message}`);
+              setCurrentView('home');
+              return;
+            }
+          }
+
+          // Sync into mockAuth session & state
+          const { user: mockUser } = mockGoogleLogin(gEmail, gName, finalRole);
           const initials = gName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
-          setUserProfile({
-            id: su.id,
+
+          const profile: UserProfile = {
+            id: mockUser.id || su.id,
             name: gName,
             email: gEmail,
             phone: su.phone || '',
             pan: '',
             gstNumber: '',
-            companyName: `${gName}'s Enterprise`,
+            companyName: finalRole === 'ADMIN' ? 'Government Administration' : `${gName}'s Enterprise`,
             cin: '',
             entityType: 'Private Limited',
             state: 'India',
             address: '',
             isDigiLockerVerified: false,
-            role: oauthRole,
+            role: finalRole,
             avatarInitials: initials,
-          });
+            accountType: finalRole === 'ADMIN' ? 'System Administrator' : 'Business User',
+          };
+
+          setUserProfile(profile);
+          setStoredSession({ user: mockUser, token: supaSession.access_token });
+          localStorage.removeItem('swagat_oauth_role');
+          sessionStorage.removeItem('swagat_oauth_role');
           setIsAuthModalOpen(false);
-          setCurrentView(oauthRole === 'ADMIN' ? 'admin-dashboard' : 'dashboard');
+
+          // Load applications and notifications for this role
+          if (finalRole === 'USER') {
+            setApplications(loadUserApplications(mockUser.id || su.id));
+            setUserNotifications(loadNotifications('USER', mockUser.id || su.id));
+          } else {
+            setUserNotifications(loadNotifications('ADMIN'));
+          }
+
+          // Clear URL hash to prevent re-triggering and clean up URL
+          const targetPath = finalRole === 'ADMIN' ? '/admin/dashboard' : '/dashboard';
+          window.history.replaceState(null, '', targetPath);
+          setCurrentView(finalRole === 'ADMIN' ? 'admin-dashboard' : 'dashboard');
+          showToast(`Welcome back, ${gName}! Signed in as ${finalRole === 'ADMIN' ? 'Administrator' : 'Business'}.`);
         }
       });
       return () => subscription.unsubscribe();
@@ -461,7 +594,15 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const loginWithGoogle = async (email: string, name: string, role: 'USER' | 'ADMIN') => {
     const targetRole: 'USER' | 'ADMIN' = role === 'ADMIN' ? 'ADMIN' : 'USER';
-    const resolvedSession = mockGoogleLogin(email, name, targetRole);
+    const gEmail = email.toLowerCase().trim();
+
+    // Check if user is already registered with another role
+    const existingUser = getMockUsers().find(u => u.email.toLowerCase() === gEmail);
+    if (existingUser && existingUser.role !== targetRole) {
+      throw new Error(`This account (${email}) is already registered as ${existingUser.role === 'ADMIN' ? 'Officer / Admin' : 'Business'}. You cannot log in via the ${targetRole === 'ADMIN' ? 'Admin' : 'Business'} portal.`);
+    }
+
+    const resolvedSession = mockGoogleLogin(gEmail, name, targetRole);
 
     const { user } = resolvedSession;
     const finalRole: UserRole = user.role === 'ADMIN' ? 'ADMIN' : 'USER';
@@ -488,16 +629,19 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     };
 
     setUserProfile(profile);
+    setStoredSession(resolvedSession);
     setIsAuthModalOpen(false);
 
     if (finalRole === 'ADMIN') {
+      setUserNotifications(loadNotifications('ADMIN'));
       setCurrentView('admin-dashboard');
-      if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/dashboard');
+      if (typeof window !== 'undefined') window.history.replaceState({}, '', '/admin/dashboard');
       showToast(`Welcome, ${resolvedName}! Signed in to SWAGAT ADMIN Portal.`);
     } else {
       setApplications(loadUserApplications(user.id));
+      setUserNotifications(loadNotifications('USER', user.id));
       setCurrentView('dashboard');
-      if (typeof window !== 'undefined') window.history.pushState({}, '', '/dashboard');
+      if (typeof window !== 'undefined') window.history.replaceState({}, '', '/dashboard');
       showToast(`Welcome, ${resolvedName}! Signed in to My SWAGAT Dashboard.`);
 
       if (pendingApprovalToApply) {
@@ -512,11 +656,21 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } catch {
       // ignore offline errors
     }
+    if (isSupabaseConfigured()) {
+      try {
+        supabase.auth.signOut();
+      } catch {
+        // ignore
+      }
+    }
     clearSession();
+    clearStoredAuth();
+    localStorage.removeItem('swagat_oauth_role');
+    sessionStorage.removeItem('swagat_oauth_role');
     setUserProfile(null);
     setWizardSession(null);
     setCurrentView('home');
-    if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
+    if (typeof window !== 'undefined') window.history.replaceState({}, '', '/');
     showToast('Signed out successfully from SWAGAT session.');
   };
 

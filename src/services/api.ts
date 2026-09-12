@@ -142,6 +142,26 @@ export const authApi = {
     return { ...res, user };
   },
 
+  googleAuth: async (
+    email: string,
+    fullName: string,
+    role: 'applicant' | 'super_admin' | 'USER' | 'ADMIN' = 'applicant'
+  ): Promise<AuthResponse> => {
+    const normalizedRole = (role === 'ADMIN' || role === 'super_admin') ? 'super_admin' : 'applicant';
+    const res = await request<AuthResponse>('/auth/google', {
+      method: 'POST',
+      body: JSON.stringify({ email, full_name: fullName, role: normalizedRole }),
+    });
+    const user: AuthUser = res.user || {
+      id: res.user_id || 'usr-default',
+      email,
+      full_name: fullName,
+      role: normalizedRole,
+    };
+    setStoredAuth(res.token, user);
+    return { ...res, user };
+  },
+
   logout: () => clearStoredAuth(),
 };
 

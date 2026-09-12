@@ -412,13 +412,28 @@ export function createAdminAccount(
   return newAdmin;
 }
 
+export function setStoredSession(session: AuthSession) {
+  const token = session.token || generateFakeToken(session.user);
+  const fullSession = { token, user: session.user };
+  localStorage.setItem(SESSION_KEY, JSON.stringify(fullSession));
+  localStorage.setItem('swagat_auth_token', token);
+  localStorage.setItem('swagat_auth_user', JSON.stringify({
+    id: session.user.id,
+    email: session.user.email,
+    full_name: session.user.name,
+    role: session.user.role,
+  }));
+}
+
 export function getStoredSession(): AuthSession | null {
   try {
     const raw = localStorage.getItem(SESSION_KEY);
     if (!raw) return null;
     const session: AuthSession = JSON.parse(raw);
-    const decoded = decodeToken(session.token);
-    if (!decoded) { clearSession(); return null; }
+    if (!session || !session.user) {
+      clearSession();
+      return null;
+    }
     return session;
   } catch {
     return null;
@@ -429,6 +444,8 @@ export function clearSession() {
   localStorage.removeItem(SESSION_KEY);
   localStorage.removeItem('swagat_auth_token');
   localStorage.removeItem('swagat_auth_user');
+  localStorage.removeItem('swagat_oauth_role');
+  sessionStorage.removeItem('swagat_oauth_role');
 }
 
 export function getAllMockUsers(): MockUser[] {

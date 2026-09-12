@@ -23,12 +23,14 @@ import { UserRole } from '../types/swagat';
 
 export const signInWithGoogleOAuth = async (role: UserRole = 'USER') => {
   localStorage.setItem('swagat_oauth_role', role);
+  sessionStorage.setItem('swagat_oauth_role', role);
 
   if (isSupabaseConfigured()) {
+    const redirectUrl = `${window.location.origin}${role === 'ADMIN' ? '/admin/dashboard' : '/dashboard'}`;
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin,
+        redirectTo: redirectUrl,
       },
     });
     if (error) throw error;

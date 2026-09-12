@@ -42,6 +42,13 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
+    // Do NOT run redirect or access-denied ejection while OAuth hash tokens or auth codes are being exchanged
+    const hash = window.location.hash;
+    const search = window.location.search;
+    if (hash.includes('access_token') || hash.includes('id_token') || hash.includes('refresh_token') || search.includes('code=')) {
+      return;
+    }
+
     const path = window.location.pathname;
 
     if (path === '/admin/dashboard' || currentView === 'admin-dashboard') {
@@ -64,6 +71,21 @@ const AppContent: React.FC = () => {
       }
     }
   }, [currentView, userProfile]);
+
+  // If returning from Google OAuth redirect, show authenticating screen while onAuthStateChange resolves
+  const isOAuthRedirectInFlight = typeof window !== 'undefined' &&
+    (window.location.hash.includes('access_token') || window.location.hash.includes('id_token')) &&
+    !userProfile;
+
+  if (isOAuthRedirectInFlight) {
+    return (
+      <div className="min-h-screen bg-[#07182C] text-white flex flex-col items-center justify-center space-y-4 font-sans selection:bg-amber-400/30">
+        <div className="w-12 h-12 border-4 border-amber-400/20 border-t-amber-400 rounded-full animate-spin"></div>
+        <h2 className="text-xl font-bold tracking-tight">Authenticating with Google</h2>
+        <p className="text-sm text-slate-400">Verifying authorized credentials and portal permissions...</p>
+      </div>
+    );
+  }
 
   // ── Role-based dashboard routing ────────────────────────────────────────────
 
