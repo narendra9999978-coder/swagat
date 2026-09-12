@@ -233,11 +233,11 @@ export const HeaderNavbar: React.FC = () => {
                 {t('state_approvals')}
               </button>
 
-              {/* 6. Resources (Visible on >= 1400px, in More on 901px-1399px) */}
+              {/* 6. Resources (Visible on >= 1350px, in More on 901px-1349px) */}
               <button
                 id="nav-link-about"
                 onClick={() => handleNavClick('home', 'section-about')}
-                className="hidden min-[1400px]:inline-block px-2 min-[1200px]:px-2.5 min-[1400px]:px-3 py-1.5 rounded-lg hover:text-[#07182C] hover:bg-slate-50 transition-colors shrink-0 cursor-pointer"
+                className="hidden min-[1350px]:inline-block px-2 min-[1200px]:px-2.5 min-[1400px]:px-3 py-1.5 rounded-lg hover:text-[#07182C] hover:bg-slate-50 transition-colors shrink-0 cursor-pointer"
               >
                 Resources
               </button>
@@ -275,7 +275,7 @@ export const HeaderNavbar: React.FC = () => {
                     </button>
                     <button
                       onClick={() => handleNavClick('home', 'section-about')}
-                      className="w-full text-left px-3.5 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-[#07182C] transition-colors flex items-center space-x-2"
+                      className="w-full text-left px-3.5 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-[#07182C] transition-colors flex items-center space-x-2 min-[1350px]:hidden"
                     >
                       <BookOpen className="w-3.5 h-3.5 text-slate-500" />
                       <span>Resources</span>

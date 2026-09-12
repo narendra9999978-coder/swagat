@@ -91,7 +91,6 @@
   align-items: center;
   gap: clamp(4px, 1vw, 18px);
   white-space: nowrap;
-  overflow: hidden;
 }
 
 .swagat-actions {
