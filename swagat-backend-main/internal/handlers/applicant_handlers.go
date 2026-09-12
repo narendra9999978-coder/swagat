@@ -72,6 +72,17 @@ func (h *ApplicantHandler) WalkStep(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	// If root was requested or child is a question, also include its option children
+	// so the applicant frontend receives both the question and its interactive choices!
+	if len(children) > 0 && children[0].NodeType == models.NodeTypeQuestion {
+		qID := children[0].ID
+		options, err := h.Tree.Children(c, &qID, models.TreeTypeBusiness, &businessTypeID, &st)
+		if err == nil && len(options) > 0 {
+			children = append(children, options...)
+		}
+	}
+
 	c.JSON(http.StatusOK, gin.H{"children": children})
 }
 

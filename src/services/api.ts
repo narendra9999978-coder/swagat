@@ -4,6 +4,8 @@
  * All calls try real backend first; on failure they return mock fallback data.
  */
 
+import { getSectorRootQuestion, SECTOR_TREES, normalizeSectorCode } from '../data/sectorDecisionTrees';
+
 const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || '';
 
 // Local Storage Keys
@@ -246,103 +248,71 @@ const MOCK_BUSINESS_TYPES: BusinessTypeAPI[] = [
   { id: 'bt-mining', name: 'Mining & Minerals', code: 'MINING', description: 'Quarrying, mineral extraction, processing' },
 ];
 
-const MOCK_TREES: Record<string, Record<string, TreeNodeAPI[]>> = {
-  'business_registration': {
-    root: [
-      { id: 'br-q1', label: 'What type of legal entity will be registered?', node_type: 'question', is_leaf: false, sort_order: 0 },
-    ],
-    'br-q1': [
-      { id: 'br-o1', label: 'Private Limited Company (Pvt Ltd)', node_type: 'option', is_leaf: true, sort_order: 0 },
-      { id: 'br-o2', label: 'Limited Liability Partnership (LLP)', node_type: 'option', is_leaf: true, sort_order: 1 },
-      { id: 'br-o3', label: 'Proprietorship / Sole Trader', node_type: 'option', is_leaf: true, sort_order: 2 },
-      { id: 'br-o4', label: 'Partnership Firm', node_type: 'option', is_leaf: true, sort_order: 3 },
-      { id: 'br-o5', label: 'Public Limited Company (Ltd)', node_type: 'option', is_leaf: true, sort_order: 4 },
-    ],
-  },
-  'business_activity': {
-    root: [
-      { id: 'ba-q1', label: 'What is the primary business activity scale?', node_type: 'question', is_leaf: false, sort_order: 0 },
-    ],
-    'ba-q1': [
-      { id: 'ba-o1', label: 'Micro (Investment < ₹1 Crore)', node_type: 'option', is_leaf: false, sort_order: 0 },
-      { id: 'ba-o2', label: 'Small (Investment ₹1 Cr – ₹10 Cr)', node_type: 'option', is_leaf: false, sort_order: 1 },
-      { id: 'ba-o3', label: 'Medium (Investment ₹10 Cr – ₹50 Cr)', node_type: 'option', is_leaf: false, sort_order: 2 },
-      { id: 'ba-o4', label: 'Large (Investment > ₹50 Crore)', node_type: 'option', is_leaf: false, sort_order: 3 },
-    ],
-    'ba-o1': [
-      { id: 'ba-q2a', label: 'Will you employ workers at the facility?', node_type: 'question', is_leaf: false, sort_order: 0 },
-    ],
-    'ba-q2a': [
-      { id: 'ba-o2a1', label: 'Yes, 1 to 10 workers', node_type: 'option', is_leaf: true, sort_order: 0 },
-      { id: 'ba-o2a2', label: 'No workers / fully automated', node_type: 'option', is_leaf: true, sort_order: 1 },
-    ],
-    'ba-o2': [
-      { id: 'ba-q2b', label: 'Does the business involve hazardous materials or chemicals?', node_type: 'question', is_leaf: false, sort_order: 0 },
-    ],
-    'ba-q2b': [
-      { id: 'ba-o2b1', label: 'Yes, Schedule 1 chemicals listed under EPA', node_type: 'option', is_leaf: true, sort_order: 0 },
-      { id: 'ba-o2b2', label: 'No hazardous materials', node_type: 'option', is_leaf: true, sort_order: 1 },
-    ],
-    'ba-o3': [
-      { id: 'ba-q2c', label: 'Does the business involve hazardous materials or chemicals?', node_type: 'question', is_leaf: false, sort_order: 0 },
-    ],
-    'ba-q2c': [
-      { id: 'ba-o2c1', label: 'Yes, Schedule 1/2 chemicals', node_type: 'option', is_leaf: true, sort_order: 0 },
-      { id: 'ba-o2c2', label: 'Standard industrial solvents', node_type: 'option', is_leaf: true, sort_order: 1 },
-      { id: 'ba-o2c3', label: 'No hazardous materials', node_type: 'option', is_leaf: true, sort_order: 2 },
-    ],
-    'ba-o4': [
-      { id: 'ba-q2d', label: 'Does the project generate industrial effluents?', node_type: 'question', is_leaf: false, sort_order: 0 },
-    ],
-    'ba-q2d': [
-      { id: 'ba-o2d1', label: 'Yes, requires ETP / ZLD plant', node_type: 'option', is_leaf: true, sort_order: 0 },
-      { id: 'ba-o2d2', label: 'Minimal effluents (dry process)', node_type: 'option', is_leaf: true, sort_order: 1 },
-    ],
-  },
-  'foreign_investment': {
-    root: [
-      { id: 'fi-q1', label: 'Does the project involve Foreign Direct Investment (FDI)?', node_type: 'question', is_leaf: false, sort_order: 0 },
-    ],
-    'fi-q1': [
-      { id: 'fi-o1', label: 'No — 100% Domestic Capital', node_type: 'option', is_leaf: true, sort_order: 0 },
-      { id: 'fi-o2', label: 'Yes — FDI is involved', node_type: 'option', is_leaf: false, sort_order: 1 },
-    ],
-    'fi-o2': [
-      { id: 'fi-q2', label: 'What percentage of equity is from foreign investors?', node_type: 'question', is_leaf: false, sort_order: 0 },
-    ],
-    'fi-q2': [
-      { id: 'fi-o2a', label: 'Less than 26% (Minority stake)', node_type: 'option', is_leaf: true, sort_order: 0 },
-      { id: 'fi-o2b', label: '26% to 74%', node_type: 'option', is_leaf: true, sort_order: 1 },
-      { id: 'fi-o2c', label: '75% to 100% (FDI-dominant)', node_type: 'option', is_leaf: true, sort_order: 2 },
-    ],
-  },
-  'project_land': {
-    root: [
-      { id: 'pl-q1', label: 'What is the land acquisition / site type?', node_type: 'question', is_leaf: false, sort_order: 0 },
-    ],
-    'pl-q1': [
-      { id: 'pl-o1', label: 'Government allocated (MIDC / SIDCO / State Industrial Estate)', node_type: 'option', is_leaf: true, sort_order: 0 },
-      { id: 'pl-o2', label: 'Privately owned land (to be purchased)', node_type: 'option', is_leaf: false, sort_order: 1 },
-      { id: 'pl-o3', label: 'Leased commercial / industrial premises', node_type: 'option', is_leaf: true, sort_order: 2 },
-    ],
-    'pl-o2': [
-      { id: 'pl-q2', label: 'Is the land already converted for non-agricultural (industrial) use?', node_type: 'question', is_leaf: false, sort_order: 0 },
-    ],
-    'pl-q2': [
-      { id: 'pl-o2a', label: 'Yes — NA conversion order already obtained', node_type: 'option', is_leaf: true, sort_order: 0 },
-      { id: 'pl-o2b', label: 'No — conversion application in process', node_type: 'option', is_leaf: true, sort_order: 1 },
-    ],
-  },
-};
+export function getMockRootNode(businessTypeIdOrStep: string, step?: string): TreeNodeAPI[] {
+  const actualStep = step || (['business_registration', 'business_activity', 'foreign_investment', 'project_land'].includes(businessTypeIdOrStep) ? businessTypeIdOrStep : 'business_registration');
+  const sectorCode = normalizeSectorCode(step ? businessTypeIdOrStep : 'HOTEL');
+  const q = getSectorRootQuestion(sectorCode, actualStep as any);
+  if (!q) return [];
 
-function getMockNodeChildren(nodeId: string, step: string): TreeNodeAPI[] {
-  const stepTree = MOCK_TREES[step];
-  if (!stepTree) return [];
-  return stepTree[nodeId] || [];
+  const nodes: TreeNodeAPI[] = [
+    { id: q.id, label: q.question, node_type: 'question', is_leaf: false, sort_order: 0 }
+  ];
+
+  (q.options || []).forEach((opt, idx) => {
+    nodes.push({
+      id: opt.id,
+      label: opt.label,
+      node_type: 'option',
+      is_leaf: opt.isLeaf,
+      sort_order: idx + 1,
+    });
+  });
+
+  return nodes;
 }
 
-function getMockRootNode(step: string): TreeNodeAPI[] {
-  return getMockNodeChildren('root', step);
+export function getMockNodeChildren(nodeId: string, step: string, businessTypeId?: string): TreeNodeAPI[] {
+  const sectorCode = normalizeSectorCode(businessTypeId || 'HOTEL');
+  const tree = SECTOR_TREES[sectorCode] || SECTOR_TREES.HOTEL;
+  const questions = tree.steps[step as any] || [];
+
+  // 1. Check if nodeId is an option
+  for (const q of questions) {
+    const opt = q.options.find(o => o.id === nodeId);
+    if (opt) {
+      if (opt.isLeaf || !opt.nextQuestionId) {
+        return [];
+      }
+      const nextQ = questions.find(item => item.id === opt.nextQuestionId);
+      if (nextQ) {
+        return [
+          { id: nextQ.id, label: nextQ.question, node_type: 'question', is_leaf: false, sort_order: 0 },
+          ...nextQ.options.map((o, idx) => ({
+            id: o.id,
+            label: o.label,
+            node_type: 'option' as const,
+            is_leaf: o.isLeaf,
+            sort_order: idx + 1,
+          }))
+        ];
+      }
+    }
+  }
+
+  // 2. Check if nodeId is a question ID directly
+  const directQ = questions.find(q => q.id === nodeId);
+  if (directQ) {
+    return directQ.options.map((o, idx) => ({
+      id: o.id,
+      label: o.label,
+      node_type: 'option' as const,
+      is_leaf: o.isLeaf,
+      sort_order: idx + 1,
+    }));
+  }
+
+  // 3. Fallback to root question
+  return getMockRootNode(sectorCode, step);
 }
 
 const MOCK_CHECKLIST: ChecklistDocumentAPI[] = [
@@ -425,14 +395,26 @@ export const applicantApi = {
     catch { return MOCK_BUSINESS_TYPES; }
   },
 
-  getNodeChildren: async (nodeId: string, step: string): Promise<TreeNodeAPI[]> => {
-    try { return await request<TreeNodeAPI[]>(`/apply/nodes/${nodeId}/children?step=${step}`); }
-    catch { return getMockNodeChildren(nodeId, step); }
+  getNodeChildren: async (nodeId: string, step: string, businessTypeId?: string): Promise<TreeNodeAPI[]> => {
+    try {
+      const res = await request<any>(`/apply/walk?node_id=${nodeId}&step=${step}`);
+      const list: TreeNodeAPI[] = Array.isArray(res) ? res : res?.children || [];
+      if (list.length > 0) return list;
+      return getMockNodeChildren(nodeId, step, businessTypeId);
+    } catch {
+      return getMockNodeChildren(nodeId, step, businessTypeId);
+    }
   },
 
   getRootNodes: async (businessTypeId: string, step: string): Promise<TreeNodeAPI[]> => {
-    try { return await request<TreeNodeAPI[]>(`/apply/walk?business_type_id=${businessTypeId}&step=${step}`); }
-    catch { return getMockRootNode(step); }
+    try {
+      const res = await request<any>(`/apply/walk?business_type_id=${businessTypeId}&step=${step}`);
+      const list: TreeNodeAPI[] = Array.isArray(res) ? res : res?.children || [];
+      if (list.length > 0) return list;
+      return getMockRootNode(businessTypeId, step);
+    } catch {
+      return getMockRootNode(businessTypeId, step);
+    }
   },
 
   createDraft: async (businessTypeId: string): Promise<ApplicationDraftResponse> => {
