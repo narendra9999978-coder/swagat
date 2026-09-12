@@ -27,9 +27,9 @@ export const SwagatLogo: React.FC<SwagatLogoProps> = ({
   const s = sizeMap[size];
 
   return (
-    <div className={`flex items-center space-x-3 select-none ${className}`}>
+    <div className={`flex items-center space-x-2.5 sm:space-x-3 select-none shrink-0 ${className}`}>
       {/* Emblem */}
-      <div className={`relative flex items-center justify-center ${s.box} rounded-2xl bg-gradient-to-br from-[#06152B] via-[#0D284E] to-[#06152B] text-white shadow-md border border-white/15 overflow-hidden group`}>
+      <div className={`relative flex items-center justify-center ${s.box} rounded-2xl bg-gradient-to-br from-[#06152B] via-[#0D284E] to-[#06152B] text-white shadow-md border border-white/15 overflow-hidden group shrink-0`}>
         {/* Glow behind */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,153,51,0.25),transparent_60%)]"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,rgba(19,136,8,0.25),transparent_60%)]"></div>
@@ -105,9 +105,9 @@ export const SwagatLogo: React.FC<SwagatLogoProps> = ({
 
       {/* Wordmark */}
       {showWordmark && (
-        <div className="flex flex-col leading-tight">
+        <div className="flex flex-col leading-tight min-w-0 shrink-0">
           <span
-            className={`font-display font-extrabold tracking-tight ${s.text} ${
+            className={`font-display font-extrabold tracking-tight shrink-0 ${s.text} ${
               theme === 'dark' ? 'text-white' : 'text-[#07182C]'
             }`}
           >
@@ -124,9 +124,10 @@ export const SwagatLogo: React.FC<SwagatLogoProps> = ({
             </span>
           ) : (
             <span
-              className={`text-[10px] font-medium leading-none whitespace-nowrap hidden sm:inline ${
+              className={`text-[10px] font-medium leading-none truncate max-w-[130px] sm:max-w-[200px] hidden min-[601px]:block ${
                 theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
               }`}
+              title="India’s Single Window for Business Approvals"
             >
               India’s Single Window for Business Approvals
             </span>
