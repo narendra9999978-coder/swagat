@@ -17,7 +17,9 @@ import {
   Sparkles,
   FileCheck2,
   Compass,
-  MapPin
+  MapPin,
+  Layers,
+  BookOpen
 } from 'lucide-react';
 import { useSwagat } from '../context/SwagatContext';
 import { useLanguage, LanguageCode } from '../context/LanguageContext';
@@ -43,11 +45,15 @@ export const HeaderNavbar: React.FC = () => {
   const [isThreeDotOpen, setIsThreeDotOpen] = useState(false);
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
   const [isStateDropdownOpen, setIsStateDropdownOpen] = useState(false);
+  const [isLoginDropdownOpen, setIsLoginDropdownOpen] = useState(false);
+  const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const threeDotRef = useRef<HTMLDivElement>(null);
   const langRef = useRef<HTMLDivElement>(null);
   const stateRef = useRef<HTMLDivElement>(null);
+  const loginDropdownRef = useRef<HTMLDivElement>(null);
+  const moreRef = useRef<HTMLDivElement>(null);
 
   const languages: { code: LanguageCode; label: string; native: string }[] = [
     { code: 'en', label: 'English', native: 'English' },
@@ -63,17 +69,21 @@ export const HeaderNavbar: React.FC = () => {
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (threeDotRef.current && !threeDotRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (threeDotRef.current && !threeDotRef.current.contains(target)) {
         setIsThreeDotOpen(false);
       }
-      if (langRef.current && !langRef.current.contains(event.target as Node)) {
+      if (langRef.current && !langRef.current.contains(target)) {
         setIsLangDropdownOpen(false);
       }
-      if (stateRef.current && !stateRef.current.contains(event.target as Node)) {
+      if (stateRef.current && !stateRef.current.contains(target)) {
         setIsStateDropdownOpen(false);
       }
-      if (loginDropdownRef.current && !loginDropdownRef.current.contains(event.target as Node)) {
+      if (loginDropdownRef.current && !loginDropdownRef.current.contains(target)) {
         setIsLoginDropdownOpen(false);
+      }
+      if (moreRef.current && !moreRef.current.contains(target)) {
+        setIsMoreDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -83,6 +93,7 @@ export const HeaderNavbar: React.FC = () => {
   const handleNavClick = (view: typeof currentView, hashTarget?: string) => {
     setCurrentView(view);
     setIsMobileMenuOpen(false);
+    setIsMoreDropdownOpen(false);
     if (hashTarget && view === 'home') {
       const el = document.getElementById(hashTarget);
       if (el) {
@@ -93,14 +104,12 @@ export const HeaderNavbar: React.FC = () => {
     }
   };
 
-  const [isLoginDropdownOpen, setIsLoginDropdownOpen] = useState(false);
-  const loginDropdownRef = useRef<HTMLDivElement>(null);
-
   const openAuthWithMode = (mode: 'signin-user' | 'signup-user' | 'signin-admin' | 'signin-super') => {
     setAuthModalMode(mode);
     setIsAuthModalOpen(true);
     setIsThreeDotOpen(false);
     setIsLoginDropdownOpen(false);
+    setIsMoreDropdownOpen(false);
     setIsMobileMenuOpen(false);
   };
 
@@ -124,7 +133,7 @@ export const HeaderNavbar: React.FC = () => {
   return (
     <>
       {/* Top Single Window Assurance Bar */}
-      <div className="bg-[#07182C] text-slate-300 text-[11px] font-medium py-1 px-4 sm:px-6 lg:px-8 border-b border-white/10 hidden md:block">
+      <div className="bg-[#07182C] text-slate-300 text-[11px] font-medium py-1 px-4 sm:px-6 lg:px-8 border-b border-white/10 hidden md:block select-none">
         <div className="w-full flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -143,13 +152,15 @@ export const HeaderNavbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Navigation Bar */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
-        <div className="w-full px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20 gap-3">
+      {/* Main Navigation Bar — Fixed & High Z-Index */}
+      <header className="sticky top-0 z-[1000] swagat-navbar-header bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
+        <div className="w-full px-3 sm:px-6 lg:px-8">
+          <div className="swagat-navbar-container flex items-center justify-between h-20 w-full gap-2 sm:gap-3 lg:gap-4">
             
-            {/* Left: SWAGAT Brand Logo & Navigation Links */}
-            <div className="flex items-center space-x-3 xl:space-x-6 min-w-0">
+            {/* ─────────────────────────────────────────────────────────────
+                SECTION 1: SWAGAT Brand Logo (Left, flex-shrink: 0)
+                ───────────────────────────────────────────────────────────── */}
+            <div className="swagat-nav-logo shrink-0 flex items-center">
               <button
                 id="swagat-brand-home-btn"
                 onClick={handleLogoClick}
@@ -158,121 +169,182 @@ export const HeaderNavbar: React.FC = () => {
               >
                 <SwagatLogo size="md" showWordmark={true} showTagline={false} theme="light" />
               </button>
-
-              {/* Main Navigation Links moved to left next to logo */}
-              <nav className="hidden lg:flex items-center space-x-0.5 xl:space-x-1 font-medium text-xs xl:text-sm text-slate-700 whitespace-nowrap">
-                <button
-                  id="nav-link-home"
-                  onClick={() => handleNavClick('home')}
-                  className={`px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-lg transition-colors ${
-                    currentView === 'home' ? 'text-[#07182C] font-bold bg-slate-100' : 'hover:text-[#07182C] hover:bg-slate-50'
-                  }`}
-                >
-                  {t('nav_home')}
-                </button>
-
-                <button
-                  id="nav-link-kya"
-                  onClick={() => handleNavClick('home', 'section-kya')}
-                  className="px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-lg text-amber-700 font-semibold hover:bg-amber-50/80 transition-colors flex items-center space-x-1"
-                >
-                  <Compass className="w-3.5 h-3.5 xl:w-4 xl:h-4 text-amber-600 shrink-0" />
-                  <span>{t('nav_kya')}</span>
-                </button>
-
-                <button
-                  id="nav-link-approvals"
-                  onClick={() => handleNavClick('home', 'section-approvals')}
-                  className={`px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-lg transition-colors ${
-                    currentView === 'approvals' ? 'text-[#07182C] font-bold bg-slate-100' : 'hover:text-[#07182C] hover:bg-slate-50'
-                  }`}
-                >
-                  {t('nav_approvals')}
-                </button>
-
-                <button
-                  id="nav-link-schemes"
-                  onClick={() => handleNavClick('home', 'section-schemes')}
-                  className={`px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-lg transition-colors ${
-                    currentView === 'schemes' ? 'text-[#07182C] font-bold bg-slate-100' : 'hover:text-[#07182C] hover:bg-slate-50'
-                  }`}
-                >
-                  {t('nav_schemes')}
-                </button>
-
-                <button
-                  id="nav-link-states"
-                  onClick={() => handleNavClick('home', 'section-states')}
-                  className="px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-lg hover:text-[#07182C] hover:bg-slate-50 transition-colors"
-                >
-                  {t('state_approvals')}
-                </button>
-
-                <button
-                  id="nav-link-about"
-                  onClick={() => handleNavClick('home', 'section-about')}
-                  className="px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-lg hover:text-[#07182C] hover:bg-slate-50 transition-colors"
-                >
-                  {t('nav_about')}
-                </button>
-
-                <button
-                  id="nav-link-help"
-                  onClick={() => handleNavClick('home', 'section-help')}
-                  className="px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-lg hover:text-[#07182C] hover:bg-slate-50 transition-colors"
-                >
-                  {t('nav_help')}
-                </button>
-
-                {userProfile && (
-                  <button
-                    id="nav-link-dashboard"
-                    onClick={() => handleNavClick('dashboard')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 ${
-                      currentView === 'dashboard' 
-                        ? 'bg-[#07182C] text-white shadow-xs' 
-                        : 'bg-blue-50 text-[#0B2545] border border-blue-200 hover:bg-blue-100'
-                    }`}
-                  >
-                    <LayoutDashboard className="w-3.5 h-3.5" />
-                    <span>{t('nav_dashboard')}</span>
-                  </button>
-                )}
-              </nav>
             </div>
 
-            {/* Right: Search, Language Selector & THREE-DOT MENU */}
-            <div className="flex items-center space-x-1.5 sm:space-x-2.5 shrink-0">
+            {/* ─────────────────────────────────────────────────────────────
+                SECTION 2: Navigation Links (Center, flex: 1, dynamic clamp)
+                Desktop shows all; Laptop/medium screens shows primary + More
+                ───────────────────────────────────────────────────────────── */}
+            <nav className="swagat-nav-links hidden lg:flex items-center justify-center flex-1 min-w-0 font-medium text-xs xl:text-sm text-slate-700 whitespace-nowrap">
+              {/* 1. Home */}
+              <button
+                id="nav-link-home"
+                onClick={() => handleNavClick('home')}
+                className={`px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-lg transition-colors shrink-0 cursor-pointer ${
+                  currentView === 'home' ? 'text-[#07182C] font-bold bg-slate-100' : 'hover:text-[#07182C] hover:bg-slate-50'
+                }`}
+              >
+                {t('nav_home')}
+              </button>
+
+              {/* 2. Approvals */}
+              <button
+                id="nav-link-approvals"
+                onClick={() => handleNavClick('home', 'section-approvals')}
+                className={`px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-lg transition-colors shrink-0 cursor-pointer ${
+                  currentView === 'approvals' ? 'text-[#07182C] font-bold bg-slate-100' : 'hover:text-[#07182C] hover:bg-slate-50'
+                }`}
+              >
+                {t('nav_approvals')}
+              </button>
+
+              {/* 3. Sectors (Visible on XL+, inside More on LG) */}
+              <button
+                id="nav-link-schemes"
+                onClick={() => handleNavClick('home', 'section-schemes')}
+                className={`hidden xl:inline-block px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-lg transition-colors shrink-0 cursor-pointer ${
+                  currentView === 'schemes' ? 'text-[#07182C] font-bold bg-slate-100' : 'hover:text-[#07182C] hover:bg-slate-50'
+                }`}
+              >
+                Sectors
+              </button>
+
+              {/* 4. Know Your Approvals (Always visible, highlighted) */}
+              <button
+                id="nav-link-kya"
+                onClick={() => handleNavClick('home', 'section-kya')}
+                className="px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-lg text-amber-700 font-semibold hover:bg-amber-50/80 transition-colors flex items-center space-x-1 shrink-0 cursor-pointer"
+              >
+                <Compass className="w-3.5 h-3.5 xl:w-4 xl:h-4 text-amber-600 shrink-0" />
+                <span>{t('nav_kya')}</span>
+              </button>
+
+              {/* 5. States (Visible on XL+, inside More on LG) */}
+              <button
+                id="nav-link-states"
+                onClick={() => handleNavClick('home', 'section-states')}
+                className="hidden xl:inline-block px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-lg hover:text-[#07182C] hover:bg-slate-50 transition-colors shrink-0 cursor-pointer"
+              >
+                {t('state_approvals')}
+              </button>
+
+              {/* 6. Resources (Visible on XL+, inside More on LG) */}
+              <button
+                id="nav-link-about"
+                onClick={() => handleNavClick('home', 'section-about')}
+                className="hidden xl:inline-block px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-lg hover:text-[#07182C] hover:bg-slate-50 transition-colors shrink-0 cursor-pointer"
+              >
+                Resources
+              </button>
+
+              {/* 7. Help (Visible on XL+, inside More on LG) */}
+              <button
+                id="nav-link-help"
+                onClick={() => handleNavClick('home', 'section-help')}
+                className="hidden xl:inline-block px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-lg hover:text-[#07182C] hover:bg-slate-50 transition-colors shrink-0 cursor-pointer"
+              >
+                {t('nav_help')}
+              </button>
+
+              {/* Medium-screen "More ▾" menu (Visible only on LG: 1024px to 1279px) */}
+              <div className="relative xl:hidden shrink-0" ref={moreRef}>
+                <button
+                  id="nav-link-more"
+                  onClick={() => setIsMoreDropdownOpen(!isMoreDropdownOpen)}
+                  className={`flex items-center space-x-1 px-2.5 py-1.5 rounded-lg transition-colors font-medium text-xs text-slate-700 cursor-pointer ${
+                    isMoreDropdownOpen ? 'bg-slate-100 font-bold text-[#07182C]' : 'hover:text-[#07182C] hover:bg-slate-50'
+                  }`}
+                >
+                  <span>More</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isMoreDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {isMoreDropdownOpen && (
+                  <div className="absolute left-0 mt-2 w-48 bg-white rounded-xl shadow-2xl border border-slate-200 py-1.5 z-[1050] animate-in fade-in slide-in-from-top-1">
+                    <button
+                      onClick={() => handleNavClick('home', 'section-schemes')}
+                      className="w-full text-left px-3.5 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-[#07182C] transition-colors flex items-center space-x-2"
+                    >
+                      <Layers className="w-3.5 h-3.5 text-slate-500" />
+                      <span>Sectors &amp; Schemes</span>
+                    </button>
+                    <button
+                      onClick={() => handleNavClick('home', 'section-states')}
+                      className="w-full text-left px-3.5 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-[#07182C] transition-colors flex items-center space-x-2"
+                    >
+                      <MapPin className="w-3.5 h-3.5 text-slate-500" />
+                      <span>{t('state_approvals')}</span>
+                    </button>
+                    <button
+                      onClick={() => handleNavClick('home', 'section-about')}
+                      className="w-full text-left px-3.5 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-[#07182C] transition-colors flex items-center space-x-2"
+                    >
+                      <BookOpen className="w-3.5 h-3.5 text-slate-500" />
+                      <span>Resources</span>
+                    </button>
+                    <button
+                      onClick={() => handleNavClick('home', 'section-help')}
+                      className="w-full text-left px-3.5 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-[#07182C] transition-colors flex items-center space-x-2"
+                    >
+                      <HelpCircle className="w-3.5 h-3.5 text-slate-500" />
+                      <span>{t('nav_help')}</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Logged in Dashboard link */}
+              {userProfile && (
+                <button
+                  id="nav-link-dashboard"
+                  onClick={() => handleNavClick(userProfile.role === 'ADMIN' ? 'admin-dashboard' : 'dashboard')}
+                  className={`px-2.5 xl:px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 shrink-0 cursor-pointer ${
+                    currentView === 'dashboard' || currentView === 'admin-dashboard'
+                      ? 'bg-[#07182C] text-white shadow-xs' 
+                      : 'bg-blue-50 text-[#0B2545] border border-blue-200 hover:bg-blue-100'
+                  }`}
+                >
+                  <LayoutDashboard className="w-3.5 h-3.5" />
+                  <span className="hidden 2xl:inline">{t('nav_dashboard')}</span>
+                  <span className="2xl:hidden">Dashboard</span>
+                </button>
+              )}
+            </nav>
+
+            {/* ─────────────────────────────────────────────────────────────
+                SECTION 3: Right-Side Actions & Three-Dot Menu (flex-shrink: 0)
+                ───────────────────────────────────────────────────────────── */}
+            <div className="swagat-nav-right shrink-0 flex items-center space-x-1 sm:space-x-2">
               
               {/* Global Search Button */}
               <button
                 id="global-search-btn"
                 onClick={() => setIsSearchModalOpen(true)}
-                className="p-2.5 text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/90 rounded-xl transition-colors flex items-center space-x-2 text-xs font-medium"
+                className="p-2 sm:p-2.5 text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/90 rounded-xl transition-colors flex items-center space-x-1.5 text-xs font-medium shrink-0 cursor-pointer"
                 title="Search Approvals, Schemes, Departments (Ctrl+K or /)"
               >
-                <Search className="w-4 h-4 text-slate-700" />
-                <span className="hidden xl:inline text-slate-500">Quick Search...</span>
-                <kbd className="hidden xl:inline px-1.5 py-0.5 text-[10px] bg-white rounded border border-slate-300 text-slate-400 font-mono">/</kbd>
+                <Search className="w-4 h-4 text-slate-700 shrink-0" />
+                <span className="hidden 2xl:inline text-slate-500">Quick Search...</span>
+                <kbd className="hidden 2xl:inline px-1.5 py-0.5 text-[10px] bg-white rounded border border-slate-300 text-slate-400 font-mono">/</kbd>
               </button>
 
-              {/* Pan-India State Selector Dropdown */}
-              <div className="relative" ref={stateRef}>
+              {/* State Selector Dropdown (Hidden on very small mobile) */}
+              <div className="relative shrink-0 hidden sm:block" ref={stateRef}>
                 <button
                   id="navbar-state-selector-toggle"
                   onClick={() => setIsStateDropdownOpen(!isStateDropdownOpen)}
-                  className="flex items-center space-x-1.5 px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors border border-slate-200/70"
+                  className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors border border-slate-200/70 shrink-0 cursor-pointer"
                   title="Select State / Union Territory"
                 >
-                  <MapPin className="w-3.5 h-3.5 text-emerald-700" />
-                  <span className="hidden sm:inline max-w-[120px] truncate">
-                    {selectedStateFilter !== 'All' ? selectedStateFilter : 'All India (36)'}
+                  <MapPin className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                  <span className="hidden md:inline max-w-[95px] xl:max-w-[120px] truncate">
+                    {selectedStateFilter !== 'All' ? selectedStateFilter : 'All India'}
                   </span>
-                  <ChevronDown className="w-3 h-3 text-slate-500" />
+                  <ChevronDown className="w-3 h-3 text-slate-500 shrink-0" />
                 </button>
 
                 {isStateDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-72 max-h-96 overflow-y-auto bg-white rounded-2xl shadow-2xl border border-slate-200 py-2 z-50 animate-in fade-in slide-in-from-top-1">
+                  <div className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-24px)] max-h-96 overflow-y-auto bg-white rounded-2xl shadow-2xl border border-slate-200 py-2 z-[1050] animate-in fade-in slide-in-from-top-1">
                     <div className="px-3 py-1.5 text-[10px] font-bold uppercase text-slate-400 tracking-wider flex items-center justify-between border-b border-slate-100">
                       <span>Select State / Territory</span>
                       <span className="text-emerald-700 font-extrabold">36 Regions</span>
@@ -283,7 +355,7 @@ export const HeaderNavbar: React.FC = () => {
                         setSelectedStateFilter('All');
                         setIsStateDropdownOpen(false);
                       }}
-                      className={`w-full text-left px-3.5 py-2 text-xs flex items-center justify-between hover:bg-slate-50 transition-colors ${
+                      className={`w-full text-left px-3.5 py-2 text-xs flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer ${
                         selectedStateFilter === 'All' ? 'bg-amber-50 text-[#07182C] font-bold' : 'text-slate-700'
                       }`}
                     >
@@ -307,7 +379,7 @@ export const HeaderNavbar: React.FC = () => {
                           setIsStateDropdownOpen(false);
                           openStateDetailModal(st.code);
                         }}
-                        className={`w-full text-left px-3.5 py-1.5 text-xs flex items-center justify-between hover:bg-slate-50 transition-colors ${
+                        className={`w-full text-left px-3.5 py-1.5 text-xs flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer ${
                           selectedStateFilter === st.name ? 'bg-emerald-50 text-[#07182C] font-bold' : 'text-slate-700'
                         }`}
                       >
@@ -327,7 +399,7 @@ export const HeaderNavbar: React.FC = () => {
                           setIsStateDropdownOpen(false);
                           openStateDetailModal(ut.code);
                         }}
-                        className={`w-full text-left px-3.5 py-1.5 text-xs flex items-center justify-between hover:bg-slate-50 transition-colors ${
+                        className={`w-full text-left px-3.5 py-1.5 text-xs flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer ${
                           selectedStateFilter === ut.name ? 'bg-emerald-50 text-[#07182C] font-bold' : 'text-slate-700'
                         }`}
                       >
@@ -339,21 +411,21 @@ export const HeaderNavbar: React.FC = () => {
                 )}
               </div>
 
-              {/* Language Selector Dropdown */}
-              <div className="relative" ref={langRef}>
+              {/* Language Selector Dropdown (Hidden on very small mobile) */}
+              <div className="relative shrink-0 hidden sm:block" ref={langRef}>
                 <button
                   id="language-selector-toggle"
                   onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
-                  className="flex items-center space-x-1.5 px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors border border-slate-200/70"
+                  className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors border border-slate-200/70 shrink-0 cursor-pointer"
                   title="Select Language"
                 >
-                  <Globe className="w-3.5 h-3.5 text-[#0B2545]" />
-                  <span>{currentLangObj.native}</span>
-                  <ChevronDown className="w-3 h-3 text-slate-500" />
+                  <Globe className="w-3.5 h-3.5 text-[#0B2545] shrink-0" />
+                  <span className="hidden md:inline">{currentLangObj.native}</span>
+                  <ChevronDown className="w-3 h-3 text-slate-500 shrink-0" />
                 </button>
 
                 {isLangDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 animate-in fade-in slide-in-from-top-1">
+                  <div className="absolute right-0 mt-2 w-44 max-w-[calc(100vw-24px)] bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-[1050] animate-in fade-in slide-in-from-top-1">
                     <div className="px-3 py-1 text-[10px] font-bold uppercase text-slate-400 tracking-wider">
                       Select Language
                     </div>
@@ -364,7 +436,7 @@ export const HeaderNavbar: React.FC = () => {
                           setLanguage(lang.code);
                           setIsLangDropdownOpen(false);
                         }}
-                        className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-slate-50 transition-colors ${
+                        className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer ${
                           language === lang.code ? 'bg-blue-50 text-[#07182C] font-bold' : 'text-slate-700'
                         }`}
                       >
@@ -381,35 +453,35 @@ export const HeaderNavbar: React.FC = () => {
                 <button
                   id="header-user-badge"
                   onClick={() => handleNavClick(userProfile.role === 'ADMIN' ? 'admin-dashboard' : 'dashboard')}
-                  className="hidden sm:flex items-center space-x-2 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100/90 border border-emerald-200 rounded-xl transition-colors text-left"
+                  className="hidden md:flex items-center space-x-2 px-2.5 sm:px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100/90 border border-emerald-200 rounded-xl transition-colors text-left shrink-0 cursor-pointer"
                 >
-                  <div className={`w-7 h-7 rounded-lg text-white flex items-center justify-center text-xs font-bold shadow-2xs ${
+                  <div className={`w-7 h-7 rounded-lg text-white flex items-center justify-center text-xs font-bold shadow-2xs shrink-0 ${
                     userProfile.role === 'ADMIN' ? 'bg-[#07182C]' : 'bg-emerald-700'
                   }`}>
                     {userProfile.avatarInitials}
                   </div>
-                  <div className="leading-tight">
-                    <div className="text-xs font-bold text-emerald-950 truncate max-w-[110px]">{userProfile.name}</div>
+                  <div className="leading-tight hidden lg:block">
+                    <div className="text-xs font-bold text-emerald-950 truncate max-w-[100px]">{userProfile.name}</div>
                     <div className="text-[10px] text-emerald-700 font-medium capitalize">
                       {userProfile.role === 'ADMIN' ? 'Admin Portal' : 'Business User'}
                     </div>
                   </div>
                 </button>
               ) : (
-                /* Login Dropdown Button — shown only when not logged in */
-                <div className="relative" ref={loginDropdownRef}>
+                /* Login Dropdown Button (shown on tablet/desktop when not logged in) */
+                <div className="relative shrink-0 hidden sm:block" ref={loginDropdownRef}>
                   <button
                     id="login-dropdown-btn"
                     onClick={() => setIsLoginDropdownOpen(!isLoginDropdownOpen)}
-                    className="flex items-center space-x-2 px-4 py-2 bg-[#07182C] hover:bg-[#0B2545] text-white text-sm font-bold rounded-xl transition-all shadow-md"
+                    className="flex items-center space-x-1.5 sm:space-x-2 px-3 sm:px-4 py-2 bg-[#07182C] hover:bg-[#0B2545] text-white text-xs sm:text-sm font-bold rounded-xl transition-all shadow-md shrink-0 cursor-pointer"
                   >
-                    <LogIn className="w-4 h-4" />
+                    <LogIn className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
                     <span>Login</span>
                     <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isLoginDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
 
                   {isLoginDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-60 bg-white rounded-2xl shadow-2xl border border-slate-200 py-2 z-50 animate-in fade-in slide-in-from-top-2">
+                    <div className="absolute right-0 mt-2 w-60 max-w-[calc(100vw-24px)] bg-white rounded-2xl shadow-2xl border border-slate-200 py-2 z-[1050] animate-in fade-in slide-in-from-top-2">
                       <div className="px-4 py-2 text-[10px] font-bold uppercase text-slate-400 tracking-wider border-b border-slate-100">
                         Select Portal
                       </div>
@@ -417,7 +489,7 @@ export const HeaderNavbar: React.FC = () => {
                       <button
                         id="login-as-user-btn"
                         onClick={() => openAuthWithMode('signin-user')}
-                        className="w-full text-left px-4 py-3 hover:bg-emerald-50 transition group"
+                        className="w-full text-left px-4 py-3 hover:bg-emerald-50 transition group cursor-pointer"
                       >
                         <div className="flex items-center space-x-3">
                           <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition">
@@ -433,7 +505,7 @@ export const HeaderNavbar: React.FC = () => {
                       <button
                         id="login-as-admin-btn"
                         onClick={() => openAuthWithMode('signin-admin')}
-                        className="w-full text-left px-4 py-3 hover:bg-slate-50 transition group border-t border-slate-100"
+                        className="w-full text-left px-4 py-3 hover:bg-slate-50 transition group border-t border-slate-100 cursor-pointer"
                       >
                         <div className="flex items-center space-x-3">
                           <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center group-hover:bg-amber-200 transition">
@@ -450,20 +522,20 @@ export const HeaderNavbar: React.FC = () => {
                 </div>
               )}
 
-              {/* THREE-DOT VERTICAL MENU (Requested specifically) */}
-              <div className="relative" ref={threeDotRef}>
+              {/* THREE-DOT VERTICAL MENU (Login, Sign Up, Admin Login, Help, Contact) */}
+              <div className="relative shrink-0" ref={threeDotRef}>
                 <button
                   id="three-dot-menu-btn"
                   onClick={() => setIsThreeDotOpen(!isThreeDotOpen)}
-                  className="p-2.5 text-slate-700 hover:text-[#07182C] bg-slate-100 hover:bg-slate-200 rounded-xl transition-all border border-slate-200 flex items-center justify-center"
+                  className="p-2 sm:p-2.5 text-slate-700 hover:text-[#07182C] bg-slate-100 hover:bg-slate-200 rounded-xl transition-all border border-slate-200 flex items-center justify-center shrink-0 cursor-pointer"
                   aria-label="Account and Access Menu"
                   title="Menu & Access"
                 >
-                  <MoreVertical className="w-5 h-5" />
+                  <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                 </button>
 
                 {isThreeDotOpen && (
-                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-200 py-2 z-50 animate-in fade-in slide-in-from-top-2 divide-y divide-slate-100">
+                  <div className="absolute right-0 mt-2 w-64 max-w-[calc(100vw-20px)] bg-white rounded-2xl shadow-2xl border border-slate-200 py-2 z-[1050] animate-in fade-in slide-in-from-top-2 divide-y divide-slate-100">
                     
                     {/* User Profile Header if Logged In */}
                     {userProfile ? (
@@ -484,10 +556,10 @@ export const HeaderNavbar: React.FC = () => {
                           <button
                             id="menu-open-dashboard"
                             onClick={() => {
-                              handleNavClick('dashboard');
+                              handleNavClick(userProfile.role === 'ADMIN' ? 'admin-dashboard' : 'dashboard');
                               setIsThreeDotOpen(false);
                             }}
-                            className="w-full text-left px-4 py-2.5 text-xs font-semibold text-slate-800 hover:bg-slate-100 flex items-center space-x-2.5"
+                            className="w-full text-left px-4 py-2.5 text-xs font-semibold text-slate-800 hover:bg-slate-100 flex items-center space-x-2.5 cursor-pointer"
                           >
                             <LayoutDashboard className="w-4 h-4 text-[#0B2545]" />
                             <span>My SWAGAT Dashboard</span>
@@ -499,7 +571,7 @@ export const HeaderNavbar: React.FC = () => {
                               setDashboardActiveTab('applications');
                               setIsThreeDotOpen(false);
                             }}
-                            className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-100 flex items-center space-x-2.5"
+                            className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-100 flex items-center space-x-2.5 cursor-pointer"
                           >
                             <FileCheck2 className="w-4 h-4 text-slate-500" />
                             <span>My Applications &amp; Tracking</span>
@@ -510,7 +582,7 @@ export const HeaderNavbar: React.FC = () => {
                           <button
                             id="menu-action-login"
                             onClick={() => openAuthWithMode('signin-user')}
-                            className="w-full text-left px-4 py-2.5 text-xs font-bold text-[#07182C] hover:bg-slate-100 flex items-center space-x-2.5"
+                            className="w-full text-left px-4 py-2.5 text-xs font-bold text-[#07182C] hover:bg-slate-100 flex items-center space-x-2.5 cursor-pointer"
                           >
                             <LogIn className="w-4 h-4 text-emerald-600" />
                             <span>Login</span>
@@ -519,7 +591,7 @@ export const HeaderNavbar: React.FC = () => {
                           <button
                             id="menu-action-signup"
                             onClick={() => openAuthWithMode('signup-user')}
-                            className="w-full text-left px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100 flex items-center space-x-2.5"
+                            className="w-full text-left px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100 flex items-center space-x-2.5 cursor-pointer"
                           >
                             <UserPlus className="w-4 h-4 text-blue-600" />
                             <span>Sign Up</span>
@@ -528,7 +600,7 @@ export const HeaderNavbar: React.FC = () => {
                           <button
                             id="menu-action-admin-login"
                             onClick={() => openAuthWithMode('signin-admin')}
-                            className="w-full text-left px-4 py-2 text-xs font-semibold text-slate-900 hover:bg-slate-100 flex items-center space-x-2.5 border-t border-slate-100"
+                            className="w-full text-left px-4 py-2 text-xs font-semibold text-slate-900 hover:bg-slate-100 flex items-center space-x-2.5 border-t border-slate-100 cursor-pointer"
                           >
                             <ShieldCheck className="w-4 h-4 text-amber-600" />
                             <span>Admin Login</span>
@@ -560,10 +632,10 @@ export const HeaderNavbar: React.FC = () => {
                           handleNavClick('home', 'section-help');
                           setIsThreeDotOpen(false);
                         }}
-                        className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-100 flex items-center space-x-2.5"
+                        className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-100 flex items-center space-x-2.5 cursor-pointer"
                       >
                         <HelpCircle className="w-4 h-4 text-slate-500" />
-                        <span>{t('menu_help')}</span>
+                        <span>Help</span>
                       </button>
 
                       <button
@@ -572,10 +644,10 @@ export const HeaderNavbar: React.FC = () => {
                           handleNavClick('home', 'section-help');
                           setIsThreeDotOpen(false);
                         }}
-                        className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-100 flex items-center space-x-2.5"
+                        className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-100 flex items-center space-x-2.5 cursor-pointer"
                       >
                         <Mail className="w-4 h-4 text-slate-500" />
-                        <span>{t('menu_contact')}</span>
+                        <span>Contact</span>
                       </button>
                     </div>
 
@@ -588,7 +660,7 @@ export const HeaderNavbar: React.FC = () => {
                             logout();
                             setIsThreeDotOpen(false);
                           }}
-                          className="w-full text-left px-4 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center space-x-2.5"
+                          className="w-full text-left px-4 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center space-x-2.5 cursor-pointer"
                         >
                           <LogOut className="w-4 h-4 text-rose-500" />
                           <span>{t('menu_logout')}</span>
@@ -599,86 +671,153 @@ export const HeaderNavbar: React.FC = () => {
                 )}
               </div>
 
-              {/* Mobile Hamburger Menu Toggle */}
+              {/* Mobile Hamburger Menu Toggle Button (Visible on screens < lg) */}
               <button
                 id="mobile-menu-hamburger-btn"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-xl lg:hidden"
+                className="p-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-xl lg:hidden shrink-0 cursor-pointer"
                 aria-label="Toggle Navigation Menu"
               >
                 {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
             </div>
+
           </div>
         </div>
 
-        {/* Mobile Dropdown Navigation */}
+        {/* ─────────────────────────────────────────────────────────────
+            SECTION 4: Mobile Navigation Panel (Clean, Full, Scrollable)
+            Contains Home, Approvals, Sectors, KYA, Resources, Help,
+            Login, Sign Up, Admin Login, State & Lang Pickers
+            ───────────────────────────────────────────────────────────── */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-6 space-y-3 shadow-xl animate-in fade-in slide-in-from-top-1">
+          <div className="lg:hidden fixed inset-x-0 top-[80px] bg-white border-t border-slate-200 shadow-2xl z-[1050] max-h-[calc(100vh-80px)] overflow-y-auto px-4 pt-4 pb-8 space-y-4 animate-in fade-in slide-in-from-top-2">
+            
+            {/* Primary Mobile Navigation Links */}
             <nav className="flex flex-col space-y-1 font-medium text-sm text-slate-800">
               <button
                 onClick={() => handleNavClick('home')}
-                className="text-left px-3 py-2.5 rounded-lg hover:bg-slate-50"
+                className="text-left px-3.5 py-2.5 rounded-xl hover:bg-slate-50 transition flex items-center space-x-3 cursor-pointer"
               >
-                {t('nav_home')}
+                <span>{t('nav_home')}</span>
               </button>
-              <button
-                onClick={() => handleNavClick('home', 'section-kya')}
-                className="text-left px-3 py-2.5 rounded-lg text-amber-700 font-bold bg-amber-50/60"
-              >
-                {t('nav_kya')}
-              </button>
+
               <button
                 onClick={() => handleNavClick('home', 'section-approvals')}
-                className="text-left px-3 py-2.5 rounded-lg hover:bg-slate-50"
+                className="text-left px-3.5 py-2.5 rounded-xl hover:bg-slate-50 transition flex items-center space-x-3 cursor-pointer"
               >
-                {t('nav_approvals')}
+                <span>{t('nav_approvals')}</span>
               </button>
+
               <button
                 onClick={() => handleNavClick('home', 'section-schemes')}
-                className="text-left px-3 py-2.5 rounded-lg hover:bg-slate-50"
+                className="text-left px-3.5 py-2.5 rounded-xl hover:bg-slate-50 transition flex items-center space-x-3 cursor-pointer"
               >
-                {t('nav_schemes')}
+                <span>Sectors</span>
               </button>
+
+              <button
+                onClick={() => handleNavClick('home', 'section-kya')}
+                className="text-left px-3.5 py-2.5 rounded-xl text-amber-800 font-bold bg-amber-50/80 border border-amber-200/60 transition flex items-center space-x-2.5 cursor-pointer"
+              >
+                <Compass className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>{t('nav_kya')}</span>
+              </button>
+
               <button
                 onClick={() => handleNavClick('home', 'section-states')}
-                className="text-left px-3 py-2.5 rounded-lg hover:bg-slate-50"
+                className="text-left px-3.5 py-2.5 rounded-xl hover:bg-slate-50 transition flex items-center space-x-3 cursor-pointer"
               >
-                {t('state_approvals')}
+                <span>{t('state_approvals')}</span>
               </button>
+
               <button
                 onClick={() => handleNavClick('home', 'section-about')}
-                className="text-left px-3 py-2.5 rounded-lg hover:bg-slate-50"
+                className="text-left px-3.5 py-2.5 rounded-xl hover:bg-slate-50 transition flex items-center space-x-3 cursor-pointer"
               >
-                {t('nav_about')}
+                <span>Resources</span>
               </button>
+
               <button
                 onClick={() => handleNavClick('home', 'section-help')}
-                className="text-left px-3 py-2.5 rounded-lg hover:bg-slate-50"
+                className="text-left px-3.5 py-2.5 rounded-xl hover:bg-slate-50 transition flex items-center space-x-3 cursor-pointer"
               >
-                {t('nav_help')}
+                <span>{t('nav_help')}</span>
               </button>
             </nav>
 
-            <div className="pt-3 border-t border-slate-100 flex flex-col space-y-2">
+            {/* Mobile Auth & Account Actions */}
+            <div className="pt-4 border-t border-slate-100 flex flex-col space-y-2.5">
               {userProfile ? (
-                <button
-                  onClick={() => handleNavClick('dashboard')}
-                  className="w-full flex items-center justify-center space-x-2 px-4 py-3 text-sm font-bold text-white bg-[#07182C] rounded-xl shadow-md"
-                >
-                  <LayoutDashboard className="w-4 h-4 text-amber-400" />
-                  <span>Go to My Dashboard</span>
-                </button>
+                <>
+                  <button
+                    onClick={() => handleNavClick(userProfile.role === 'ADMIN' ? 'admin-dashboard' : 'dashboard')}
+                    className="w-full flex items-center justify-center space-x-2 px-4 py-3 text-sm font-bold text-white bg-[#07182C] rounded-xl shadow-md cursor-pointer"
+                  >
+                    <LayoutDashboard className="w-4 h-4 text-amber-400" />
+                    <span>My Dashboard ({userProfile.role === 'ADMIN' ? 'Admin' : 'Business'})</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      logout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full flex items-center justify-center space-x-2 px-4 py-2.5 text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4 text-rose-500" />
+                    <span>Sign Out</span>
+                  </button>
+                </>
               ) : (
-                <button
-                  onClick={() => openAuthWithMode('signin-user')}
-                  className="w-full flex items-center justify-center space-x-2 px-4 py-3 text-sm font-bold text-white bg-gradient-to-r from-[#07182C] to-[#0B2545] rounded-xl shadow-md"
-                >
-                  <LogIn className="w-4 h-4 text-emerald-400" />
-                  <span>Login / Register</span>
-                </button>
+                <>
+                  <div className="text-[10px] font-bold uppercase text-slate-400 tracking-wider px-1">
+                    Account Access
+                  </div>
+
+                  <button
+                    onClick={() => openAuthWithMode('signin-user')}
+                    className="w-full flex items-center justify-center space-x-2 px-4 py-2.5 text-sm font-bold text-white bg-[#07182C] hover:bg-[#0B2545] rounded-xl shadow-md transition cursor-pointer"
+                  >
+                    <LogIn className="w-4 h-4 text-emerald-400" />
+                    <span>Login</span>
+                  </button>
+
+                  <button
+                    onClick={() => openAuthWithMode('signup-user')}
+                    className="w-full flex items-center justify-center space-x-2 px-4 py-2.5 text-sm font-bold text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl border border-slate-200 transition cursor-pointer"
+                  >
+                    <UserPlus className="w-4 h-4 text-blue-600" />
+                    <span>Sign Up</span>
+                  </button>
+
+                  <button
+                    onClick={() => openAuthWithMode('signin-admin')}
+                    className="w-full flex items-center justify-center space-x-2 px-4 py-2.5 text-xs font-bold text-amber-900 bg-amber-50 hover:bg-amber-100 border border-amber-200/80 rounded-xl transition cursor-pointer"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-amber-600" />
+                    <span>Admin Login</span>
+                  </button>
+                </>
               )}
             </div>
+
+            {/* Mobile State & Language Quick Switcher */}
+            <div className="pt-3 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs">
+              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex flex-col space-y-1">
+                <span className="text-[10px] font-bold text-slate-400 uppercase">State / Territory</span>
+                <span className="font-semibold text-emerald-800 truncate">
+                  {selectedStateFilter !== 'All' ? selectedStateFilter : 'All India (36)'}
+                </span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex flex-col space-y-1">
+                <span className="text-[10px] font-bold text-slate-400 uppercase">Language</span>
+                <span className="font-semibold text-blue-900">
+                  {currentLangObj.native}
+                </span>
+              </div>
+            </div>
+
           </div>
         )}
       </header>
