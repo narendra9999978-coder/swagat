@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/solvix/swagat/internal/routing"
@@ -50,7 +51,7 @@ func (h *DeptAdminHandler) Queue(c *gin.Context) {
 	userID := c.GetString("user_id")
 	role := c.GetString("role")
 
-	var rows pgxpool.Rows
+	var rows pgx.Rows
 	var err error
 
 	if role == "super_admin" {
