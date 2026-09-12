@@ -65,7 +65,7 @@ interface SwagatContextType {
   login: (
     mode: 'signin' | 'signup',
     role: 'USER' | 'ADMIN',
-    data: { email: string; password: string; name?: string; mobile?: string }
+    data: { email: string; password: string; name?: string; mobile?: string; companyName?: string }
   ) => Promise<void>;
   logout: () => void;
   isBackendOnline: boolean;
@@ -393,7 +393,7 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const login = async (
     mode: 'signin' | 'signup',
     role: 'USER' | 'ADMIN',
-    data: { email: string; password: string; name?: string; mobile?: string }
+    data: { email: string; password: string; name?: string; mobile?: string; companyName?: string }
   ) => {
     const targetRole: 'USER' | 'ADMIN' = role === 'ADMIN' ? 'ADMIN' : 'USER';
 
@@ -404,7 +404,8 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         data.name || data.email.split('@')[0],
         data.email,
         data.mobile || '',
-        data.password
+        data.password,
+        data.companyName
       );
     } else {
       resolvedSession = mockLogin(data.email, data.password, targetRole);
@@ -421,7 +422,7 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       phone: user.mobile || data.mobile || '',
       pan: '',
       gstNumber: '',
-      companyName: user.departmentName || (finalRole === 'ADMIN' ? 'SWAGAT System Administration' : `${name}'s Enterprise`),
+      companyName: user.companyName || user.departmentName || (finalRole === 'ADMIN' ? 'SWAGAT System Administration' : `${name}'s Enterprise`),
       cin: '',
       entityType: 'Private Limited',
       state: 'India',

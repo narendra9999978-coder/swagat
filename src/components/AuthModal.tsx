@@ -25,6 +25,7 @@ export const AuthModal: React.FC = () => {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [mobile, setMobile] = useState('');
+  const [companyName, setCompanyName] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [accountType] = useState<'Business User'>('Business User');
   const [showPassword, setShowPassword] = useState(false);
@@ -78,7 +79,7 @@ export const AuthModal: React.FC = () => {
 
     setLoading(true);
     try {
-      await login(formMode, targetRole, { email, password, name, mobile });
+      await login(formMode, targetRole, { email, password, name, mobile, companyName });
     } catch (err: any) {
       setError(err.message || 'Authentication failed. Please check your credentials.');
     } finally {
@@ -234,6 +235,17 @@ export const AuthModal: React.FC = () => {
                     placeholder="Mobile Number (+91 XXXXX XXXXX)"
                     value={mobile}
                     onChange={e => setMobile(e.target.value)}
+                    className={`w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 ${roleRing} text-sm font-medium`}
+                  />
+                </div>
+
+                <div className="relative">
+                  <Building2 className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Company / Organization Name (e.g. ABC Electronics Pvt Ltd)"
+                    value={companyName}
+                    onChange={e => setCompanyName(e.target.value)}
                     className={`w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 ${roleRing} text-sm font-medium`}
                   />
                 </div>

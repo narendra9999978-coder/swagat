@@ -110,12 +110,18 @@ export interface TimelineStep {
 
 export interface ApplicationQuery {
   id: string;
+  approvalId?: string;
+  documentId?: string;
   queryText: string;
+  message?: string;
   dateRaised: string;
+  raisedDate?: string;
   raisedByOfficer: string;
+  raisedBy?: string;
   department: string;
-  status: 'Open' | 'Responded' | 'Resolved';
+  status: 'Open' | 'Pending' | 'Responded' | 'Response Submitted' | 'Resolved';
   responseText?: string;
+  applicantResponse?: string;
   responseDate?: string;
   attachedDocs?: string[];
 }
@@ -133,7 +139,7 @@ export interface ApplicationApprovalItem {
   remarks?: string;
 }
 
-export type DocumentVerificationStatus = 'Pending Upload' | 'Uploaded' | 'Under Review' | 'Approved' | 'Rejected' | 'Correction Required';
+export type DocumentVerificationStatus = 'Pending Upload' | 'Pending' | 'Uploaded' | 'Under Review' | 'Approved' | 'Rejected' | 'Correction Required';
 
 export interface ApplicationDocumentItem {
   id: string;
@@ -180,6 +186,8 @@ export interface Application {
   queries: ApplicationQuery[];
   remarks?: string;
   certificateUrl?: string;
+  projectCategory?: string;
+  businessActivity?: string;
 }
 
 export interface DocumentItem {
@@ -216,7 +224,7 @@ export interface AppNotification {
   applicationId?: string;
   trackingNumber?: string;
   role: 'USER' | 'ADMIN' | 'ALL';
-  type: 'Application Submitted' | 'Status Changed' | 'Document Approved' | 'Document Rejected' | 'Correction Requested' | 'Query Raised' | 'Query Resolved' | 'Response Submitted' | 'System';
+  type: 'Application Submitted' | 'Status Changed' | 'Document Approved' | 'Document Rejected' | 'Correction Requested' | 'Query Raised' | 'Query Resolved' | 'Response Submitted' | 'System' | 'New User Registered';
   title: string;
   message: string;
   timestamp: string;

@@ -5,6 +5,8 @@
  * and Admin Account creation workflows.
  */
 
+import { addNotification } from './applicationStore';
+
 export type MockRole = 'USER' | 'ADMIN';
 
 export interface MockUser {
@@ -12,6 +14,9 @@ export interface MockUser {
   email: string;
   name: string;
   mobile?: string;
+  phone?: string;
+  companyName?: string;
+  organization?: string;
   password?: string;
   role: 'USER' | 'ADMIN';
   accountType: 'Business User' | 'System Administrator';
@@ -93,7 +98,7 @@ function saveMockUsers(users: MockUser[]) {
   localStorage.setItem(USERS_KEY, JSON.stringify(users));
 }
 
-/** Seed default demo accounts on first run */
+/** Seed default production accounts on first run */
 export function seedDefaultUsers() {
   // Clear legacy mock store keys to prevent stale users
   localStorage.removeItem('swagat_mock_users');
@@ -101,73 +106,56 @@ export function seedDefaultUsers() {
   localStorage.removeItem('swagat_mock_users_v3');
 
   const existing = getMockUsers();
-  if (existing.length > 0) return;
+  
+  // Clean out any legacy mock accounts disconnected from actual system
+  const cleaned = existing.filter(u => !['rajesh@apexind.in', 'priya.mehta@startup.in', 'officer@mpcb.gov.in'].includes(u.email.toLowerCase()));
 
-  const defaults: MockUser[] = [
-    {
+  // Ensure baseline user@demo.com and admin@demo.com exist
+  const hasUser = cleaned.some(u => u.email.toLowerCase() === 'user@demo.com');
+  const hasAdmin = cleaned.some(u => u.email.toLowerCase() === 'admin@demo.com');
+
+  if (!hasUser) {
+    cleaned.unshift({
       id: 'usr-demo-user',
       email: 'user@demo.com',
-      name: 'Demo Business User',
+      name: 'Narendra Singh',
       mobile: '+91 98201 45678',
+      phone: '+91 98201 45678',
+      companyName: 'ABC Electronics Pvt Ltd',
+      organization: 'ABC Electronics Pvt Ltd',
       password: 'user123',
       role: 'USER',
       accountType: 'Business User',
       status: 'Active',
-      createdAt: new Date(Date.now() - 30 * 86400000).toISOString(),
+      createdAt: '2026-09-01T08:00:00.000Z',
       lastLogin: 'Today, 09:15 AM',
-    },
-    {
+    });
+  } else {
+    const u = cleaned.find(u => u.email.toLowerCase() === 'user@demo.com')!;
+    if (!u.companyName) u.companyName = 'ABC Electronics Pvt Ltd';
+    if (!u.name || u.name === 'Demo Business User') u.name = 'Narendra Singh';
+    if (!u.phone) u.phone = u.mobile || '+91 98201 45678';
+  }
+
+  if (!hasAdmin) {
+    cleaned.push({
       id: 'usr-demo-admin',
       email: 'admin@demo.com',
-      name: 'Demo Administrator',
+      name: 'SWAGAT Administrator',
       mobile: '+91 98201 11111',
+      phone: '+91 98201 11111',
+      companyName: 'SWAGAT Central Command',
+      organization: 'SWAGAT Central Command',
       password: 'admin123',
       role: 'ADMIN',
       accountType: 'System Administrator',
       status: 'Active',
-      createdAt: new Date(Date.now() - 60 * 86400000).toISOString(),
+      createdAt: '2026-08-01T08:00:00.000Z',
       lastLogin: 'Today, 09:20 AM',
-    },
-    {
-      id: 'usr-app-001',
-      email: 'rajesh@apexind.in',
-      name: 'Rajesh Sharma',
-      mobile: '+91 98201 45678',
-      password: 'user123',
-      role: 'USER',
-      accountType: 'Business User',
-      status: 'Active',
-      createdAt: new Date(Date.now() - 15 * 86400000).toISOString(),
-      lastLogin: '02 Sep 2026',
-    },
-    {
-      id: 'usr-app-002',
-      email: 'priya.mehta@startup.in',
-      name: 'Priya Mehta',
-      mobile: '+91 99900 12345',
-      password: 'user123',
-      role: 'USER',
-      accountType: 'Business User',
-      status: 'Active',
-      createdAt: new Date(Date.now() - 10 * 86400000).toISOString(),
-      lastLogin: '01 Sep 2026',
-    },
-    {
-      id: 'usr-adm-001',
-      email: 'officer@mpcb.gov.in',
-      name: 'Dr. Suresh Patil',
-      mobile: '+91 98201 22222',
-      password: 'admin123',
-      role: 'ADMIN',
-      accountType: 'System Administrator',
-      status: 'Active',
-      createdAt: new Date(Date.now() - 45 * 86400000).toISOString(),
-      lastLogin: '28 Aug 2026',
-      departmentName: 'Maharashtra Pollution Control Board (MPCB)',
-    },
-  ];
+    });
+  }
 
-  saveMockUsers(defaults);
+  saveMockUsers(cleaned);
 }
 
 // ── Auth Operations ───────────────────────────────────────────────────────────
@@ -254,7 +242,8 @@ export function mockRegister(
   name: string,
   email: string,
   mobile: string,
-  password: string
+  password: string,
+  companyName?: string
 ): AuthSession {
   seedDefaultUsers();
   const users = getMockUsers();
@@ -268,11 +257,16 @@ export function mockRegister(
     );
   }
 
+  const finalCompany = companyName?.trim() || `${name.trim()}'s Enterprise`;
+
   const newUser: MockUser = {
     id: `usr-${Date.now()}`,
     email: cleanEmail,
     name: name.trim(),
     mobile: mobile.trim(),
+    phone: mobile.trim(),
+    companyName: finalCompany,
+    organization: finalCompany,
     password,
     role: 'USER',
     accountType: 'Business User',
@@ -283,6 +277,21 @@ export function mockRegister(
 
   users.push(newUser);
   saveMockUsers(users);
+
+  // Emit statutory notification to Admin
+  try {
+    addNotification({
+      id: `notif-${Date.now()}`,
+      role: 'ADMIN',
+      type: 'New User Registered',
+      title: 'New Enterprise User Registered',
+      message: `${newUser.name} (${newUser.email}) from ${finalCompany} registered on SWAGAT Single Window Portal.`,
+      timestamp: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+      read: false,
+    });
+  } catch (err) {
+    console.warn('Could not dispatch register notification', err);
+  }
 
   const token = generateFakeToken(newUser);
   const session: AuthSession = { token, user: newUser };
