@@ -128,6 +128,20 @@ func (e *Engine) breachAndEscalate(ctx context.Context, bundleID string) {
 		return
 	}
 	e.logEvent(ctx, bundleID, "deemed_approved", "All pending documents auto-approved; department could not silently sit on the file")
+
+	// Check if parent application is now completely approved
+	var appID string
+	_ = e.DB.QueryRow(ctx, `SELECT application_id FROM document_bundles WHERE id = $1`, bundleID).Scan(&appID)
+	if appID != "" {
+		var pendingDocs int
+		_ = e.DB.QueryRow(ctx, `
+			SELECT COUNT(*) FROM application_documents
+			WHERE application_id = $1 AND COALESCE(is_mandatory, true) = true AND status <> 'approved'
+		`, appID).Scan(&pendingDocs)
+		if pendingDocs == 0 {
+			_, _ = e.DB.Exec(ctx, `UPDATE applications SET status = 'approved' WHERE id = $1`, appID)
+		}
+	}
 }
 
 func (e *Engine) logEvent(ctx context.Context, bundleID, eventType, note string) {

@@ -43,11 +43,38 @@ func (r *Router) RouteBundle(ctx context.Context, bundleID string, departmentID 
 		}
 	}
 
-	// No admin found anywhere on the path -> flag for manual Super Admin / dept-head review.
-	if flagErr := r.flagForManualReview(ctx, bundleID); flagErr != nil {
-		return "", "", flagErr
+	// Fallback 1: Any admin registered for this department
+	var deptAdmin string
+	err = r.DB.QueryRow(ctx, `
+		SELECT ar.user_id FROM admin_registrations ar
+		LEFT JOIN document_bundles db ON db.assigned_admin_id = ar.user_id AND db.status IN ('pending', 'in_review')
+		WHERE ar.department_id = $1
+		GROUP BY ar.user_id
+		ORDER BY COUNT(db.id) ASC
+		LIMIT 1
+	`, departmentID).Scan(&deptAdmin)
+	if err == nil && deptAdmin != "" {
+		_ = r.assign(ctx, bundleID, deptAdmin)
+		return deptAdmin, "dept-fallback", nil
 	}
-	return "", "", ErrNoAdminFound
+
+	// Fallback 2: Any registered department_admin or super_admin
+	var sysAdmin string
+	err = r.DB.QueryRow(ctx, `
+		SELECT id FROM users
+		WHERE role IN ('department_admin', 'super_admin')
+		ORDER BY CASE WHEN role = 'department_admin' THEN 1 ELSE 2 END, created_at ASC
+		LIMIT 1
+	`).Scan(&sysAdmin)
+	if err == nil && sysAdmin != "" {
+		_ = r.assign(ctx, bundleID, sysAdmin)
+		return sysAdmin, "system-fallback", nil
+	}
+
+	// No admin found anywhere -> flag for manual review but keep bundle in review
+	_ = r.flagForManualReview(ctx, bundleID)
+	_, _ = r.DB.Exec(ctx, `UPDATE document_bundles SET status = 'in_review' WHERE id = $1`, bundleID)
+	return "", "", nil
 }
 
 // leastLoadedAdminAt finds, among admins registered exactly at nodeID for departmentID,

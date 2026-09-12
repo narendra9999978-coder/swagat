@@ -29,6 +29,7 @@ import {
 } from '../lib/adminMockData';
 import { allIndianStatesList } from '../data/indiaStatesData';
 import { LiquidChrome } from './reactbits/LiquidChrome';
+import { superAdminApi, deptAdminApi } from '../services/api';
 import {
   LayoutDashboard, Users, FileText, Building2, Map, Layers, Building,
   FileCheck, Brain, Clock, HelpCircle, DollarSign, RefreshCw, Bell,
@@ -447,11 +448,115 @@ export const AdminDashboard: React.FC = () => {
   const [docModalAction, setDocModalAction] = useState<DocumentVerificationStatus>('Correction Required');
   const [docModalRemark, setDocModalRemark] = useState('');
 
-  // Unified reload from single source of truth (Database / Shared Store)
-  const reloadAll = useCallback(() => {
-    setUsersList(getAllMockUsers());
-    setAppList(loadAllApplications().map(mapToAdminApplication));
-    setDocQueue(getAllDocumentsAcrossApplications());
+  // Unified reload from single source of truth (Database + Local Store)
+  const reloadAll = useCallback(async () => {
+    // 1. Synchronize Registered Users with Go Backend
+    try {
+      const backendUsers = await superAdminApi.getUsers();
+      if (Array.isArray(backendUsers) && backendUsers.length > 0) {
+        const mappedUsers: MockUser[] = backendUsers.map(u => ({
+          id: u.id,
+          name: u.full_name || u.email.split('@')[0],
+          email: u.email,
+          role: u.role === 'super_admin' || u.role === 'department_admin' ? 'ADMIN' : 'USER',
+          accountType: u.role === 'super_admin' || u.role === 'department_admin' ? 'System Administrator' : 'Business User',
+          status: (u.status as any) === 'Deactivated' ? 'Deactivated' : 'Active',
+          createdAt: u.created_at || new Date().toISOString(),
+          applicationsCount: u.applications_count || 0,
+        }));
+        const local = getAllMockUsers();
+        const merged = [...mappedUsers];
+        local.forEach(l => {
+          if (!merged.some(m => m.email.toLowerCase() === l.email.toLowerCase())) {
+            merged.push(l);
+          }
+        });
+        setUsersList(merged);
+      } else {
+        setUsersList(getAllMockUsers());
+      }
+    } catch {
+      setUsersList(getAllMockUsers());
+    }
+
+    // 2. Synchronize Applications from Backend & Local Store
+    try {
+      const backendApps = await superAdminApi.getApplications();
+      if (Array.isArray(backendApps) && backendApps.length > 0) {
+        const localApps = loadAllApplications().map(mapToAdminApplication);
+        const mappedBackend: AdminApplication[] = backendApps.map(b => ({
+          id: b.id,
+          trackingNumber: b.tracking_number,
+          applicantName: b.applicant_name,
+          companyName: b.company_name,
+          email: b.applicant_email,
+          state: b.state_name,
+          sector: b.sector,
+          approvalName: b.project_title,
+          department: 'Single Window Authority',
+          ministry: 'Ministry of Commerce & Industry',
+          submittedDate: b.submitted_at ? new Date(b.submitted_at).toLocaleDateString('en-GB') : new Date(b.created_at).toLocaleDateString('en-GB'),
+          lastUpdated: 'Live from Backend',
+          currentStatus: (b.status === 'approved' ? 'Approved' : b.status === 'rejected' ? 'Rejected' : b.status === 'query_raised' ? 'Query Raised' : 'Under Review') as AppStatusAdmin,
+          slaDeadlineDays: 30,
+          slaRemainingDays: 14,
+          slaStatus: 'On Track',
+          investmentAmount: b.investment_amount,
+          complexity: 'Medium',
+          documentsCount: b.documents_count || 0,
+          queriesCount: 0,
+          timeline: [],
+        }));
+        const mergedApps = [...localApps];
+        mappedBackend.forEach(ba => {
+          const idx = mergedApps.findIndex(la => la.id === ba.id || la.trackingNumber === ba.trackingNumber);
+          if (idx >= 0) {
+            mergedApps[idx] = { ...mergedApps[idx], currentStatus: ba.currentStatus };
+          } else {
+            mergedApps.push(ba);
+          }
+        });
+        setAppList(mergedApps);
+      } else {
+        setAppList(loadAllApplications().map(mapToAdminApplication));
+      }
+    } catch {
+      setAppList(loadAllApplications().map(mapToAdminApplication));
+    }
+
+    // 3. Synchronize Document Review Queue from Backend
+    try {
+      const backendDocs = await deptAdminApi.getQueue();
+      if (Array.isArray(backendDocs) && backendDocs.length > 0) {
+        const localDocs = getAllDocumentsAcrossApplications();
+        const mappedBackendDocs: DocumentReviewQueueItem[] = backendDocs.map(bd => ({
+          id: bd.application_document_id,
+          applicationId: bd.application_id,
+          trackingNumber: bd.tracking_number || `SWG-2026-${bd.application_id.slice(0, 8)}`,
+          applicantName: bd.applicant_name,
+          applicantEmail: bd.applicant_email,
+          companyName: bd.company_name,
+          documentName: bd.document_name,
+          category: bd.department_name,
+          fileUrl: bd.file_url || '#',
+          uploadDate: bd.created_at ? new Date(bd.created_at).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'),
+          verificationStatus: bd.status === 'approved' ? 'Approved' : bd.status === 'rejected' ? 'Rejected' : 'Under Review',
+          adminRemark: bd.rejection_reason || 'Department desk scrutiny',
+        }));
+        const mergedDocs = [...mappedBackendDocs];
+        localDocs.forEach(ld => {
+          if (!mergedDocs.some(md => md.id === ld.id)) {
+            mergedDocs.push(ld);
+          }
+        });
+        setDocQueue(mergedDocs);
+      } else {
+        setDocQueue(getAllDocumentsAcrossApplications());
+      }
+    } catch {
+      setDocQueue(getAllDocumentsAcrossApplications());
+    }
+
     setQueryList(getAllQueriesAcrossApplications());
     setNotifList(loadNotifications('ADMIN'));
   }, []);
@@ -480,9 +585,14 @@ export const AdminDashboard: React.FC = () => {
       (userRoleFilter === 'All' || u.role === userRoleFilter);
   }), [usersList, userSearch, userRoleFilter]);
 
-  const handleToggleUser = (id: string, name: string) => {
+  const handleToggleUser = async (id: string, name: string) => {
     const updated = toggleUserStatus(id);
     if (updated) {
+      try {
+        await superAdminApi.toggleUserStatus(id, updated.status);
+      } catch (e) {
+        console.warn('[SWAGAT] Backend user status toggle:', e);
+      }
       reloadAll();
       showToast(`Account status for ${name} updated to ${updated.status}.`);
     }
@@ -515,18 +625,28 @@ export const AdminDashboard: React.FC = () => {
     return matchSearch && matchState && matchStatus;
   }), [appList, appSearch, appStateFilter, appStatusFilter]);
 
-  const changeAppStatus = (id: string, newStatus: AppStatusAdmin) => {
+  const changeAppStatus = async (id: string, newStatus: AppStatusAdmin) => {
+    const remark = newStatus === 'Approved'
+      ? 'Application has been approved. Certificate/licence will be issued.'
+      : newStatus === 'Rejected'
+      ? 'Application rejected. Applicant notified with remarks.'
+      : newStatus === 'Under Review'
+      ? 'Application is under active review by the department.'
+      : 'Status updated by administrator.';
+
     updateApplicationStatus(
       id,
       newStatus as Application['currentStatus'],
-      newStatus === 'Approved'
-        ? 'Application has been approved. Certificate/licence will be issued.'
-        : newStatus === 'Rejected'
-        ? 'Application rejected. Applicant notified with remarks.'
-        : newStatus === 'Under Review'
-        ? 'Application is under active review by the department.'
-        : 'Status updated by administrator.',
+      remark,
     );
+
+    // Sync status change directly to Go Backend
+    try {
+      await superAdminApi.updateApplicationStatus(id, newStatus, remark);
+    } catch (e) {
+      console.warn('[SWAGAT] Backend status sync:', e);
+    }
+
     reloadAll();
     showToast(`Application status updated to ${newStatus}.`);
     setSelectedApp(null);
@@ -548,10 +668,22 @@ export const AdminDashboard: React.FC = () => {
     showToast('Query raised. Applicant will be notified.');
   };
 
-  const handleVerifyDoc = (appId: string, docId: string, status: DocumentVerificationStatus, remark?: string) => {
+  const handleVerifyDoc = async (appId: string, docId: string, status: DocumentVerificationStatus, remark?: string) => {
     updateDocumentVerification(appId, docId, status, remark);
+
+    // Transmit decision directly to Go Backend
+    try {
+      if (status === 'Approved') {
+        await deptAdminApi.approveDocument(docId);
+      } else if (status === 'Rejected' || status === 'Correction Required') {
+        await deptAdminApi.rejectDocument(docId, remark || 'Correction required by scrutiny authority');
+      }
+    } catch (e) {
+      console.warn('[SWAGAT] Backend doc action sync:', e);
+    }
+
     reloadAll();
-    showToast(`Document updated to "${status}".`);
+    showToast(`Document updated to "${status}" and synced with Department.`);
   };
 
   const openDocActionModal = (docId: string, docName: string, action: DocumentVerificationStatus, appId?: string) => {

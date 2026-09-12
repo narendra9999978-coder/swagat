@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"net/http"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -301,6 +303,389 @@ func (h *AdminHandler) OrgCoverage(c *gin.Context) {
 		var r row
 		rows.Scan(&r.ID, &r.Label, &r.ParentID, &r.AdminCount)
 		out = append(out, r)
+	}
+	c.JSON(http.StatusOK, out)
+}
+
+// ---------- User Directory & Registration Tracking ----------
+
+func (h *AdminHandler) ListUsers(c *gin.Context) {
+	rows, err := h.DB.Query(c, `
+		SELECT 
+			u.id, 
+			u.email, 
+			u.full_name, 
+			u.role, 
+			COALESCE(u.status, 'Active') as status, 
+			u.created_at,
+			COUNT(DISTINCT a.id) as applications_count
+		FROM users u
+		LEFT JOIN applicants ap ON ap.user_id = u.id
+		LEFT JOIN applications a ON a.applicant_id = ap.id
+		GROUP BY u.id, u.email, u.full_name, u.role, u.status, u.created_at
+		ORDER BY u.created_at DESC
+	`)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer rows.Close()
+
+	type UserItem struct {
+		ID                string    `json:"id"`
+		Email             string    `json:"email"`
+		FullName          string    `json:"full_name"`
+		Role              string    `json:"role"`
+		Status            string    `json:"status"`
+		CreatedAt         time.Time `json:"created_at"`
+		ApplicationsCount int       `json:"applications_count"`
+	}
+	var out []UserItem
+	for rows.Next() {
+		var it UserItem
+		rows.Scan(&it.ID, &it.Email, &it.FullName, &it.Role, &it.Status, &it.CreatedAt, &it.ApplicationsCount)
+		out = append(out, it)
+	}
+	c.JSON(http.StatusOK, out)
+}
+
+func (h *AdminHandler) ToggleUserStatus(c *gin.Context) {
+	userID := c.Param("userID")
+	var req struct {
+		Status string `json:"status" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	_, err := h.DB.Exec(c, `UPDATE users SET status=$1 WHERE id=$2`, req.Status, userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"status": req.Status})
+}
+
+// ---------- System-Wide Applications Governance ----------
+
+func (h *AdminHandler) ListApplications(c *gin.Context) {
+	rows, err := h.DB.Query(c, `
+		SELECT 
+			a.id, 
+			COALESCE(a.tracking_number, 'SWG-2026-' || SUBSTRING(a.id::text, 1, 8)) as tracking_number,
+			u.full_name as applicant_name,
+			u.email as applicant_email,
+			COALESCE(a.company_name, u.full_name || ' Enterprises') as company_name,
+			COALESCE(a.state_name, 'Maharashtra') as state_name,
+			bt.name as sector,
+			a.status,
+			COALESCE(a.project_title, bt.name || ' Facility') as project_title,
+			COALESCE(a.investment_amount, '₹25.0 Crore') as investment_amount,
+			COALESCE(a.admin_remarks, '') as admin_remarks,
+			a.created_at,
+			a.submitted_at,
+			COUNT(ad.id) as documents_count,
+			COUNT(CASE WHEN ad.status = 'approved' THEN 1 END) as approved_count,
+			COUNT(CASE WHEN ad.status = 'pending_review' THEN 1 END) as pending_count,
+			COUNT(CASE WHEN ad.status = 'rejected' THEN 1 END) as rejected_count
+		FROM applications a
+		JOIN applicants ap ON ap.id = a.applicant_id
+		JOIN users u ON u.id = ap.user_id
+		JOIN business_types bt ON bt.id = a.business_type_id
+		LEFT JOIN application_documents ad ON ad.application_id = a.id
+		GROUP BY a.id, a.tracking_number, u.full_name, u.email, a.company_name, a.state_name, bt.name, a.status, a.project_title, a.investment_amount, a.admin_remarks, a.created_at, a.submitted_at
+		ORDER BY a.created_at DESC
+	`)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer rows.Close()
+
+	type AppItem struct {
+		ID               string     `json:"id"`
+		TrackingNumber   string     `json:"tracking_number"`
+		ApplicantName    string     `json:"applicant_name"`
+		ApplicantEmail   string     `json:"applicant_email"`
+		CompanyName      string     `json:"company_name"`
+		StateName        string     `json:"state_name"`
+		Sector           string     `json:"sector"`
+		Status           string     `json:"status"`
+		ProjectTitle     string     `json:"project_title"`
+		InvestmentAmount string     `json:"investment_amount"`
+		AdminRemarks     string     `json:"admin_remarks"`
+		CreatedAt        time.Time  `json:"created_at"`
+		SubmittedAt      *time.Time `json:"submitted_at"`
+		DocumentsCount   int        `json:"documents_count"`
+		ApprovedCount    int        `json:"approved_count"`
+		PendingCount     int        `json:"pending_count"`
+		RejectedCount    int        `json:"rejected_count"`
+	}
+	var out []AppItem
+	for rows.Next() {
+		var it AppItem
+		rows.Scan(
+			&it.ID, &it.TrackingNumber, &it.ApplicantName, &it.ApplicantEmail,
+			&it.CompanyName, &it.StateName, &it.Sector, &it.Status,
+			&it.ProjectTitle, &it.InvestmentAmount, &it.AdminRemarks,
+			&it.CreatedAt, &it.SubmittedAt,
+			&it.DocumentsCount, &it.ApprovedCount, &it.PendingCount, &it.RejectedCount,
+		)
+		out = append(out, it)
+	}
+	c.JSON(http.StatusOK, out)
+}
+
+func (h *AdminHandler) GetApplicationDetail(c *gin.Context) {
+	appID := c.Param("applicationID")
+
+	type AppDetail struct {
+		ID               string     `json:"id"`
+		TrackingNumber   string     `json:"tracking_number"`
+		ApplicantName    string     `json:"applicant_name"`
+		ApplicantEmail   string     `json:"applicant_email"`
+		CompanyName      string     `json:"company_name"`
+		StateName        string     `json:"state_name"`
+		Sector           string     `json:"sector"`
+		Status           string     `json:"status"`
+		ProjectTitle     string     `json:"project_title"`
+		InvestmentAmount string     `json:"investment_amount"`
+		AdminRemarks     string     `json:"admin_remarks"`
+		CreatedAt        time.Time  `json:"created_at"`
+		SubmittedAt      *time.Time `json:"submitted_at"`
+	}
+	var app AppDetail
+	err := h.DB.QueryRow(c, `
+		SELECT 
+			a.id, 
+			COALESCE(a.tracking_number, 'SWG-2026-' || SUBSTRING(a.id::text, 1, 8)) as tracking_number,
+			u.full_name as applicant_name,
+			u.email as applicant_email,
+			COALESCE(a.company_name, u.full_name || ' Enterprises') as company_name,
+			COALESCE(a.state_name, 'Maharashtra') as state_name,
+			bt.name as sector,
+			a.status,
+			COALESCE(a.project_title, bt.name || ' Facility') as project_title,
+			COALESCE(a.investment_amount, '₹25.0 Crore') as investment_amount,
+			COALESCE(a.admin_remarks, '') as admin_remarks,
+			a.created_at,
+			a.submitted_at
+		FROM applications a
+		JOIN applicants ap ON ap.id = a.applicant_id
+		JOIN users u ON u.id = ap.user_id
+		JOIN business_types bt ON bt.id = a.business_type_id
+		WHERE a.id = $1
+	`, appID).Scan(
+		&app.ID, &app.TrackingNumber, &app.ApplicantName, &app.ApplicantEmail,
+		&app.CompanyName, &app.StateName, &app.Sector, &app.Status,
+		&app.ProjectTitle, &app.InvestmentAmount, &app.AdminRemarks,
+		&app.CreatedAt, &app.SubmittedAt,
+	)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "application not found"})
+		return
+	}
+
+	// Fetch documents
+	docRows, _ := h.DB.Query(c, `
+		SELECT 
+			ad.id, 
+			dt.name as document_name, 
+			d.name as department_name, 
+			COALESCE(ad.is_mandatory, true) as is_mandatory,
+			ad.status, 
+			ad.reused_from_vault, 
+			ad.file_url,
+			COALESCE(ad.rejection_reason, '') as rejection_reason,
+			ad.reviewed_at,
+			ad.created_at
+		FROM application_documents ad
+		JOIN document_types dt ON dt.id = ad.document_type_id
+		JOIN departments d ON d.id = dt.owning_department_id
+		WHERE ad.application_id = $1
+		ORDER BY ad.created_at ASC
+	`, appID)
+
+	type DocDetail struct {
+		ID              string     `json:"id"`
+		DocumentName    string     `json:"document_name"`
+		DepartmentName  string     `json:"department_name"`
+		IsMandatory     bool       `json:"is_mandatory"`
+		Status          string     `json:"status"`
+		ReusedFromVault bool       `json:"reused_from_vault"`
+		FileURL         *string    `json:"file_url"`
+		RejectionReason string     `json:"rejection_reason"`
+		ReviewedAt      *time.Time `json:"reviewed_at"`
+		CreatedAt       time.Time  `json:"created_at"`
+	}
+	var docs []DocDetail
+	if docRows != nil {
+		defer docRows.Close()
+		for docRows.Next() {
+			var d DocDetail
+			docRows.Scan(
+				&d.ID, &d.DocumentName, &d.DepartmentName, &d.IsMandatory,
+				&d.Status, &d.ReusedFromVault, &d.FileURL, &d.RejectionReason,
+				&d.ReviewedAt, &d.CreatedAt,
+			)
+			docs = append(docs, d)
+		}
+	}
+
+	// Fetch bundles
+	bundleRows, _ := h.DB.Query(c, `
+		SELECT db.id, d.name, db.status, db.dispatched_at, db.sla_deadline, db.completed_at, d.sla_hours
+		FROM document_bundles db
+		JOIN departments d ON d.id = db.department_id
+		WHERE db.application_id = $1
+	`, appID)
+
+	type BundleDetail struct {
+		ID             string     `json:"id"`
+		DepartmentName string     `json:"department_name"`
+		Status         string     `json:"status"`
+		DispatchedAt   *time.Time `json:"dispatched_at"`
+		SLADeadline    *time.Time `json:"sla_deadline"`
+		CompletedAt    *time.Time `json:"completed_at"`
+		SLAHours       int        `json:"sla_hours"`
+	}
+	var bundles []BundleDetail
+	if bundleRows != nil {
+		defer bundleRows.Close()
+		for bundleRows.Next() {
+			var b BundleDetail
+			bundleRows.Scan(&b.ID, &b.DepartmentName, &b.Status, &b.DispatchedAt, &b.SLADeadline, &b.CompletedAt, &b.SLAHours)
+			bundles = append(bundles, b)
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"application": app,
+		"documents":   docs,
+		"bundles":     bundles,
+	})
+}
+
+func (h *AdminHandler) UpdateApplicationStatus(c *gin.Context) {
+	appID := c.Param("applicationID")
+	userID := c.GetString("user_id")
+
+	var req struct {
+		Status  string `json:"status" binding:"required"`
+		Remarks string `json:"remarks"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	normalized := strings.ToLower(req.Status)
+	var dbStatus string
+	switch normalized {
+	case "approved":
+		dbStatus = "approved"
+	case "rejected":
+		dbStatus = "rejected"
+	case "query raised", "query_raised":
+		dbStatus = "query_raised"
+	case "under review", "under_review", "in_review":
+		dbStatus = "in_review"
+	default:
+		dbStatus = "in_review"
+	}
+
+	_, err := h.DB.Exec(c, `
+		UPDATE applications 
+		SET status = $1, admin_remarks = $2 
+		WHERE id = $3
+	`, dbStatus, req.Remarks, appID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if dbStatus == "approved" {
+		_, _ = h.DB.Exec(c, `
+			UPDATE application_documents 
+			SET status = 'approved', reviewed_by = $1, reviewed_at = now(), rejection_reason = NULL 
+			WHERE application_id = $2 AND status <> 'approved'
+		`, userID, appID)
+		_, _ = h.DB.Exec(c, `
+			UPDATE document_bundles 
+			SET status = 'approved', completed_at = now() 
+			WHERE application_id = $1
+		`, appID)
+	} else if dbStatus == "rejected" {
+		_, _ = h.DB.Exec(c, `
+			UPDATE application_documents 
+			SET status = 'rejected', reviewed_by = $1, reviewed_at = now(), rejection_reason = $2 
+			WHERE application_id = $3 AND status <> 'approved'
+		`, userID, req.Remarks, appID)
+		_, _ = h.DB.Exec(c, `
+			UPDATE document_bundles 
+			SET status = 'rejected' 
+			WHERE application_id = $1
+		`, appID)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"status": dbStatus, "application_id": appID})
+}
+
+func (h *AdminHandler) AdminDocumentQueue(c *gin.Context) {
+	rows, err := h.DB.Query(c, `
+		SELECT 
+			ad.id, 
+			ad.application_id, 
+			COALESCE(a.tracking_number, 'SWG-2026-' || SUBSTRING(ad.application_id::text, 1, 8)) as tracking_number,
+			dt.name as document_name, 
+			d.name as department_name,
+			u.full_name as applicant_name,
+			u.email as applicant_email,
+			COALESCE(a.company_name, u.full_name || ' Enterprises') as company_name,
+			ad.file_url, 
+			ad.status, 
+			ad.bundle_id,
+			ad.created_at,
+			COALESCE(ad.rejection_reason, '') as rejection_reason
+		FROM application_documents ad
+		JOIN document_types dt ON dt.id = ad.document_type_id
+		JOIN departments d ON d.id = dt.owning_department_id
+		JOIN applications a ON a.id = ad.application_id
+		JOIN applicants ap ON ap.id = a.applicant_id
+		JOIN users u ON u.id = ap.user_id
+		ORDER BY ad.created_at DESC
+	`)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer rows.Close()
+
+	type QueueItem struct {
+		AppDocID        string     `json:"application_document_id"`
+		ApplicationID   string     `json:"application_id"`
+		TrackingNumber  string     `json:"tracking_number"`
+		DocumentName    string     `json:"document_name"`
+		DepartmentName  string     `json:"department_name"`
+		ApplicantName   string     `json:"applicant_name"`
+		ApplicantEmail  string     `json:"applicant_email"`
+		CompanyName     string     `json:"company_name"`
+		FileURL         *string    `json:"file_url"`
+		Status          string     `json:"status"`
+		BundleID        *string    `json:"bundle_id"`
+		CreatedAt       *time.Time `json:"created_at"`
+		RejectionReason string     `json:"rejection_reason"`
+	}
+	var out []QueueItem
+	for rows.Next() {
+		var it QueueItem
+		rows.Scan(
+			&it.AppDocID, &it.ApplicationID, &it.TrackingNumber,
+			&it.DocumentName, &it.DepartmentName, &it.ApplicantName, &it.ApplicantEmail,
+			&it.CompanyName, &it.FileURL, &it.Status, &it.BundleID,
+			&it.CreatedAt, &it.RejectionReason,
+		)
+		out = append(out, it)
 	}
 	c.JSON(http.StatusOK, out)
 }

@@ -117,7 +117,7 @@ export const authApi = {
     const user: AuthUser = res.user || {
       id: res.user_id || 'usr-default',
       email,
-      full_name: email.split('@')[0],
+      full_name: (res as any).full_name || email.split('@')[0],
       role: (res.role as any) || 'applicant',
     };
     setStoredAuth(res.token, user);
@@ -417,11 +417,14 @@ export const applicantApi = {
     }
   },
 
-  createDraft: async (businessTypeId: string): Promise<ApplicationDraftResponse> => {
+  createDraft: async (
+    businessTypeId: string,
+    meta?: { company_name?: string; project_title?: string; state_name?: string; investment_amount?: string }
+  ): Promise<ApplicationDraftResponse> => {
     try {
       return await request<ApplicationDraftResponse>('/apply/applications', {
         method: 'POST',
-        body: JSON.stringify({ business_type_id: businessTypeId }),
+        body: JSON.stringify({ business_type_id: businessTypeId, ...meta }),
       });
     } catch {
       return {
@@ -445,7 +448,11 @@ export const applicantApi = {
       formData.append('file', file);
       formData.append('app_doc_id', appDocId);
       const token = getStoredToken();
-      const res = await fetch(`${API_BASE_URL}/apply/documents/upload`, {
+      // Try generic upload endpoint first (app_doc_id in form body)
+      const uploadUrl = API_BASE_URL
+        ? `${API_BASE_URL}/apply/documents/upload`
+        : `https://swagat-backend.onrender.com/apply/documents/upload`;
+      const res = await fetch(uploadUrl, {
         method: 'POST',
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: formData,
@@ -457,11 +464,27 @@ export const applicantApi = {
     }
   },
 
+  getApplications: async (): Promise<any[]> => {
+    try { return await request<any[]>('/apply/applications'); }
+    catch { return []; }
+  },
+
   submitApplication: async (applicationId: string): Promise<any> => {
     try {
       return await request<any>(`/apply/applications/${applicationId}/submit`, { method: 'POST' });
     } catch {
       return { success: true, message: 'Application submitted (mock)' };
+    }
+  },
+
+  reuploadDocument: async (appDocId: string, fileUrl: string): Promise<any> => {
+    try {
+      return await request<any>(`/apply/documents/${appDocId}/reupload`, {
+        method: 'POST',
+        body: JSON.stringify({ file_url: fileUrl }),
+      });
+    } catch {
+      return { status: 'reuploaded' };
     }
   },
 
@@ -475,26 +498,41 @@ export const applicantApi = {
 
 export const deptAdminApi = {
   getQueue: async (): Promise<any[]> => {
-    try { return await request<any[]>('/department-admin/queue'); }
-    catch { return MOCK_DEPT_QUEUE; }
+    try { 
+      return await request<any[]>('/dept/queue'); 
+    } catch {
+      try { return await request<any[]>('/department-admin/queue'); }
+      catch { return MOCK_DEPT_QUEUE; }
+    }
   },
 
   approveDocument: async (docId: string): Promise<any> => {
     try {
-      return await request<any>(`/department-admin/documents/${docId}/approve`, { method: 'POST' });
+      return await request<any>(`/dept/documents/${docId}/approve`, { method: 'POST' });
     } catch {
-      return { success: true };
+      try {
+        return await request<any>(`/admin/documents/${docId}/approve`, { method: 'POST' });
+      } catch {
+        return { success: true };
+      }
     }
   },
 
   rejectDocument: async (docId: string, reason: string): Promise<any> => {
     try {
-      return await request<any>(`/department-admin/documents/${docId}/reject`, {
+      return await request<any>(`/dept/documents/${docId}/reject`, {
         method: 'POST',
         body: JSON.stringify({ reason }),
       });
     } catch {
-      return { success: true };
+      try {
+        return await request<any>(`/admin/documents/${docId}/reject`, {
+          method: 'POST',
+          body: JSON.stringify({ reason }),
+        });
+      } catch {
+        return { success: true };
+      }
     }
   },
 };
@@ -587,5 +625,47 @@ export const superAdminApi = {
     } catch {
       return { id: `dept-${Date.now()}`, name, sla_hours: hours, admin_count: 0 };
     }
+  },
+
+  getUsers: async (): Promise<any[]> => {
+    try { return await request<any[]>('/admin/users'); }
+    catch { return []; }
+  },
+
+  toggleUserStatus: async (userId: string, status: string): Promise<any> => {
+    try {
+      return await request<any>(`/admin/users/${userId}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+      });
+    } catch {
+      return { status };
+    }
+  },
+
+  getApplications: async (): Promise<any[]> => {
+    try { return await request<any[]>('/admin/applications'); }
+    catch { return []; }
+  },
+
+  getApplicationDetail: async (applicationId: string): Promise<any> => {
+    try { return await request<any>(`/admin/applications/${applicationId}`); }
+    catch { return null; }
+  },
+
+  updateApplicationStatus: async (applicationId: string, status: string, remarks?: string): Promise<any> => {
+    try {
+      return await request<any>(`/admin/applications/${applicationId}/status`, {
+        method: 'POST',
+        body: JSON.stringify({ status, remarks }),
+      });
+    } catch {
+      return { status, applicationId };
+    }
+  },
+
+  getDocumentQueue: async (): Promise<any[]> => {
+    try { return await request<any[]>('/admin/documents/queue'); }
+    catch { return []; }
   },
 };

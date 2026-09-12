@@ -45,11 +45,23 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	}
 
 	if req.Role == "applicant" {
-		_, err = h.DB.Exec(c, `INSERT INTO applicants (id, user_id) VALUES ($1, $2)`, uuid.New().String(), id)
+		_, err = h.DB.Exec(c, `INSERT INTO applicants (id, user_id) VALUES ($1, $2) ON CONFLICT (user_id) DO NOTHING`, uuid.New().String(), id)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "applicant profile creation failed"})
 			return
 		}
+	} else if req.Role == "department_admin" {
+		// Link to default department so admin immediately receives applications
+		_, _ = h.DB.Exec(c, `
+			INSERT INTO admin_registrations (id, user_id, department_id, org_node_id)
+			SELECT 
+				uuid_generate_v4(), 
+				$1, 
+				d.id, 
+				COALESCE((SELECT id FROM tree_nodes WHERE department_id = d.id LIMIT 1), 'e1000000-0000-0000-0000-000000000001'::uuid)
+			FROM departments d LIMIT 1
+			ON CONFLICT (user_id, department_id) DO NOTHING
+		`, id)
 	}
 
 	token, err := signToken(id, req.Role)
@@ -57,7 +69,13 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "token signing failed"})
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{"token": token, "user_id": id, "ekyc_verified": true})
+	c.JSON(http.StatusCreated, gin.H{
+		"token":         token,
+		"user_id":       id,
+		"full_name":     req.FullName,
+		"role":          req.Role,
+		"ekyc_verified": true,
+	})
 }
 
 type loginReq struct {
@@ -72,8 +90,8 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	var id, hash, role string
-	err := h.DB.QueryRow(c, `SELECT id, password_hash, role FROM users WHERE email=$1`, req.Email).Scan(&id, &hash, &role)
+	var id, hash, role, fullName string
+	err := h.DB.QueryRow(c, `SELECT id, password_hash, role, COALESCE(full_name, email) FROM users WHERE email=$1`, req.Email).Scan(&id, &hash, &role, &fullName)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 		return
@@ -88,7 +106,18 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "token signing failed"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"token": token, "user_id": id, "role": role})
+	c.JSON(http.StatusOK, gin.H{
+		"token":     token,
+		"user_id":   id,
+		"role":      role,
+		"full_name": fullName,
+		"user": gin.H{
+			"id":        id,
+			"email":     req.Email,
+			"full_name": fullName,
+			"role":      role,
+		},
+	})
 }
 
 type googleAuthReq struct {
@@ -147,7 +176,18 @@ func (h *AuthHandler) GoogleAuth(c *gin.Context) {
 	}
 
 	if req.Role == "applicant" {
-		_, _ = h.DB.Exec(c, `INSERT INTO applicants (id, user_id) VALUES ($1, $2)`, uuid.New().String(), id)
+		_, _ = h.DB.Exec(c, `INSERT INTO applicants (id, user_id) VALUES ($1, $2) ON CONFLICT (user_id) DO NOTHING`, uuid.New().String(), id)
+	} else if req.Role == "department_admin" {
+		_, _ = h.DB.Exec(c, `
+			INSERT INTO admin_registrations (id, user_id, department_id, org_node_id)
+			SELECT 
+				uuid_generate_v4(), 
+				$1, 
+				d.id, 
+				COALESCE((SELECT id FROM tree_nodes WHERE department_id = d.id LIMIT 1), 'e1000000-0000-0000-0000-000000000001'::uuid)
+			FROM departments d LIMIT 1
+			ON CONFLICT (user_id, department_id) DO NOTHING
+		`, id)
 	}
 
 	token, err := signToken(id, req.Role)

@@ -25,6 +25,7 @@ export interface MockUser {
   lastLogin?: string;
   departmentId?: string;
   departmentName?: string;
+  applicationsCount?: number;
 }
 
 const USERS_KEY = 'swagat_mock_users_v4';
