@@ -35,6 +35,7 @@ import {
 import {
   mockLogin,
   mockRegister,
+  mockGoogleLogin,
   getStoredSession,
   clearSession,
   MockRole,
@@ -67,6 +68,7 @@ interface SwagatContextType {
     role: 'USER' | 'ADMIN',
     data: { email: string; password: string; name?: string; mobile?: string; companyName?: string }
   ) => Promise<void>;
+  loginWithGoogle: (email: string, name: string, role: 'USER' | 'ADMIN') => Promise<void>;
   logout: () => void;
   isBackendOnline: boolean;
 
@@ -457,6 +459,53 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
+  const loginWithGoogle = async (email: string, name: string, role: 'USER' | 'ADMIN') => {
+    const targetRole: 'USER' | 'ADMIN' = role === 'ADMIN' ? 'ADMIN' : 'USER';
+    const resolvedSession = mockGoogleLogin(email, name, targetRole);
+
+    const { user } = resolvedSession;
+    const finalRole: UserRole = user.role === 'ADMIN' ? 'ADMIN' : 'USER';
+    const resolvedName = user.name || name || email.split('@')[0];
+
+    const profile: UserProfile = {
+      id: user.id,
+      name: resolvedName,
+      email: user.email,
+      phone: user.mobile || '',
+      pan: '',
+      gstNumber: '',
+      companyName: user.companyName || user.departmentName || (finalRole === 'ADMIN' ? 'SWAGAT System Administration' : `${resolvedName}'s Enterprise`),
+      cin: '',
+      entityType: 'Private Limited',
+      state: 'India',
+      address: '',
+      isDigiLockerVerified: false,
+      role: finalRole,
+      avatarInitials: resolvedName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2),
+      departmentName: user.departmentName,
+      status: user.status || 'Active',
+      accountType: user.accountType || (finalRole === 'ADMIN' ? 'System Administrator' : 'Business User'),
+    };
+
+    setUserProfile(profile);
+    setIsAuthModalOpen(false);
+
+    if (finalRole === 'ADMIN') {
+      setCurrentView('admin-dashboard');
+      if (typeof window !== 'undefined') window.history.pushState({}, '', '/admin/dashboard');
+      showToast(`Welcome, ${resolvedName}! Signed in to SWAGAT ADMIN Portal.`);
+    } else {
+      setApplications(loadUserApplications(user.id));
+      setCurrentView('dashboard');
+      if (typeof window !== 'undefined') window.history.pushState({}, '', '/dashboard');
+      showToast(`Welcome, ${resolvedName}! Signed in to My SWAGAT Dashboard.`);
+
+      if (pendingApprovalToApply) {
+        setIsApplyModalOpen(true);
+      }
+    }
+  };
+
   const logout = () => {
     try {
       authApi.logout();
@@ -751,7 +800,7 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   return (
     <SwagatContext.Provider value={{
-      userProfile, login, logout, isBackendOnline,
+      userProfile, login, loginWithGoogle, logout, isBackendOnline,
       isAuthModalOpen, setIsAuthModalOpen,
       authModalMode, setAuthModalMode,
       currentView, setCurrentView,

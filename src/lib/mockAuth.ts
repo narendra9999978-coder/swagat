@@ -98,7 +98,7 @@ function saveMockUsers(users: MockUser[]) {
   localStorage.setItem(USERS_KEY, JSON.stringify(users));
 }
 
-/** Seed default production accounts on first run */
+/** Purge all demo accounts and ensure clean state on first run */
 export function seedDefaultUsers() {
   // Clear legacy mock store keys to prevent stale users
   localStorage.removeItem('swagat_mock_users');
@@ -107,55 +107,14 @@ export function seedDefaultUsers() {
 
   const existing = getMockUsers();
   
-  // Clean out any legacy mock accounts disconnected from actual system
-  const cleaned = existing.filter(u => !['rajesh@apexind.in', 'priya.mehta@startup.in', 'officer@mpcb.gov.in'].includes(u.email.toLowerCase()));
+  // Clean out any legacy mock accounts, demo user, and demo admin
+  const cleaned = existing.filter(u => 
+    !['user@demo.com', 'admin@demo.com', 'rajesh@apexind.in', 'priya.mehta@startup.in', 'officer@mpcb.gov.in'].includes(u.email.toLowerCase())
+  );
 
-  // Ensure baseline user@demo.com and admin@demo.com exist
-  const hasUser = cleaned.some(u => u.email.toLowerCase() === 'user@demo.com');
-  const hasAdmin = cleaned.some(u => u.email.toLowerCase() === 'admin@demo.com');
-
-  if (!hasUser) {
-    cleaned.unshift({
-      id: 'usr-demo-user',
-      email: 'user@demo.com',
-      name: 'Narendra Singh',
-      mobile: '+91 98201 45678',
-      phone: '+91 98201 45678',
-      companyName: 'ABC Electronics Pvt Ltd',
-      organization: 'ABC Electronics Pvt Ltd',
-      password: 'user123',
-      role: 'USER',
-      accountType: 'Business User',
-      status: 'Active',
-      createdAt: '2026-09-01T08:00:00.000Z',
-      lastLogin: 'Today, 09:15 AM',
-    });
-  } else {
-    const u = cleaned.find(u => u.email.toLowerCase() === 'user@demo.com')!;
-    if (!u.companyName) u.companyName = 'ABC Electronics Pvt Ltd';
-    if (!u.name || u.name === 'Demo Business User') u.name = 'Narendra Singh';
-    if (!u.phone) u.phone = u.mobile || '+91 98201 45678';
+  if (cleaned.length !== existing.length) {
+    saveMockUsers(cleaned);
   }
-
-  if (!hasAdmin) {
-    cleaned.push({
-      id: 'usr-demo-admin',
-      email: 'admin@demo.com',
-      name: 'SWAGAT Administrator',
-      mobile: '+91 98201 11111',
-      phone: '+91 98201 11111',
-      companyName: 'SWAGAT Central Command',
-      organization: 'SWAGAT Central Command',
-      password: 'admin123',
-      role: 'ADMIN',
-      accountType: 'System Administrator',
-      status: 'Active',
-      createdAt: '2026-08-01T08:00:00.000Z',
-      lastLogin: 'Today, 09:20 AM',
-    });
-  }
-
-  saveMockUsers(cleaned);
 }
 
 // ── Auth Operations ───────────────────────────────────────────────────────────
@@ -305,6 +264,110 @@ export function mockRegister(
     role: newUser.role,
   }));
 
+  return session;
+}
+
+/**
+ * Google Authentication handler for both USER and ADMIN portals.
+ * Enforces strict 1 Email = 1 Account = 1 Role policy.
+ * If registered with Business first, it cannot log in as Admin, and vice versa.
+ */
+export function mockGoogleLogin(
+  email: string,
+  name: string,
+  targetPortalRole: 'USER' | 'ADMIN' = 'USER'
+): AuthSession {
+  seedDefaultUsers();
+  const users = getMockUsers();
+  const cleanEmail = email.trim().toLowerCase();
+
+  const existing = users.find(u => u.email.toLowerCase() === cleanEmail);
+
+  if (existing) {
+    // Check account role vs target portal
+    if (existing.role !== targetPortalRole) {
+      if (existing.role === 'USER' && targetPortalRole === 'ADMIN') {
+        throw new Error(
+          'This Google account is registered as a Business User and cannot be used for Administrator login. Under SWAGAT policy, one email is permanently tied to one role.'
+        );
+      } else {
+        throw new Error(
+          'This Google account is registered as an Administrator and cannot be used for Business User login. Under SWAGAT policy, one email is permanently tied to one role.'
+        );
+      }
+    }
+
+    if (existing.status === 'Deactivated') {
+      throw new Error('This account has been deactivated. Please contact system administrator.');
+    }
+
+    // Update last login
+    existing.lastLogin = new Date().toLocaleString('en-IN', {
+      day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+    saveMockUsers(users);
+
+    const token = generateFakeToken(existing);
+    const session: AuthSession = { token, user: existing };
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    localStorage.setItem('swagat_auth_token', token);
+    localStorage.setItem('swagat_auth_user', JSON.stringify({
+      id: existing.id,
+      email: existing.email,
+      full_name: existing.name,
+      role: existing.role,
+    }));
+    return session;
+  }
+
+  // Register new account with the requested role
+  const finalName = name.trim() || cleanEmail.split('@')[0];
+  const finalCompany = targetPortalRole === 'ADMIN' ? 'SWAGAT Central Administration' : `${finalName}'s Enterprise`;
+
+  const newUser: MockUser = {
+    id: `${targetPortalRole === 'ADMIN' ? 'adm' : 'usr'}-${Date.now()}`,
+    email: cleanEmail,
+    name: finalName,
+    mobile: '+91 98765 43210',
+    phone: '+91 98765 43210',
+    companyName: finalCompany,
+    organization: finalCompany,
+    password: 'google-oauth-session-token',
+    role: targetPortalRole,
+    accountType: targetPortalRole === 'ADMIN' ? 'System Administrator' : 'Business User',
+    status: 'Active',
+    createdAt: new Date().toISOString(),
+    lastLogin: 'Just now',
+    departmentName: targetPortalRole === 'ADMIN' ? 'SWAGAT Central Administration' : undefined,
+  };
+
+  users.push(newUser);
+  saveMockUsers(users);
+
+  if (targetPortalRole === 'USER') {
+    try {
+      addNotification({
+        id: `notif-${Date.now()}`,
+        role: 'ADMIN',
+        type: 'New User Registered',
+        title: 'New Enterprise User Registered via Google',
+        message: `${newUser.name} (${newUser.email}) registered via Google Authentication on SWAGAT Portal.`,
+        timestamp: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+        read: false,
+      });
+    } catch {}
+  }
+
+  const token = generateFakeToken(newUser);
+  const session: AuthSession = { token, user: newUser };
+  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  localStorage.setItem('swagat_auth_token', token);
+  localStorage.setItem('swagat_auth_user', JSON.stringify({
+    id: newUser.id,
+    email: newUser.email,
+    full_name: newUser.name,
+    role: newUser.role,
+  }));
   return session;
 }
 

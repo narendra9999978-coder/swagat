@@ -393,33 +393,16 @@ export const adminApprovalsCatalog: AdminApproval[] = [
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SLA RECORDS
+// SLA RECORDS (Dynamic from live applications)
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const adminSLARecords: AdminSLARecord[] = [
-  { id: 'sla-001', applicationId: 'adm-app-007', trackingNumber: 'SWG-2026-UP-10244', applicantName: 'Ramesh Gupta', department: 'FSSAI — Northern Zone', state: 'Uttar Pradesh', approvalName: 'FSSAI Central License', slaDays: 30, remainingDays: 0, slaStatus: 'Due Today', submittedDate: '12 Jul 2026', deadlineDate: '11 Sep 2026', assignedOfficer: 'Rajiv Anand', escalationLevel: 2 },
-  { id: 'sla-002', applicationId: 'adm-app-012', trackingNumber: 'SWG-2026-OD-10132', applicantName: 'Santosh Panda', department: 'MoEFCC', state: 'Odisha', approvalName: 'Mining Lease — Env. Clearance', slaDays: 90, remainingDays: -12, slaStatus: 'Overdue', submittedDate: '02 Apr 2026', deadlineDate: '01 Jul 2026', assignedOfficer: 'Pradeep Mohanty', escalationLevel: 3 },
-  { id: 'sla-003', applicationId: 'adm-app-005', trackingNumber: 'SWG-2026-RJ-10287', applicantName: 'Vikram Singh', department: 'RSPCB', state: 'Rajasthan', approvalName: 'EIA — Wind Farm', slaDays: 90, remainingDays: -5, slaStatus: 'Overdue', submittedDate: '10 May 2026', deadlineDate: '07 Aug 2026', assignedOfficer: 'Meena Saini', escalationLevel: 2 },
-  { id: 'sla-004', applicationId: 'adm-app-002', trackingNumber: 'SWG-2026-GJ-10388', applicantName: 'Priya Mehta', department: 'GUVNL / CEA', state: 'Gujarat', approvalName: 'Grid Connectivity Approval', slaDays: 60, remainingDays: 4, slaStatus: 'Due Soon', submittedDate: '28 Jul 2026', deadlineDate: '26 Sep 2026', assignedOfficer: 'Nilesh Patel', escalationLevel: 1 },
-  { id: 'sla-005', applicationId: 'adm-app-001', trackingNumber: 'SWG-2026-KA-10421', applicantName: 'Rajesh Sharma', department: 'KSPCB', state: 'Karnataka', approvalName: 'CTE/CTO — Electronics', slaDays: 45, remainingDays: 12, slaStatus: 'On Track', submittedDate: '05 Aug 2026', deadlineDate: '19 Sep 2026', assignedOfficer: 'Shilpa Rao', escalationLevel: 0 },
-  { id: 'sla-006', applicationId: 'adm-app-006', trackingNumber: 'SWG-2026-TS-10265', applicantName: 'Mohammed Yusuf', department: 'TSPCB', state: 'Telangana', approvalName: 'CTE — Green Hydrogen', slaDays: 60, remainingDays: 8, slaStatus: 'On Track', submittedDate: '01 Jun 2026', deadlineDate: '30 Sep 2026', assignedOfficer: 'Latha Reddy', escalationLevel: 0 },
-  { id: 'sla-007', applicationId: 'adm-app-010', trackingNumber: 'SWG-2026-DL-10176', applicantName: 'Kavita Sharma', department: 'NABH', state: 'Delhi', approvalName: 'NABH Accreditation', slaDays: 120, remainingDays: 22, slaStatus: 'On Track', submittedDate: '22 May 2026', deadlineDate: '19 Sep 2026', assignedOfficer: 'Sunil Verma', escalationLevel: 0 },
-  { id: 'sla-008', applicationId: 'adm-app-011', trackingNumber: 'SWG-2026-HR-10154', applicantName: 'Ashok Kumar', department: 'DISH Haryana', state: 'Haryana', approvalName: 'Factory License', slaDays: 45, remainingDays: 18, slaStatus: 'On Track', submittedDate: '14 Aug 2026', deadlineDate: '28 Sep 2026', assignedOfficer: 'Harinder Singh', escalationLevel: 0 },
-];
+export const adminSLARecords: AdminSLARecord[] = [];
 
 // ─────────────────────────────────────────────────────────────────────────────
-// QUERY & GRIEVANCE RECORDS
+// QUERY & GRIEVANCE RECORDS (Dynamic from live user queries)
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const adminQueries: AdminQuery[] = [
-  { id: 'qry-001', queryNumber: 'QRY-2026-KA-0421', applicantName: 'Rajesh Sharma', companyName: 'Apex Precision Manufacturing Ltd', applicationId: 'adm-app-001', trackingNumber: 'SWG-2026-KA-10421', department: 'KSPCB', state: 'Karnataka', sector: 'Electronics & Semiconductors', queryText: 'The ETP design submitted does not match the process wastewater generation rates mentioned in the application form. Please clarify and resubmit corrected effluent treatment capacity calculation.', raisedDate: '20 Aug 2026', priority: 'High', status: 'Open', escalationLevel: 1 },
-  { id: 'qry-002', queryNumber: 'QRY-2026-GJ-0388', applicantName: 'Priya Mehta', companyName: 'GreenWave Solar Technologies', applicationId: 'adm-app-002', trackingNumber: 'SWG-2026-GJ-10388', department: 'GUVNL / CEA', state: 'Gujarat', sector: 'Renewable Energy', queryText: 'The single-line diagram submitted for 33 kV interconnection does not include protection relay settings. Also clarify the proposed metering arrangement.', raisedDate: '15 Aug 2026', priority: 'High', status: 'Assigned', assignedTo: 'Nilesh Patel', escalationLevel: 1 },
-  { id: 'qry-003', queryNumber: 'QRY-2026-RJ-0287', applicantName: 'Vikram Singh', companyName: 'Suryaansh Wind Power Ltd', applicationId: 'adm-app-005', trackingNumber: 'SWG-2026-RJ-10287', department: 'MoEFCC', state: 'Rajasthan', sector: 'Renewable Energy', queryText: 'Additional wildlife impact assessment required for proposed turbine locations in Sector 3 of the wind farm. Please submit ornithological study results.', raisedDate: '15 Jun 2026', priority: 'Urgent', status: 'Under Review', assignedTo: 'Meena Saini', escalationLevel: 2 },
-  { id: 'qry-004', queryNumber: 'QRY-2026-OD-0132', applicantName: 'Santosh Panda', companyName: 'OrisaMines & Minerals Corp', applicationId: 'adm-app-012', trackingNumber: 'SWG-2026-OD-10132', department: 'MoEFCC', state: 'Odisha', sector: 'Mining', queryText: 'Village Sabhadra Sampura has not been consulted in the public hearing. Please attach revised Form-I and also submit local language (Odia) translated EIA summary.', raisedDate: '10 Jun 2026', priority: 'Urgent', status: 'Responded', assignedTo: 'Pradeep Mohanty', responseText: 'We acknowledge the query. The public hearing for Sabhadra Sampura village has been rescheduled for 15 August 2026. Odia translation attached.', responseDate: '20 Aug 2026', escalationLevel: 2 },
-  { id: 'qry-005', queryNumber: 'QRY-2026-DL-0176', applicantName: 'Kavita Sharma', companyName: 'CapitalOne Healthcare', applicationId: 'adm-app-010', trackingNumber: 'SWG-2026-DL-10176', department: 'NABH', state: 'Delhi', sector: 'Healthcare', queryText: 'ICU nurse-to-patient ratio does not meet NABH Standard HIC.11. Please submit revised nursing staff deployment plan.', raisedDate: '01 Sep 2026', priority: 'Medium', status: 'Open', escalationLevel: 0 },
-  { id: 'qry-006', queryNumber: 'QRY-2026-KL-0198', applicantName: 'Arun Nair', companyName: 'CoastalTech Marine Engineering', applicationId: 'adm-app-009', trackingNumber: 'SWG-2026-KL-10198', department: 'DG Shipping', state: 'Kerala', sector: 'Ports & Shipping', queryText: 'PFSP does not contain details of restricted access zones. Resubmit with ISPS Code Chapter XI-2 compliance declaration.', raisedDate: '20 Jul 2026', priority: 'High', status: 'Resolved', assignedTo: 'Suresh Menon', responseText: 'Application rejected due to non-compliance with ISPS Code requirements after second review.', responseDate: '25 Aug 2026', escalationLevel: 0 },
-  { id: 'qry-007', queryNumber: 'QRY-2026-MH-0356', applicantName: 'Dr. Suresh Patil', companyName: 'BioGenix Pharmaceuticals', applicationId: 'adm-app-003', trackingNumber: 'SWG-2026-MH-10356', department: 'CDSCO / FDA Maharashtra', state: 'Maharashtra', sector: 'Pharmaceuticals', queryText: 'Additional clarification on sterile manufacturing area classification required as per Schedule M.', raisedDate: '25 Jul 2026', priority: 'High', status: 'Resolved', assignedTo: 'Dr. Anita Kadam', responseText: 'GMP documentation reviewed and approved. License issued as per Schedule M compliance.', responseDate: '01 Sep 2026', escalationLevel: 0 },
-];
+export const adminQueries: AdminQuery[] = [];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ADMIN SCHEMES
@@ -437,54 +420,22 @@ export const adminSchemes: AdminScheme[] = [
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ADMIN RENEWALS
+// ADMIN RENEWALS (Dynamic from live approved applications)
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const adminRenewals: AdminRenewal[] = [
-  { id: 'ren-001', approvalName: 'Factory License', applicantName: 'Rajesh Sharma', companyName: 'Apex Precision Mfg Ltd', licenseNumber: 'KA/DISH/FT/2024/4421', state: 'Karnataka', sector: 'Electronics', department: 'DISH Karnataka', expiryDate: '31 Dec 2026', daysRemaining: 110, renewalStatus: 'Upcoming', renewalFee: '₹18,500', lastRenewalDate: '31 Dec 2025' },
-  { id: 'ren-002', approvalName: 'Fire NOC', applicantName: 'Priya Mehta', companyName: 'GreenWave Solar Tech', licenseNumber: 'GJ/FIRE/2025/1184', state: 'Gujarat', sector: 'Renewable Energy', department: 'Gujarat Fire Services', expiryDate: '30 Sep 2026', daysRemaining: 18, renewalStatus: 'Due Soon', renewalFee: '₹12,000', lastRenewalDate: '30 Sep 2025' },
-  { id: 'ren-003', approvalName: 'Consent to Operate (CTO)', applicantName: 'BioGenix Pharmaceuticals', companyName: 'BioGenix Pharmaceuticals Ltd', licenseNumber: 'MPCB/CTO/2021/7823', state: 'Maharashtra', sector: 'Pharmaceuticals', department: 'MPCB', expiryDate: '14 Sep 2026', daysRemaining: 2, renewalStatus: 'Due Soon', renewalFee: '₹85,000', lastRenewalDate: '14 Sep 2021' },
-  { id: 'ren-004', approvalName: 'Drug Manufacturing License', applicantName: 'MediCore Labs', companyName: 'MediCore Laboratories Ltd', licenseNumber: 'AP/FDA/DML/2021/3421', state: 'Andhra Pradesh', sector: 'Pharmaceuticals', department: 'AP FDA', expiryDate: '01 Aug 2026', daysRemaining: -41, renewalStatus: 'Expired', renewalFee: '₹1,25,000' },
-  { id: 'ren-005', approvalName: 'CNG Station License (PESO)', applicantName: 'IndoFuel Networks', companyName: 'IndoFuel Networks Pvt Ltd', licenseNumber: 'PESO/CNG/UP/2023/884', state: 'Uttar Pradesh', sector: 'Oil & Gas', department: 'PESO', expiryDate: '15 Oct 2026', daysRemaining: 33, renewalStatus: 'Due Soon', renewalFee: '₹8,500' },
-  { id: 'ren-006', approvalName: 'Factory License', applicantName: 'Bengal Textile Mills', companyName: 'Bengal Textile Mills Ltd', licenseNumber: 'WB/DISH/FT/2026/2241', state: 'West Bengal', sector: 'Textiles', department: 'DISH West Bengal', expiryDate: '31 Jan 2027', daysRemaining: 141, renewalStatus: 'Upcoming', renewalFee: '₹22,000', lastRenewalDate: '31 Jan 2026' },
-  { id: 'ren-007', approvalName: 'FSSAI License', applicantName: 'AgroFirst Food Industries', companyName: 'AgroFirst Food Industries', licenseNumber: 'FSSAI/UP/2025/12284', state: 'Uttar Pradesh', sector: 'Food Processing', department: 'FSSAI', expiryDate: '31 Dec 2026', daysRemaining: 110, renewalStatus: 'Upcoming', renewalFee: '₹7,500', lastRenewalDate: '31 Dec 2025' },
-  { id: 'ren-008', approvalName: 'Fire NOC', applicantName: 'Pinnacle Auto Components', companyName: 'Pinnacle Auto Components Ltd', licenseNumber: 'HR/FIRE/2025/6421', state: 'Haryana', sector: 'Automobile', department: 'Haryana Fire Department', expiryDate: '25 Sep 2026', daysRemaining: 13, renewalStatus: 'Due Soon', renewalFee: '₹9,500' },
-  { id: 'ren-009', approvalName: 'CTO Renewal', applicantName: 'ChemPlast Industries', companyName: 'ChemPlast Industries Ltd', licenseNumber: 'GJ/GPCB/CTO/2019/5521', state: 'Gujarat', sector: 'Chemicals', department: 'GPCB', expiryDate: '30 Jun 2026', daysRemaining: -73, renewalStatus: 'Expired', renewalFee: '₹95,000' },
-  { id: 'ren-010', approvalName: 'NABH Accreditation', applicantName: 'Kavita Sharma', companyName: 'CapitalOne Healthcare', licenseNumber: 'NABH/DL/2023/HC-4421', state: 'Delhi', sector: 'Healthcare', department: 'NABH', expiryDate: '22 May 2026', daysRemaining: -113, renewalStatus: 'Expired', renewalFee: '₹3,50,000' },
-];
+export const adminRenewals: AdminRenewal[] = [];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // NOTIFICATIONS
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const adminNotifications: AdminNotification[] = [
-  { id: 'notif-001', type: 'SLA Warning', title: 'SLA Breach Warning — 5 Applications', message: '5 applications are overdue or due today. Immediate escalation required for Odisha Mining Lease and Rajasthan Wind EIA.', target: 'All Users', createdAt: '11 Sep 2026', sentAt: '11 Sep 2026', status: 'Sent', sentCount: 8 },
-  { id: 'notif-002', type: 'Renewal Reminder', title: 'Renewal Due: MPCB CTO — BioGenix', message: 'Your Consent to Operate (CTO) from MPCB expires in 2 days. Please initiate renewal immediately to avoid production halt.', target: 'Specific User', targetValue: 'dr.suresh@biogenix.in', createdAt: '10 Sep 2026', sentAt: '10 Sep 2026', status: 'Sent', sentCount: 1 },
-  { id: 'notif-003', type: 'Scheme Update', title: 'New PLI Scheme Round Open for Applications', message: 'Ministry of Electronics has opened Round 2 of PLI applications for semiconductor components. Deadline: 31 October 2026.', target: 'Specific Sector', targetValue: 'Electronics & Semiconductors', createdAt: '08 Sep 2026', status: 'Sent', sentAt: '09 Sep 2026', sentCount: 142 },
-  { id: 'notif-004', type: 'System Announcement', title: 'System Maintenance — 14 Sep 2026, 02:00–05:00 AM', message: 'SWAGAT Portal will be under scheduled maintenance. Applications submitted during this window will be queued and processed automatically.', target: 'All Users', createdAt: '10 Sep 2026', scheduledAt: '13 Sep 2026', status: 'Scheduled' },
-  { id: 'notif-005', type: 'Query Update', title: 'Query Response Required — Vikram Singh (Wind Farm)', message: 'Query QRY-2026-RJ-0287 requires your response within 7 days. Wildlife impact assessment is mandatory.', target: 'Specific User', targetValue: 'vikram@suryaansh.in', createdAt: '12 Jun 2026', sentAt: '12 Jun 2026', status: 'Sent', sentCount: 1 },
-  { id: 'notif-006', type: 'Application Update', title: 'Your Application SWG-2026-MH-10356 Approved', message: 'Congratulations! Your Drug Manufacturing License application has been approved. Download your license from My Dashboard > Documents.', target: 'Specific User', targetValue: 'suresh@biogenix.in', createdAt: '02 Sep 2026', sentAt: '02 Sep 2026', status: 'Sent', sentCount: 1 },
-  { id: 'notif-007', type: 'System Announcement', title: 'New E-Signatures Integration for Document Verification', message: 'SWAGAT now supports DigiLocker-based e-signature verification for all application documents. Update your profile to enable.', target: 'All Users', createdAt: '05 Sep 2026', status: 'Draft' },
-];
+export const adminNotifications: AdminNotification[] = [];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // AUDIT LOGS
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const adminAuditLogs: AdminAuditLog[] = [
-  { id: 'aud-001', adminName: 'Demo Administrator', adminEmail: 'admin@demo.com', action: 'Approved Drug Manufacturing License', module: 'Applications', target: 'SWG-2026-MH-10356 (BioGenix Pharma)', timestamp: '02 Sep 2026, 14:32:18', result: 'Success', ipAddress: '192.168.1.105', details: 'Status changed from Under Review → Approved' },
-  { id: 'aud-002', adminName: 'Demo Administrator', adminEmail: 'admin@demo.com', action: 'Created Admin Account', module: 'User Management', target: 'officer@mpcb.gov.in (Dr. Suresh Patil)', timestamp: '01 Sep 2026, 10:15:42', result: 'Success', ipAddress: '192.168.1.105', details: 'New ADMIN role account created for MPCB department' },
-  { id: 'aud-003', adminName: 'Dr. Suresh Patil', adminEmail: 'officer@mpcb.gov.in', action: 'Raised Query on Application', module: 'Applications', target: 'SWG-2026-KA-10421 (Apex Precision)', timestamp: '20 Aug 2026, 09:45:22', result: 'Success', ipAddress: '10.0.0.22', details: 'Query QRY-2026-KA-0421 created — ETP design discrepancy' },
-  { id: 'aud-004', adminName: 'Demo Administrator', adminEmail: 'admin@demo.com', action: 'Updated SLA Configuration', module: 'SLA & Escalations', target: 'FSSAI Central License Processing', timestamp: '15 Aug 2026, 16:22:11', result: 'Success', ipAddress: '192.168.1.105', details: 'SLA changed from 45 days → 30 days per new DPIIT directive' },
-  { id: 'aud-005', adminName: 'Demo Administrator', adminEmail: 'admin@demo.com', action: 'Deactivated User Account', module: 'User Management', target: 'fake.user@test.com', timestamp: '12 Aug 2026, 11:08:33', result: 'Success', ipAddress: '192.168.1.105', details: 'Account deactivated due to suspicious login activity' },
-  { id: 'aud-006', adminName: 'Demo Administrator', adminEmail: 'admin@demo.com', action: 'Added New Approval', module: 'Approvals', target: 'Green Hydrogen Production License', timestamp: '10 Aug 2026, 14:18:55', result: 'Success', ipAddress: '192.168.1.105', details: 'New approval added for Renewable Energy sector — Green Hydrogen units' },
-  { id: 'aud-007', adminName: 'Dr. Suresh Patil', adminEmail: 'officer@mpcb.gov.in', action: 'Login', module: 'Authentication', target: 'Admin Portal', timestamp: '11 Sep 2026, 08:02:14', result: 'Success', ipAddress: '10.0.0.22' },
-  { id: 'aud-008', adminName: 'Demo Administrator', adminEmail: 'admin@demo.com', action: 'Sent Bulk Notification', module: 'Notifications', target: 'All Electronics Sector Users (142)', timestamp: '09 Sep 2026, 10:30:00', result: 'Success', ipAddress: '192.168.1.105', details: 'PLI Round 2 scheme notification dispatched to 142 users' },
-  { id: 'aud-009', adminName: 'Demo Administrator', adminEmail: 'admin@demo.com', action: 'Rejected Application', module: 'Applications', target: 'SWG-2026-KL-10198 (CoastalTech Marine)', timestamp: '25 Aug 2026, 15:44:32', result: 'Success', ipAddress: '192.168.1.105', details: 'ISPS Code non-compliance — PFSP rejected' },
-  { id: 'aud-010', adminName: 'Demo Administrator', adminEmail: 'admin@demo.com', action: 'Updated Scheme Status', module: 'Government Schemes', target: 'Karnataka Aerospace Policy 2022', timestamp: '01 Sep 2026, 09:20:11', result: 'Success', ipAddress: '192.168.1.105', details: 'Scheme marked Active; budget updated to ₹1,500 Cr' },
-  { id: 'aud-011', adminName: 'Demo Administrator', adminEmail: 'admin@demo.com', action: 'Login Attempt Failed', module: 'Authentication', target: 'Admin Portal', timestamp: '08 Sep 2026, 22:15:42', result: 'Failed', ipAddress: '45.234.112.89', details: 'Invalid credentials — possible unauthorized access attempt' },
-  { id: 'aud-012', adminName: 'Demo Administrator', adminEmail: 'admin@demo.com', action: 'Escalated Application SLA', module: 'SLA & Escalations', target: 'SWG-2026-OD-10132 (OrisaMines)', timestamp: '05 Sep 2026, 14:12:08', result: 'Success', ipAddress: '192.168.1.105', details: 'SLA breached by 12 days — escalated to Joint Secretary, MoEFCC' },
-];
+export const adminAuditLogs: AdminAuditLog[] = [];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // APPROVAL RULES

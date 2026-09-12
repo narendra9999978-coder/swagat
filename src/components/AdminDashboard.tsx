@@ -21,7 +21,7 @@ import {
 import { Application, DocumentVerificationStatus, ApprovalItemStatus, AppNotification } from '../types/swagat';
 import {
   adminDepartments, adminApprovalsCatalog, adminSectors,
-  adminRenewals, adminSchemes, adminSLARecords,
+  adminSchemes,
   adminAuditLogs, adminApprovalRules, adminDocumentTypes,
   analyticsStateData, analyticsSectorData, analyticsMonthlyTrend,
   AdminApplication, AdminDepartment, AdminApproval, AdminSector,
@@ -713,8 +713,26 @@ export const AdminDashboard: React.FC = () => {
     showToast('Query assigned.');
   };
 
-  // ── Renewals State ───────────────────────────────────────────────────────
-  const [renewalList] = useState<AdminRenewal[]>(adminRenewals);
+  // ── Renewals State (Dynamically derived from real approved applications) ────
+  const renewalList = useMemo<AdminRenewal[]>(() => {
+    return appList
+      .filter(a => a.currentStatus === 'Approved')
+      .map(a => ({
+        id: `ren-${a.id}`,
+        approvalName: a.approvalName || 'Statutory Clearance',
+        applicantName: a.applicantName,
+        companyName: a.companyName,
+        licenseNumber: `LIC-${a.trackingNumber}`,
+        state: a.state,
+        sector: a.sector,
+        department: a.department,
+        expiryDate: '12 Sep 2027',
+        daysRemaining: 365,
+        renewalStatus: 'Upcoming' as const,
+        renewalFee: '₹25,000',
+        lastRenewalDate: a.submittedDate,
+      }));
+  }, [appList]);
   const [renewalSearch, setRenewalSearch] = useState('');
   const [renewalStatusFilter, setRenewalStatusFilter] = useState('All');
 
@@ -772,8 +790,29 @@ export const AdminDashboard: React.FC = () => {
     showToast(`Notification "${n.title}" broadcasted.`);
   };
 
-  // ── SLA State ────────────────────────────────────────────────────────────
-  const [slaList] = useState<AdminSLARecord[]>(adminSLARecords);
+  // ── SLA State (Dynamically derived from real live applications) ──────────
+  const slaList = useMemo<AdminSLARecord[]>(() => {
+    return appList.map(a => {
+      const remaining = a.slaRemainingDays ?? 30;
+      const slaDays = a.slaDeadlineDays ?? 30;
+      return {
+        id: `sla-${a.id}`,
+        applicationId: a.id,
+        trackingNumber: a.trackingNumber,
+        applicantName: a.applicantName,
+        department: a.department,
+        state: a.state,
+        approvalName: a.approvalName,
+        slaDays,
+        remainingDays: remaining,
+        slaStatus: (remaining <= 0 ? 'Overdue' : remaining <= 2 ? 'Due Today' : remaining <= 7 ? 'Due Soon' : 'On Track') as any,
+        submittedDate: a.submittedDate,
+        deadlineDate: `In ${remaining} days`,
+        assignedOfficer: `Scrutiny Officer - ${a.department}`,
+        escalationLevel: remaining <= 0 ? 3 : remaining <= 2 ? 2 : remaining <= 7 ? 1 : 0,
+      };
+    });
+  }, [appList]);
   const [slaFilter, setSlaFilter] = useState('All');
 
   const filteredSLA = slaList.filter(s => slaFilter === 'All' || s.slaStatus === slaFilter);

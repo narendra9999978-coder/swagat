@@ -25,173 +25,6 @@ const STORE_KEY = 'swagat_applications_v1';
 const NOTIF_STORE_KEY = 'swagat_notifications_v1';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Seed demo application with realistic documents and approvals
-// ─────────────────────────────────────────────────────────────────────────────
-
-const DEMO_DOCUMENTS: ApplicationDocumentItem[] = [
-  {
-    id: 'doc-pan-01',
-    documentName: 'PAN Card',
-    category: 'Company Registration',
-    fileUrl: '/docs/PAN_AABCA9082F.pdf',
-    uploadDate: '12 Sep 2026',
-    verificationStatus: 'Approved',
-    adminRemark: 'Verified successfully',
-  },
-  {
-    id: 'doc-land-01',
-    documentName: 'Land Document',
-    category: 'Land Documents',
-    fileUrl: '/docs/MIDC_Land_Possession.pdf',
-    uploadDate: '12 Sep 2026',
-    verificationStatus: 'Under Review',
-    adminRemark: 'Waiting for department verification',
-  },
-  {
-    id: 'doc-gst-01',
-    documentName: 'GST Certificate',
-    category: 'Company Registration',
-    fileUrl: '/docs/GST_27AABCA9082F1ZG.pdf',
-    uploadDate: '12 Sep 2026',
-    verificationStatus: 'Approved',
-    adminRemark: 'Verified',
-  },
-  {
-    id: 'doc-env-01',
-    documentName: 'Environmental Report',
-    category: 'Environmental Documents',
-    fileUrl: '/docs/Environmental_Report.pdf',
-    uploadDate: '12 Sep 2026',
-    verificationStatus: 'Correction Required',
-    adminRemark: 'Please upload the updated report',
-  },
-  {
-    id: 'doc-layout-01',
-    documentName: 'Factory Layout',
-    category: 'Factory & Labour',
-    fileUrl: '/docs/Factory_Layout.pdf',
-    uploadDate: '12 Sep 2026',
-    verificationStatus: 'Pending',
-    adminRemark: 'Not yet reviewed',
-  },
-];
-
-const DEMO_APPROVALS: ApplicationApprovalItem[] = [
-  {
-    id: 'appr-mca',
-    approvalName: 'Company Registration',
-    department: 'Ministry of Corporate Affairs (MCA)',
-    centralOrState: 'Central',
-    status: 'Approved',
-    submittedDate: '12 Sep 2026',
-    lastUpdated: '12 Sep 2026',
-    remarks: 'Corporate CIN active and authenticated',
-  },
-  {
-    id: 'appr-dish',
-    approvalName: 'Factory License',
-    department: 'Directorate of Industrial Safety & Health (DISH)',
-    centralOrState: 'State',
-    status: 'Under Review',
-    submittedDate: '12 Sep 2026',
-    lastUpdated: '12 Sep 2026',
-    remarks: 'Technical scrutinizer reviewing structural & boiler safety parameters',
-  },
-  {
-    id: 'appr-fire',
-    approvalName: 'Fire NOC',
-    department: 'State Fire Prevention Services',
-    centralOrState: 'State',
-    status: 'Pending',
-    submittedDate: '12 Sep 2026',
-    lastUpdated: '12 Sep 2026',
-    remarks: 'Site inspection pending inspector assignment',
-  },
-  {
-    id: 'appr-cte',
-    approvalName: 'Pollution Consent',
-    department: 'State Pollution Control Board',
-    centralOrState: 'State',
-    status: 'Query Raised',
-    submittedDate: '12 Sep 2026',
-    lastUpdated: '12 Sep 2026',
-    remarks: 'Awaiting applicant response to department query',
-  },
-  {
-    id: 'appr-labour',
-    approvalName: 'Labour Registration',
-    department: 'Department of Labour Welfare',
-    centralOrState: 'State',
-    status: 'Approved',
-    submittedDate: '12 Sep 2026',
-    lastUpdated: '12 Sep 2026',
-    remarks: 'Digital clearance certificate issued',
-  },
-];
-
-const DEMO_APPLICATION: Application = {
-  id: 'app-swg-2026-0001',
-  trackingNumber: 'SWG-2026-0001',
-  userId: 'usr-demo-user',
-  applicantEmail: 'user@demo.com',
-  approvalId: 'app-factory-lic',
-  approvalName: 'Factory Approval',
-  department: 'Directorate of Industrial Safety & Health (DISH)',
-  ministry: 'Labour & Employment Dept, Govt of Maharashtra',
-  centralOrState: 'State',
-  stateName: 'Maharashtra',
-  submissionDate: '12 Sep 2026',
-  lastUpdated: '12 Sep 2026',
-  currentStatus: 'Under Review',
-  nextAction: 'Under desk scrutiny by Directorate of Industrial Safety & Health (DISH)',
-  estimatedCompletionDays: 30,
-  statutoryFeePaid: 'Rs.35,000',
-  applicantName: 'Narendra Singh',
-  companyName: 'ABC Electronics Pvt Ltd',
-  applicantPhone: '+91 98201 45678',
-  businessType: 'Electronics',
-  panNumber: 'AABCA9082F',
-  gstNumber: '27AABCA9082F1ZG',
-  cinNumber: 'U29253MH2021PTC368940',
-  projectTitle: 'Consumer Electronics & SMT Manufacturing Facility',
-  projectState: 'Maharashtra',
-  projectDistrict: 'Pune (Chakan Industrial Area)',
-  investmentAmount: 'Rs.18.50 Crores',
-  timeline: [
-    { title: 'Application Created', date: '12 Sep 2026', description: 'Application initiated and business details verified', completed: true, current: false },
-    { title: 'Application Submitted', date: '12 Sep 2026', description: 'Statutory fee paid and common application submitted', completed: true, current: false },
-    { title: 'Documents Uploaded', date: '12 Sep 2026', description: 'All statutory documents successfully attached to dossier', completed: true, current: false },
-    { title: 'Department Review', date: '12 Sep 2026', description: 'Department scrutiny officer reviewing statutory documents', completed: false, current: true },
-    { title: 'Approval', description: 'Final grant of statutory clearance order', completed: false, current: false },
-    { title: 'Completion', description: 'Licence issue and commencement certificate generation', completed: false, current: false },
-  ],
-  documentsAttached: [
-    { name: 'PAN Card', category: 'Company Registration', verified: true },
-    { name: 'Land Document', category: 'Land Documents', verified: false },
-    { name: 'GST Certificate', category: 'Company Registration', verified: true },
-    { name: 'Environmental Report', category: 'Environmental Documents', verified: false },
-    { name: 'Factory Layout', category: 'Factory & Labour', verified: false },
-  ],
-  documentsList: DEMO_DOCUMENTS,
-  approvalsList: DEMO_APPROVALS,
-  queries: [
-    {
-      id: 'qry-swg-01',
-      approvalId: 'appr-cte',
-      documentId: 'doc-env-01',
-      queryText: 'Please upload the latest land ownership document.',
-      message: 'Please upload the latest land ownership document.',
-      raisedByOfficer: 'Scrutiny Officer - Industry Dept',
-      raisedBy: 'Scrutiny Officer - Industry Dept',
-      department: 'State Pollution Control Board',
-      dateRaised: '12 Sep 2026',
-      raisedDate: '12 Sep 2026',
-      status: 'Open',
-    },
-  ],
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
 // Broadcaster: notifies other components & windows in real-time
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -211,78 +44,60 @@ function broadcastNotifUpdate() {
 // Public Application Store helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Load all applications from localStorage. Seeds demo data on first run. */
+/** Load all applications from localStorage. No demo data is seeded. */
 export function loadAllApplications(): Application[] {
   try {
     const raw = localStorage.getItem(STORE_KEY);
     if (!raw) {
-      const initial = [DEMO_APPLICATION];
-      localStorage.setItem(STORE_KEY, JSON.stringify(initial));
-      return initial;
+      return [];
     }
     const parsed: Application[] = JSON.parse(raw);
     if (!Array.isArray(parsed) || parsed.length === 0) {
-      localStorage.setItem(STORE_KEY, JSON.stringify([DEMO_APPLICATION]));
-      return [DEMO_APPLICATION];
+      return [];
     }
-    // Clean legacy test records and ensure complete document/approval lists
-    return parsed.map(app => {
-      // Migrate old demo tracking to canonical SWG-2026-0001
-      if (app.trackingNumber === 'SWG-2026-MH-78942' || app.applicantEmail === 'rajesh@apexind.in') {
-        app.id = 'app-swg-2026-0001';
-        app.trackingNumber = 'SWG-2026-0001';
-        app.userId = 'usr-demo-user';
-        app.applicantEmail = 'user@demo.com';
-        app.applicantName = 'Narendra Singh';
-        app.applicantPhone = '+91 98201 45678';
-        app.companyName = 'ABC Electronics Pvt Ltd';
-        app.stateName = 'Maharashtra';
-        app.businessType = 'Electronics';
-        app.approvalName = 'Factory Approval';
-        app.submissionDate = '12 Sep 2026';
-        app.lastUpdated = '12 Sep 2026';
-        app.currentStatus = 'Under Review';
-        if (!app.documentsList || app.documentsList.length === 0) {
-          app.documentsList = DEMO_DOCUMENTS;
-        }
-        if (!app.approvalsList || app.approvalsList.length === 0) {
-          app.approvalsList = DEMO_APPROVALS;
-        }
-        if (!app.queries || app.queries.length === 0) {
-          app.queries = DEMO_APPLICATION.queries;
-        }
-      }
 
-      return {
-        ...app,
-        documentsList: app.documentsList && app.documentsList.length > 0 
-          ? app.documentsList 
-          : (app.documentsAttached || []).map((d, i) => ({
-              id: `doc-${app.id}-${i}`,
-              documentName: d.name,
-              category: d.category || 'General Document',
-              uploadDate: app.submissionDate,
-              verificationStatus: (d.verified ? 'Approved' : 'Under Review') as DocumentVerificationStatus,
-              adminRemark: d.verified ? 'Verified successfully' : 'Awaiting review',
-            })),
-        approvalsList: app.approvalsList && app.approvalsList.length > 0
-          ? app.approvalsList
-          : [
-              {
-                id: `appr-${app.id}-1`,
-                approvalName: app.approvalName,
-                department: app.department,
-                centralOrState: app.centralOrState,
-                status: (app.currentStatus === 'Approved' ? 'Approved' : 'Under Review') as ApprovalItemStatus,
-                submittedDate: app.submissionDate,
-                lastUpdated: app.lastUpdated,
-                remarks: app.nextAction,
-              },
-            ],
-      };
-    });
+    // Purge any legacy demo records, test user accounts, or demo tracking numbers
+    const DEMO_EMAILS = ['user@demo.com', 'admin@demo.com', 'rajesh@apexind.in', 'priya.mehta@startup.in'];
+    const DEMO_TRACKINGS = ['SWG-2026-0001', 'SWG-2026-MH-78942'];
+    const cleaned = parsed.filter(app => 
+      !DEMO_EMAILS.includes(app.applicantEmail?.toLowerCase() || '') &&
+      !DEMO_TRACKINGS.includes(app.trackingNumber || '') &&
+      app.userId !== 'usr-demo-user'
+    );
+
+    if (cleaned.length !== parsed.length) {
+      localStorage.setItem(STORE_KEY, JSON.stringify(cleaned));
+    }
+
+    return cleaned.map(app => ({
+      ...app,
+      documentsList: app.documentsList && app.documentsList.length > 0 
+        ? app.documentsList 
+        : (app.documentsAttached || []).map((d, i) => ({
+            id: `doc-${app.id}-${i}`,
+            documentName: d.name,
+            category: d.category || 'General Document',
+            uploadDate: app.submissionDate,
+            verificationStatus: (d.verified ? 'Approved' : 'Under Review') as DocumentVerificationStatus,
+            adminRemark: d.verified ? 'Verified successfully' : 'Awaiting review',
+          })),
+      approvalsList: app.approvalsList && app.approvalsList.length > 0
+        ? app.approvalsList
+        : [
+            {
+              id: `appr-${app.id}-1`,
+              approvalName: app.approvalName,
+              department: app.department,
+              centralOrState: app.centralOrState,
+              status: (app.currentStatus === 'Approved' ? 'Approved' : 'Under Review') as ApprovalItemStatus,
+              submittedDate: app.submissionDate,
+              lastUpdated: app.lastUpdated,
+              remarks: app.nextAction,
+            },
+          ],
+    }));
   } catch {
-    return [DEMO_APPLICATION];
+    return [];
   }
 }
 
