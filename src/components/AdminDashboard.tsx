@@ -23,7 +23,6 @@ import {
   adminDepartments, adminApprovalsCatalog, adminSectors,
   adminSchemes,
   adminAuditLogs, adminApprovalRules, adminDocumentTypes,
-  analyticsStateData, analyticsSectorData, analyticsMonthlyTrend,
   AdminApplication, AdminDepartment, AdminApproval, AdminSector,
   AdminRenewal, AdminScheme, AdminSLARecord, AdminAuditLog,
   ApprovalRule, AdminDocumentType, AppStatusAdmin,
@@ -338,10 +337,10 @@ const navItems: { id: AdminTab; label: string; icon: React.ComponentType<{ class
   { id: 'departments', label: 'Departments', icon: Building },
   { id: 'documents', label: 'Documents', icon: FileCheck },
   { id: 'rules', label: 'Approval Rules', icon: Brain },
-  { id: 'sla', label: 'SLA & Escalations', icon: Clock, badge: 5 },
-  { id: 'queries', label: 'Queries & Grievances', icon: HelpCircle, badge: 7 },
+  { id: 'sla', label: 'SLA & Escalations', icon: Clock },
+  { id: 'queries', label: 'Queries & Grievances', icon: HelpCircle },
   { id: 'schemes', label: 'Govt Schemes', icon: DollarSign },
-  { id: 'renewals', label: 'Renewals', icon: RefreshCw, badge: 3 },
+  { id: 'renewals', label: 'Renewals', icon: RefreshCw },
   { id: 'notifications', label: 'Notifications', icon: Bell },
   { id: 'analytics', label: 'Analytics & Reports', icon: BarChart3 },
   { id: 'audit', label: 'Audit Logs', icon: ClipboardList },
@@ -881,7 +880,7 @@ export const AdminDashboard: React.FC = () => {
   const dynamicStateData = useMemo(() => {
     const counts: Record<string, { applications: number; approved: number; rejected: number }> = {};
     appList.forEach(a => {
-      const st = a.state || 'Maharashtra';
+      const st = a.state || 'General';
       if (!counts[st]) counts[st] = { applications: 0, approved: 0, rejected: 0 };
       counts[st].applications++;
       if (a.currentStatus === 'Approved') counts[st].approved++;
@@ -894,14 +893,6 @@ export const AdminDashboard: React.FC = () => {
       rejected: v.rejected,
     }));
     items.sort((a, b) => b.applications - a.applications);
-    if (items.length < 5) {
-      const existing = new Set(items.map(i => i.state));
-      analyticsStateData.forEach(item => {
-        if (!existing.has(item.state) && items.length < 7) {
-          items.push({ state: item.state, applications: item.applications, approved: item.approved, rejected: item.rejected });
-        }
-      });
-    }
     return items;
   }, [appList]);
 
@@ -910,7 +901,7 @@ export const AdminDashboard: React.FC = () => {
     const counts: Record<string, number> = {};
     const total = appList.length || 1;
     appList.forEach(a => {
-      const s = a.sector || 'Electronics';
+      const s = a.sector || 'General';
       counts[s] = (counts[s] || 0) + 1;
     });
     const items = Object.entries(counts).map(([sector, count]) => ({
@@ -919,14 +910,6 @@ export const AdminDashboard: React.FC = () => {
       pct: Math.round((count / total) * 100),
     }));
     items.sort((a, b) => b.count - a.count);
-    if (items.length < 4) {
-      const existing = new Set(items.map(i => i.sector));
-      analyticsSectorData.forEach(item => {
-        if (!existing.has(item.sector) && items.length < 6) {
-          items.push(item);
-        }
-      });
-    }
     return items;
   }, [appList]);
 
@@ -971,6 +954,12 @@ export const AdminDashboard: React.FC = () => {
         {navItems.map(item => {
           const Icon = item.icon;
           const active = activeTab === item.id;
+          const dynamicBadge =
+            item.id === 'sla' ? (liveKPIs.overdueApplications || 0) :
+            item.id === 'queries' ? (liveKPIs.queriesRaised || 0) :
+            item.id === 'renewals' ? (liveKPIs.upcomingRenewals || 0) :
+            item.id === 'notifications' ? notifList.filter(n => !n.read).length :
+            0;
           return (
             <button
               key={item.id}
@@ -979,8 +968,8 @@ export const AdminDashboard: React.FC = () => {
             >
               <Icon className="w-3.5 h-3.5 shrink-0" />
               <span className="flex-1 truncate">{item.label}</span>
-              {item.badge && !active && (
-                <span className="px-1.5 py-0.5 rounded-full bg-rose-500 text-white text-[9px] font-bold shrink-0">{item.badge}</span>
+              {dynamicBadge > 0 && !active && (
+                <span className="px-1.5 py-0.5 rounded-full bg-rose-500 text-white text-[9px] font-bold shrink-0">{dynamicBadge}</span>
               )}
             </button>
           );
@@ -1111,30 +1100,41 @@ export const AdminDashboard: React.FC = () => {
 
       {/* Charts Row 2 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Monthly Trend */}
-        <div className="p-5 rounded-2xl bg-[#0B2545]/80 border border-white/10">
+        {/* Pipeline SLA Health */}
+        <div className="p-5 rounded-2xl bg-[#0B2545]/80 border border-white/10 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xs font-extrabold text-white flex items-center gap-2"><TrendingUp className="w-4 h-4 text-sky-400" /> Monthly Application Trend</h3>
+            <h3 className="text-xs font-extrabold text-white flex items-center gap-2"><TrendingUp className="w-4 h-4 text-sky-400" /> Pipeline Processing Speed & SLA</h3>
+            <span className="text-[10px] text-slate-400 font-mono">Live Tracker</span>
           </div>
-          <div className="flex items-end gap-2 h-32">
-            {analyticsMonthlyTrend.map(m => (
-              <div key={m.month} className="flex-1 flex flex-col items-center gap-1">
-                <div className="w-full flex flex-col gap-0.5">
-                  <div className="w-full rounded-sm bg-emerald-500" style={{ height: `${(m.approved / 150) * 90}px` }} title={`Approved: ${m.approved}`} />
-                  <div className="w-full rounded-sm bg-amber-400" style={{ height: `${((m.submitted - m.approved - m.rejected) / 150) * 90}px` }} title={`Pending: ${m.submitted - m.approved - m.rejected}`} />
-                  <div className="w-full rounded-sm bg-rose-500" style={{ height: `${(m.rejected / 150) * 90}px` }} title={`Rejected: ${m.rejected}`} />
-                </div>
-                <span className="text-[10px] text-slate-400 font-bold">{m.month}</span>
+          <div className="space-y-3">
+            <div>
+              <div className="flex justify-between text-xs text-slate-300 font-semibold mb-1">
+                <span>Within Statutory SLA</span>
+                <span className="text-emerald-400 font-bold">{appList.filter(a => a.slaStatus !== 'Overdue').length} Apps</span>
               </div>
-            ))}
+              <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${appList.length > 0 ? (appList.filter(a => a.slaStatus !== 'Overdue').length / appList.length) * 100 : 100}%` }} />
+              </div>
+            </div>
+            <div>
+              <div className="flex justify-between text-xs text-slate-300 font-semibold mb-1">
+                <span>SLA Critical / Escalated</span>
+                <span className="text-rose-400 font-bold">{appList.filter(a => a.slaStatus === 'Overdue').length} Apps</span>
+              </div>
+              <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                <div className="h-full bg-rose-500 rounded-full" style={{ width: `${appList.length > 0 ? (appList.filter(a => a.slaStatus === 'Overdue').length / appList.length) * 100 : 0}%` }} />
+              </div>
+            </div>
           </div>
-          <div className="flex gap-3 mt-2">
-            {[{ c: 'bg-emerald-500', l: 'Approved' }, { c: 'bg-amber-400', l: 'Pending' }, { c: 'bg-rose-500', l: 'Rejected' }].map(l => (
-              <div key={l.l} className="flex items-center gap-1">
-                <div className={`w-2.5 h-2.5 rounded-sm ${l.c}`} />
-                <span className="text-[10px] text-slate-400">{l.l}</span>
-              </div>
-            ))}
+          <div className="flex gap-4 mt-4 pt-3 border-t border-white/5">
+            <div className="flex items-center gap-1.5">
+              <div className="w-2.5 h-2.5 rounded-sm bg-emerald-500" />
+              <span className="text-[11px] text-slate-400">On Track</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-2.5 h-2.5 rounded-sm bg-rose-500" />
+              <span className="text-[11px] text-slate-400">Escalated</span>
+            </div>
           </div>
         </div>
 
@@ -2771,114 +2771,163 @@ export const AdminDashboard: React.FC = () => {
   // ─────────────────────────────────────────────────────────────────────────
   // TAB: ANALYTICS
   // ─────────────────────────────────────────────────────────────────────────
-  const renderAnalytics = () => (
-    <div className="space-y-4 animate-in fade-in duration-200">
-      <SectionHeader
-        title="Analytics & Reports"
-        subtitle="Data-driven insights across PAN-India approval pipelines"
-        actions={
-          <div className="flex items-center gap-2">
-            <div className="flex gap-1">
-              {['7 Days', '30 Days', '6 Months', '1 Year'].map(f => (
-                <button key={f} onClick={() => setAnalyticsFilter(f)}
-                  className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition cursor-pointer ${analyticsFilter === f ? 'bg-amber-400 text-[#07182C]' : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'}`}>
-                  {f}
-                </button>
-              ))}
+  const renderAnalytics = () => {
+    const totalCount = appList.length;
+    const approvedCount = appList.filter(a => a.currentStatus === 'Approved').length;
+    const rejectedCount = appList.filter(a => a.currentStatus === 'Rejected').length;
+    const pendingCount = totalCount - approvedCount - rejectedCount;
+    const approvalRate = totalCount > 0 ? `${((approvedCount / totalCount) * 100).toFixed(1)}%` : '0.0%';
+
+    // Group by state
+    const stateMap: Record<string, { state: string; applications: number; approved: number; pending: number; rejected: number; avgDays: number }> = {};
+    appList.forEach(a => {
+      const st = a.state || 'Unknown';
+      if (!stateMap[st]) {
+        stateMap[st] = { state: st, applications: 0, approved: 0, pending: 0, rejected: 0, avgDays: 5 };
+      }
+      stateMap[st].applications += 1;
+      if (a.currentStatus === 'Approved') stateMap[st].approved += 1;
+      else if (a.currentStatus === 'Rejected') stateMap[st].rejected += 1;
+      else stateMap[st].pending += 1;
+    });
+    const dynamicStateData = Object.values(stateMap).sort((a, b) => b.applications - a.applications);
+
+    // Group by sector
+    const sectorMap: Record<string, number> = {};
+    appList.forEach(a => {
+      const sc = a.sector || 'General';
+      sectorMap[sc] = (sectorMap[sc] || 0) + 1;
+    });
+    const dynamicSectorData = Object.entries(sectorMap).map(([sector, count]) => ({
+      sector,
+      count,
+      pct: totalCount > 0 ? Math.round((count / totalCount) * 100) : 0,
+    })).sort((a, b) => b.count - a.count);
+
+    return (
+      <div className="space-y-4 animate-in fade-in duration-200">
+        <SectionHeader
+          title="Analytics & Reports"
+          subtitle="Real-time data insights across verified application pipelines"
+          actions={
+            <div className="flex items-center gap-2">
+              <div className="flex gap-1">
+                {['7 Days', '30 Days', '6 Months', '1 Year'].map(f => (
+                  <button key={f} onClick={() => setAnalyticsFilter(f)}
+                    className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition cursor-pointer ${analyticsFilter === f ? 'bg-amber-400 text-[#07182C]' : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'}`}>
+                    {f}
+                  </button>
+                ))}
+              </div>
+              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-xs font-semibold transition cursor-pointer border border-white/10">
+                <Download className="w-3.5 h-3.5" /> Export CSV
+              </button>
             </div>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-xs font-semibold transition cursor-pointer border border-white/10">
-              <Download className="w-3.5 h-3.5" /> Export CSV
-            </button>
-          </div>
-        }
-      />
+          }
+        />
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[
-          { l: 'Total Applications', v: '1,284', change: '+12%', color: 'text-white' },
-          { l: 'Approval Rate', v: '56.7%', change: '+3.2%', color: 'text-emerald-400' },
-          { l: 'Avg Processing', v: '14.2 days', change: '-2.1d', color: 'text-sky-400' },
-          { l: 'SLA Compliance', v: '84%', change: '-1.2%', color: 'text-amber-400' },
-        ].map(c => (
-          <div key={c.l} className="p-4 rounded-2xl bg-[#0B2545]/80 border border-white/10">
-            <p className="text-[11px] font-semibold text-slate-400">{c.l}</p>
-            <p className={`text-2xl font-extrabold ${c.color} mt-1`}>{c.v}</p>
-            <p className={`text-[10px] font-bold mt-0.5 ${c.change.startsWith('+') ? 'text-emerald-400' : c.change.startsWith('-') && c.l !== 'Avg Processing' ? 'text-rose-400' : 'text-emerald-400'}`}>{c.change} vs prev period</p>
-          </div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Applications by State */}
-        <div className="p-5 rounded-2xl bg-[#0B2545]/80 border border-white/10">
-          <h3 className="text-xs font-extrabold text-white flex items-center gap-2 mb-4"><Globe className="w-4 h-4 text-emerald-400" /> Applications by State</h3>
-          <div className="space-y-2">
-            {analyticsStateData.map((item, i) => (
-              <MiniBar key={item.state} label={item.state} value={item.applications} max={300}
-                extra={`${item.applications} (${item.approved} approved)`}
-                color={['bg-emerald-500', 'bg-blue-500', 'bg-amber-500', 'bg-purple-500', 'bg-rose-500', 'bg-sky-500', 'bg-orange-500', 'bg-pink-500', 'bg-teal-500', 'bg-indigo-500'][i % 10]} />
-            ))}
-          </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[
+            { l: 'Total Applications', v: totalCount.toLocaleString(), change: totalCount > 0 ? '+100%' : '0%', color: 'text-white' },
+            { l: 'Approval Rate', v: approvalRate, change: totalCount > 0 ? '+100%' : '0%', color: 'text-emerald-400' },
+            { l: 'Active In-Review', v: pendingCount.toString(), change: 'Live', color: 'text-sky-400' },
+            { l: 'Rejected', v: rejectedCount.toString(), change: 'Live', color: 'text-amber-400' },
+          ].map(c => (
+            <div key={c.l} className="p-4 rounded-2xl bg-[#0B2545]/80 border border-white/10">
+              <p className="text-[11px] font-semibold text-slate-400">{c.l}</p>
+              <p className={`text-2xl font-extrabold ${c.color} mt-1`}>{c.v}</p>
+              <p className="text-[10px] font-bold mt-0.5 text-slate-400">{c.change} tracked in database</p>
+            </div>
+          ))}
         </div>
 
-        {/* Applications by Sector */}
-        <div className="p-5 rounded-2xl bg-[#0B2545]/80 border border-white/10">
-          <h3 className="text-xs font-extrabold text-white flex items-center gap-2 mb-4"><Layers className="w-4 h-4 text-amber-400" /> Applications by Sector</h3>
-          <div className="space-y-2">
-            {analyticsSectorData.map((item, i) => (
-              <MiniBar key={item.sector} label={item.sector} value={item.pct} max={100} extra={`${item.count} (${item.pct}%)`}
-                color={['bg-amber-400', 'bg-emerald-400', 'bg-sky-400', 'bg-purple-400', 'bg-rose-400', 'bg-blue-400', 'bg-slate-400'][i % 7]} />
-            ))}
-          </div>
-        </div>
+        {totalCount === 0 ? (
+          <EmptyState
+            icon={BarChart3}
+            message="No Application Analytics Yet"
+            sub="Applications submitted by registered businesses will automatically generate live geographical, sector, and SLA analytics here."
+          />
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Applications by State */}
+            <div className="p-5 rounded-2xl bg-[#0B2545]/80 border border-white/10">
+              <h3 className="text-xs font-extrabold text-white flex items-center gap-2 mb-4"><Globe className="w-4 h-4 text-emerald-400" /> Applications by State</h3>
+              <div className="space-y-2">
+                {dynamicStateData.map((item, i) => (
+                  <MiniBar key={item.state} label={item.state} value={item.applications} max={Math.max(1, totalCount)}
+                    extra={`${item.applications} (${item.approved} approved)`}
+                    color={['bg-emerald-500', 'bg-blue-500', 'bg-amber-500', 'bg-purple-500', 'bg-rose-500', 'bg-sky-500', 'bg-orange-500', 'bg-pink-500', 'bg-teal-500', 'bg-indigo-500'][i % 10]} />
+                ))}
+              </div>
+            </div>
 
-        {/* State Performance Table */}
-        <div className="p-5 rounded-2xl bg-[#0B2545]/80 border border-white/10">
-          <h3 className="text-xs font-extrabold text-white flex items-center gap-2 mb-4"><BarChart3 className="w-4 h-4 text-purple-400" /> State Performance Report</h3>
-          <table className="w-full text-left">
-            <thead><tr><TH>State</TH><TH>Total</TH><TH>Approved</TH><TH>Rejected</TH><TH>Avg Days</TH></tr></thead>
-            <tbody className="divide-y divide-white/5">
-              {analyticsStateData.slice(0, 8).map(s => (
-                <tr key={s.state} className="hover:bg-white/3 transition">
-                  <TD><span className="font-semibold text-white">{s.state}</span></TD>
-                  <TD><span className="text-sky-400 font-bold">{s.applications}</span></TD>
-                  <TD><span className="text-emerald-400 font-bold">{s.approved}</span></TD>
-                  <TD><span className="text-rose-400 font-bold">{s.rejected}</span></TD>
-                  <TD><span className="text-amber-400 font-bold">{s.avgDays}d</span></TD>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            {/* Applications by Sector */}
+            <div className="p-5 rounded-2xl bg-[#0B2545]/80 border border-white/10">
+              <h3 className="text-xs font-extrabold text-white flex items-center gap-2 mb-4"><Layers className="w-4 h-4 text-amber-400" /> Applications by Sector</h3>
+              <div className="space-y-2">
+                {dynamicSectorData.map((item, i) => (
+                  <MiniBar key={item.sector} label={item.sector} value={item.pct} max={100} extra={`${item.count} (${item.pct}%)`}
+                    color={['bg-amber-400', 'bg-emerald-400', 'bg-sky-400', 'bg-purple-400', 'bg-rose-400', 'bg-blue-400', 'bg-slate-400'][i % 7]} />
+                ))}
+              </div>
+            </div>
 
-        {/* Monthly Trend */}
-        <div className="p-5 rounded-2xl bg-[#0B2545]/80 border border-white/10">
-          <h3 className="text-xs font-extrabold text-white flex items-center gap-2 mb-4"><TrendingUp className="w-4 h-4 text-sky-400" /> Monthly Trend (Applications)</h3>
-          <div className="flex items-end gap-2 h-36">
-            {analyticsMonthlyTrend.map(m => (
-              <div key={m.month} className="flex-1 flex flex-col items-center gap-1">
-                <div className="w-full flex flex-col gap-0.5">
-                  <div className="w-full rounded-sm bg-emerald-500" style={{ height: `${(m.approved / 150) * 110}px` }} />
-                  <div className="w-full rounded-sm bg-amber-400" style={{ height: `${((m.submitted - m.approved - m.rejected) / 150) * 110}px` }} />
-                  <div className="w-full rounded-sm bg-rose-500" style={{ height: `${(m.rejected / 150) * 110}px` }} />
+            {/* State Performance Table */}
+            <div className="p-5 rounded-2xl bg-[#0B2545]/80 border border-white/10">
+              <h3 className="text-xs font-extrabold text-white flex items-center gap-2 mb-4"><BarChart3 className="w-4 h-4 text-purple-400" /> State Performance Report</h3>
+              <table className="w-full text-left">
+                <thead><tr><TH>State</TH><TH>Total</TH><TH>Approved</TH><TH>Rejected</TH><TH>Avg Days</TH></tr></thead>
+                <tbody className="divide-y divide-white/5">
+                  {dynamicStateData.slice(0, 8).map(s => (
+                    <tr key={s.state} className="hover:bg-white/3 transition">
+                      <TD><span className="font-semibold text-white">{s.state}</span></TD>
+                      <TD><span className="text-sky-400 font-bold">{s.applications}</span></TD>
+                      <TD><span className="text-emerald-400 font-bold">{s.approved}</span></TD>
+                      <TD><span className="text-rose-400 font-bold">{s.rejected}</span></TD>
+                      <TD><span className="text-amber-400 font-bold">{s.avgDays}d</span></TD>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Status Breakdown */}
+            <div className="p-5 rounded-2xl bg-[#0B2545]/80 border border-white/10 flex flex-col justify-between">
+              <h3 className="text-xs font-extrabold text-white flex items-center gap-2 mb-4"><TrendingUp className="w-4 h-4 text-sky-400" /> Current Status Distribution</h3>
+              <div className="flex items-center justify-around py-8">
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-full border-4 border-emerald-500/80 flex items-center justify-center text-xl font-bold text-emerald-400 mx-auto mb-2">
+                    {approvedCount}
+                  </div>
+                  <span className="text-xs text-slate-300 font-semibold">Approved</span>
                 </div>
-                <span className="text-[10px] text-slate-400 font-bold">{m.month}</span>
-                <span className="text-[9px] text-slate-600">{m.submitted}</span>
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-full border-4 border-amber-400/80 flex items-center justify-center text-xl font-bold text-amber-300 mx-auto mb-2">
+                    {pendingCount}
+                  </div>
+                  <span className="text-xs text-slate-300 font-semibold">In Review / Pending</span>
+                </div>
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-full border-4 border-rose-500/80 flex items-center justify-center text-xl font-bold text-rose-400 mx-auto mb-2">
+                    {rejectedCount}
+                  </div>
+                  <span className="text-xs text-slate-300 font-semibold">Rejected</span>
+                </div>
               </div>
-            ))}
-          </div>
-          <div className="flex gap-4 mt-2">
-            {[{ c: 'bg-emerald-500', l: 'Approved' }, { c: 'bg-amber-400', l: 'Pending' }, { c: 'bg-rose-500', l: 'Rejected' }].map(l => (
-              <div key={l.l} className="flex items-center gap-1">
-                <div className={`w-2.5 h-2.5 rounded-sm ${l.c}`} />
-                <span className="text-[10px] text-slate-400">{l.l}</span>
+              <div className="flex gap-4 mt-2 justify-center">
+                {[{ c: 'bg-emerald-500', l: 'Approved' }, { c: 'bg-amber-400', l: 'Pending' }, { c: 'bg-rose-500', l: 'Rejected' }].map(l => (
+                  <div key={l.l} className="flex items-center gap-1">
+                    <div className={`w-2.5 h-2.5 rounded-sm ${l.c}`} />
+                    <span className="text-[10px] text-slate-400">{l.l}</span>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
-    </div>
-  );
+    );
+  };
 
   // ─────────────────────────────────────────────────────────────────────────
   // TAB: AUDIT LOGS

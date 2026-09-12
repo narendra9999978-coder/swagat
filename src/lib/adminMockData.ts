@@ -276,104 +276,7 @@ export const adminDepartments: AdminDepartment[] = [
 // ADMIN APPLICATIONS
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const adminApplications: AdminApplication[] = [
-  {
-    id: 'adm-app-001', trackingNumber: 'SWG-2026-KA-10421', applicantName: 'Rajesh Sharma', companyName: 'Apex Precision Manufacturing Ltd', email: 'rajesh@apexind.in', state: 'Karnataka', sector: 'Electronics & Semiconductors', approvalName: 'Consent to Establish & Operate (CTE/CTO)', department: 'KSPCB', ministry: 'MoEFCC', submittedDate: '05 Aug 2026', lastUpdated: '10 Sep 2026', currentStatus: 'Under Review', slaDeadlineDays: 45, slaRemainingDays: 12, slaStatus: 'On Track', investmentAmount: '₹42 Cr', complexity: 'High', documentsCount: 8, queriesCount: 1,
-    timeline: [
-      { label: 'Draft Created', date: '01 Aug 2026', done: true, current: false },
-      { label: 'Submitted', date: '05 Aug 2026', done: true, current: false },
-      { label: 'Under Review', date: '12 Aug 2026', done: true, current: true },
-      { label: 'Approved', date: '', done: false, current: false },
-    ]
-  },
-  {
-    id: 'adm-app-002', trackingNumber: 'SWG-2026-GJ-10388', applicantName: 'Priya Mehta', companyName: 'GreenWave Solar Technologies Pvt Ltd', email: 'priya@greenwave.in', state: 'Gujarat', sector: 'Renewable Energy', approvalName: 'Grid Connectivity & Power Evacuation Approval', department: 'GUVNL / CEA', ministry: 'Ministry of Power', submittedDate: '28 Jul 2026', lastUpdated: '08 Sep 2026', currentStatus: 'Query Raised', slaDeadlineDays: 60, slaRemainingDays: 4, slaStatus: 'Due Soon', investmentAmount: '₹85 Cr', complexity: 'High', documentsCount: 12, queriesCount: 2,
-    timeline: [
-      { label: 'Draft Created', date: '25 Jul 2026', done: true, current: false },
-      { label: 'Submitted', date: '28 Jul 2026', done: true, current: false },
-      { label: 'Under Review', date: '05 Aug 2026', done: true, current: false },
-      { label: 'Query Raised', date: '20 Aug 2026', done: true, current: true },
-      { label: 'Approved', date: '', done: false, current: false },
-    ]
-  },
-  {
-    id: 'adm-app-003', trackingNumber: 'SWG-2026-MH-10356', applicantName: 'Dr. Suresh Patil', companyName: 'BioGenix Pharmaceuticals Ltd', email: 'suresh@biogenix.in', state: 'Maharashtra', sector: 'Pharmaceuticals', approvalName: 'Drug Manufacturing License (Form 25)', department: 'CDSCO / FDA Maharashtra', ministry: 'Ministry of Health & Family Welfare', submittedDate: '15 Jul 2026', lastUpdated: '02 Sep 2026', currentStatus: 'Approved', slaDeadlineDays: 45, slaRemainingDays: 0, slaStatus: 'On Track', investmentAmount: '₹120 Cr', complexity: 'High', documentsCount: 15, queriesCount: 0,
-    timeline: [
-      { label: 'Draft Created', date: '12 Jul 2026', done: true, current: false },
-      { label: 'Submitted', date: '15 Jul 2026', done: true, current: false },
-      { label: 'Under Review', date: '25 Jul 2026', done: true, current: false },
-      { label: 'Approved', date: '02 Sep 2026', done: true, current: true },
-    ]
-  },
-  {
-    id: 'adm-app-004', trackingNumber: 'SWG-2026-TN-10312', applicantName: 'Anitha Krishnan', companyName: 'TechVantage IT Solutions', email: 'anitha@techvantage.in', state: 'Tamil Nadu', sector: 'IT & Technology', approvalName: 'DoT OSP License for BPO Operations', department: 'DoT — Southern Region', ministry: 'Ministry of Communications', submittedDate: '20 Jun 2026', lastUpdated: '10 Aug 2026', currentStatus: 'Approved', slaDeadlineDays: 30, slaRemainingDays: 0, slaStatus: 'On Track', investmentAmount: '₹8 Cr', complexity: 'Low', documentsCount: 6, queriesCount: 0,
-    timeline: [
-      { label: 'Submitted', date: '20 Jun 2026', done: true, current: false },
-      { label: 'Under Review', date: '28 Jun 2026', done: true, current: false },
-      { label: 'Approved', date: '10 Aug 2026', done: true, current: true },
-    ]
-  },
-  {
-    id: 'adm-app-005', trackingNumber: 'SWG-2026-RJ-10287', applicantName: 'Vikram Singh', companyName: 'Suryaansh Wind Power Ltd', email: 'vikram@suryaansh.in', state: 'Rajasthan', sector: 'Renewable Energy', approvalName: 'Environmental Clearance (EIA) — Wind Farm', department: 'RSPCB / MoEFCC', ministry: 'MoEFCC', submittedDate: '10 May 2026', lastUpdated: '15 Aug 2026', currentStatus: 'Response Submitted', slaDeadlineDays: 90, slaRemainingDays: -5, slaStatus: 'Overdue', investmentAmount: '₹340 Cr', complexity: 'High', documentsCount: 18, queriesCount: 3,
-    timeline: [
-      { label: 'Submitted', date: '10 May 2026', done: true, current: false },
-      { label: 'Under Review', date: '25 May 2026', done: true, current: false },
-      { label: 'Query Raised', date: '15 Jun 2026', done: true, current: false },
-      { label: 'Response Submitted', date: '15 Aug 2026', done: true, current: true },
-    ]
-  },
-  {
-    id: 'adm-app-006', trackingNumber: 'SWG-2026-TS-10265', applicantName: 'Mohammed Yusuf', companyName: 'HydroNXT Green Hydrogen Pvt Ltd', email: 'yusuf@hydronxt.in', state: 'Telangana', sector: 'Renewable Energy', approvalName: 'Consent to Establish (Green Hydrogen Plant)', department: 'TSPCB', ministry: 'Ministry of New & Renewable Energy', submittedDate: '01 Jun 2026', lastUpdated: '05 Sep 2026', currentStatus: 'Under Review', slaDeadlineDays: 60, slaRemainingDays: 8, slaStatus: 'On Track', investmentAmount: '₹250 Cr', complexity: 'High', documentsCount: 14, queriesCount: 1,
-    timeline: [
-      { label: 'Submitted', date: '01 Jun 2026', done: true, current: false },
-      { label: 'Under Review', date: '15 Jun 2026', done: true, current: true },
-    ]
-  },
-  {
-    id: 'adm-app-007', trackingNumber: 'SWG-2026-UP-10244', applicantName: 'Ramesh Gupta', companyName: 'AgroFirst Food Industries', email: 'ramesh@agrofirst.in', state: 'Uttar Pradesh', sector: 'Food Processing', approvalName: 'FSSAI Central License (Manufacturing)', department: 'FSSAI — Northern Zone', ministry: 'Ministry of Health & Family Welfare', submittedDate: '12 Jul 2026', lastUpdated: '08 Sep 2026', currentStatus: 'Submitted', slaDeadlineDays: 30, slaRemainingDays: 0, slaStatus: 'Due Today', investmentAmount: '₹15 Cr', complexity: 'Medium', documentsCount: 9, queriesCount: 0,
-    timeline: [
-      { label: 'Submitted', date: '12 Jul 2026', done: true, current: true },
-    ]
-  },
-  {
-    id: 'adm-app-008', trackingNumber: 'SWG-2026-WB-10221', applicantName: 'Debjani Roy', companyName: 'Bengal Textile Mills Ltd', email: 'debjani@bengaltext.in', state: 'West Bengal', sector: 'Textiles', approvalName: 'Factory License (Factories Act, 1948)', department: 'DISH — West Bengal', ministry: 'Ministry of Labour and Employment', submittedDate: '30 Jul 2026', lastUpdated: '11 Sep 2026', currentStatus: 'Approved', slaDeadlineDays: 30, slaRemainingDays: 0, slaStatus: 'On Track', investmentAmount: '₹22 Cr', complexity: 'Medium', documentsCount: 8, queriesCount: 0,
-    timeline: [
-      { label: 'Submitted', date: '30 Jul 2026', done: true, current: false },
-      { label: 'Under Review', date: '08 Aug 2026', done: true, current: false },
-      { label: 'Approved', date: '11 Sep 2026', done: true, current: true },
-    ]
-  },
-  {
-    id: 'adm-app-009', trackingNumber: 'SWG-2026-KL-10198', applicantName: 'Arun Nair', companyName: 'CoastalTech Marine Engineering', email: 'arun@coastaltech.in', state: 'Kerala', sector: 'Ports & Shipping', approvalName: 'Port Facility Security Plan (PFSP) Approval', department: 'DG Shipping', ministry: 'Ministry of Ports, Shipping & Waterways', submittedDate: '18 Jun 2026', lastUpdated: '25 Aug 2026', currentStatus: 'Rejected', slaDeadlineDays: 75, slaRemainingDays: 0, slaStatus: 'On Track', investmentAmount: '₹65 Cr', complexity: 'High', documentsCount: 11, queriesCount: 2,
-    timeline: [
-      { label: 'Submitted', date: '18 Jun 2026', done: true, current: false },
-      { label: 'Under Review', date: '01 Jul 2026', done: true, current: false },
-      { label: 'Query Raised', date: '20 Jul 2026', done: true, current: false },
-      { label: 'Rejected', date: '25 Aug 2026', done: true, current: true },
-    ]
-  },
-  {
-    id: 'adm-app-010', trackingNumber: 'SWG-2026-DL-10176', applicantName: 'Kavita Sharma', companyName: 'CapitalOne Healthcare Solutions', email: 'kavita@cap1health.in', state: 'Delhi', sector: 'Healthcare', approvalName: 'NABH Accreditation Certificate', department: 'NABH / NHB', ministry: 'Ministry of Health & Family Welfare', submittedDate: '22 May 2026', lastUpdated: '10 Sep 2026', currentStatus: 'Under Review', slaDeadlineDays: 120, slaRemainingDays: 22, slaStatus: 'On Track', investmentAmount: '₹180 Cr', complexity: 'High', documentsCount: 20, queriesCount: 1,
-    timeline: [
-      { label: 'Submitted', date: '22 May 2026', done: true, current: false },
-      { label: 'Under Review', date: '15 Jun 2026', done: true, current: true },
-    ]
-  },
-  {
-    id: 'adm-app-011', trackingNumber: 'SWG-2026-HR-10154', applicantName: 'Ashok Kumar', companyName: 'Pinnacle Auto Components Ltd', email: 'ashok@pinnacleauto.in', state: 'Haryana', sector: 'Automobile', approvalName: 'Factory License + Consent to Establish', department: 'DISH Haryana + HSPCB', ministry: 'Ministry of Labour and Employment', submittedDate: '14 Aug 2026', lastUpdated: '11 Sep 2026', currentStatus: 'Submitted', slaDeadlineDays: 45, slaRemainingDays: 18, slaStatus: 'On Track', investmentAmount: '₹56 Cr', complexity: 'Medium', documentsCount: 10, queriesCount: 0,
-    timeline: [
-      { label: 'Submitted', date: '14 Aug 2026', done: true, current: true },
-    ]
-  },
-  {
-    id: 'adm-app-012', trackingNumber: 'SWG-2026-OD-10132', applicantName: 'Santosh Panda', companyName: 'OrisaMines & Minerals Corp', email: 'santosh@orisamine.in', state: 'Odisha', sector: 'Mining', approvalName: 'Mining Lease (Iron Ore) — Environment Clearance', department: 'MoEFCC / Odisha SPC', ministry: 'Ministry of Mines', submittedDate: '02 Apr 2026', lastUpdated: '08 Sep 2026', currentStatus: 'Query Raised', slaDeadlineDays: 90, slaRemainingDays: -12, slaStatus: 'Overdue', investmentAmount: '₹420 Cr', complexity: 'High', documentsCount: 22, queriesCount: 4,
-    timeline: [
-      { label: 'Submitted', date: '02 Apr 2026', done: true, current: false },
-      { label: 'Under Review', date: '20 Apr 2026', done: true, current: false },
-      { label: 'Query Raised', date: '10 Jun 2026', done: true, current: true },
-    ]
-  },
-];
+export const adminApplications: AdminApplication[] = [];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ADMIN APPROVALS CATALOG
@@ -535,59 +438,32 @@ export const adminDocumentTypes: AdminDocumentType[] = [
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ANALYTICS DATA
+// ANALYTICS DATA (Populated dynamically from live applications)
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const analyticsStateData = [
-  { state: 'Maharashtra', applications: 284, approved: 198, pending: 62, rejected: 24, avgDays: 28 },
-  { state: 'Karnataka', applications: 242, approved: 184, pending: 44, rejected: 14, avgDays: 22 },
-  { state: 'Gujarat', applications: 218, approved: 162, pending: 40, rejected: 16, avgDays: 26 },
-  { state: 'Tamil Nadu', applications: 196, approved: 148, pending: 38, rejected: 10, avgDays: 24 },
-  { state: 'Telangana', applications: 174, approved: 128, pending: 36, rejected: 10, avgDays: 25 },
-  { state: 'Uttar Pradesh', applications: 158, approved: 108, pending: 42, rejected: 8, avgDays: 32 },
-  { state: 'Rajasthan', applications: 142, approved: 96, pending: 38, rejected: 8, avgDays: 35 },
-  { state: 'Delhi', applications: 138, approved: 104, pending: 28, rejected: 6, avgDays: 18 },
-  { state: 'West Bengal', applications: 122, approved: 88, pending: 28, rejected: 6, avgDays: 30 },
-  { state: 'Andhra Pradesh', applications: 118, approved: 84, pending: 28, rejected: 6, avgDays: 28 },
-];
+export const analyticsStateData: { state: string; applications: number; approved: number; pending: number; rejected: number; avgDays: number }[] = [];
 
-export const analyticsSectorData = [
-  { sector: 'Manufacturing', count: 348, pct: 27 },
-  { sector: 'Electronics & Semiconductors', count: 224, pct: 17 },
-  { sector: 'Pharmaceuticals', count: 196, pct: 15 },
-  { sector: 'Renewable Energy', count: 178, pct: 14 },
-  { sector: 'IT & Technology', count: 148, pct: 12 },
-  { sector: 'Food Processing', count: 112, pct: 9 },
-  { sector: 'Others', count: 82, pct: 6 },
-];
+export const analyticsSectorData: { sector: string; count: number; pct: number }[] = [];
 
-export const analyticsMonthlyTrend = [
-  { month: 'Mar', submitted: 88, approved: 62, rejected: 8 },
-  { month: 'Apr', submitted: 102, approved: 78, rejected: 10 },
-  { month: 'May', submitted: 118, approved: 88, rejected: 12 },
-  { month: 'Jun', submitted: 134, approved: 102, rejected: 14 },
-  { month: 'Jul', submitted: 152, approved: 118, rejected: 16 },
-  { month: 'Aug', submitted: 164, approved: 128, rejected: 18 },
-  { month: 'Sep', submitted: 142, approved: 108, rejected: 14 },
-];
+export const analyticsMonthlyTrend: { month: string; submitted: number; approved: number; rejected: number }[] = [];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // KPI SUMMARY
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const adminKPISummary = {
-  totalUsers: 12486,
-  activeApplications: 1284,
-  pendingApplications: 436,
-  approvedApplications: 728,
-  rejectedApplications: 64,
-  openQueries: 142,
-  overdueApplications: 37,
-  upcomingRenewals: 89,
-  avgProcessingDays: 14.2,
-  slaComplianceRate: 84,
-  totalApprovals: 1428,
-  activeApprovals: 1402,
-  totalDepartments: 148,
-  totalSchemes: 84,
+  totalUsers: 0,
+  activeApplications: 0,
+  pendingApplications: 0,
+  approvedApplications: 0,
+  rejectedApplications: 0,
+  openQueries: 0,
+  overdueApplications: 0,
+  upcomingRenewals: 0,
+  avgProcessingDays: 0,
+  slaComplianceRate: 100,
+  totalApprovals: 0,
+  activeApprovals: 0,
+  totalDepartments: 0,
+  totalSchemes: 0,
 };

@@ -415,37 +415,7 @@ function getMockStatusResponse(appId: string): ApplicationStatusResponseAPI {
   };
 }
 
-const MOCK_DEPT_QUEUE = [
-  {
-    id: 'bnd-q1',
-    application_id: 'app-mh-78942',
-    applicant_name: 'Rajesh Sharma',
-    company_name: 'Apex Precision Engineering Pvt Ltd',
-    business_type: 'General Manufacturing',
-    submitted_at: new Date(Date.now() - 2 * 86400000).toISOString(),
-    sla_deadline: new Date(Date.now() + 1 * 86400000).toISOString(),
-    sla_hours: 72,
-    status: 'in_review',
-    documents: [
-      { id: 'adoc-1', document_type_name: 'EIA Report', is_mandatory: true, status: 'pending_review', applicant_name: 'Rajesh Sharma', company_name: 'Apex Precision Engineering Pvt Ltd', uploaded_at: new Date().toISOString(), file_url: '#' },
-      { id: 'adoc-2', document_type_name: 'ETP Scheme Blueprint', is_mandatory: true, status: 'pending_review', uploaded_at: new Date().toISOString(), file_url: '#' },
-    ],
-  },
-  {
-    id: 'bnd-q2',
-    application_id: 'app-mh-65412',
-    applicant_name: 'Priya Mehta',
-    company_name: 'GreenTech Ventures LLP',
-    business_type: 'Renewable Energy',
-    submitted_at: new Date(Date.now() - 5 * 86400000).toISOString(),
-    sla_deadline: new Date(Date.now() - 1 * 86400000).toISOString(),
-    sla_hours: 96,
-    status: 'breached',
-    documents: [
-      { id: 'adoc-3', document_type_name: 'Land Possession Certificate', is_mandatory: true, status: 'pending_review', uploaded_at: new Date().toISOString(), file_url: '#' },
-    ],
-  },
-];
+const MOCK_DEPT_QUEUE: any[] = [];
 
 // ── Applicant API ─────────────────────────────────────────────────────────────
 
