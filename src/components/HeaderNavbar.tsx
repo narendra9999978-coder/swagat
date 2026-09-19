@@ -166,7 +166,7 @@ export const HeaderNavbar: React.FC = () => {
           <div className="swagat-header-grid h-20 w-full">
             
             {/* COLUMN 1: SWAGAT Brand Logo */}
-            <div className="swagat-brand w-[235px] min-w-[235px] max-w-[235px] shrink-0">
+            <div className="swagat-brand shrink-0 mr-1 sm:mr-3">
               <button
                 id="swagat-brand-home-btn"
                 onClick={handleLogoClick}
@@ -184,7 +184,7 @@ export const HeaderNavbar: React.FC = () => {
               <button
                 id="nav-link-home"
                 onClick={() => handleNavClick('home')}
-                className={`relative px-3 py-1.5 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-white shrink-0 cursor-pointer ${
+                className={`relative px-2.5 min-[1400px]:px-3 py-1.5 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-white shrink-0 cursor-pointer ${
                   currentView === 'home' ? 'text-white font-bold bg-white/10 shadow-xs border border-white/15' : 'hover:bg-white/5 text-slate-300'
                 }`}
               >
@@ -195,7 +195,7 @@ export const HeaderNavbar: React.FC = () => {
               <button
                 id="nav-link-approvals"
                 onClick={() => handleNavClick('home', 'section-approvals')}
-                className={`relative px-3 py-1.5 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-white shrink-0 cursor-pointer ${
+                className={`relative px-2.5 min-[1400px]:px-3 py-1.5 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-white shrink-0 cursor-pointer ${
                   currentView === 'approvals' ? 'text-white font-bold bg-white/10 shadow-xs border border-white/15' : 'hover:bg-white/5 text-slate-300'
                 }`}
               >
@@ -206,7 +206,7 @@ export const HeaderNavbar: React.FC = () => {
               <button
                 id="nav-link-schemes"
                 onClick={() => handleNavClick('home', 'section-schemes')}
-                className={`relative px-3 py-1.5 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-white shrink-0 cursor-pointer ${
+                className={`relative px-2.5 min-[1400px]:px-3 py-1.5 rounded-xl transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-white shrink-0 cursor-pointer ${
                   currentView === 'schemes' ? 'text-white font-bold bg-white/10 shadow-xs border border-white/15' : 'hover:bg-white/5 text-slate-300'
                 }`}
               >
@@ -217,7 +217,7 @@ export const HeaderNavbar: React.FC = () => {
               <button
                 id="nav-link-kya"
                 onClick={() => handleNavClick('home', 'section-kya')}
-                className="px-3 py-1.5 rounded-xl text-amber-300 font-bold bg-amber-500/15 border border-amber-500/30 hover:bg-amber-500/25 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] flex items-center space-x-1.5 shrink-0 cursor-pointer shadow-sm shadow-amber-500/10"
+                className="px-2.5 min-[1400px]:px-3 py-1.5 rounded-xl text-amber-300 font-bold bg-amber-500/15 border border-amber-500/30 hover:bg-amber-500/25 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] flex items-center space-x-1.5 shrink-0 cursor-pointer shadow-sm shadow-amber-500/10"
               >
                 <Compass className="w-3.5 h-3.5 min-[1400px]:w-4 min-[1400px]:h-4 text-amber-400 shrink-0" />
                 <span>{t('nav_kya')}</span>
@@ -227,7 +227,7 @@ export const HeaderNavbar: React.FC = () => {
               <button
                 id="nav-link-states"
                 onClick={() => handleNavClick('home', 'section-states')}
-                className="hidden min-[1200px]:inline-block px-3 py-1.5 rounded-xl hover:text-white hover:bg-white/5 transition-colors shrink-0 cursor-pointer text-slate-300"
+                className="hidden min-[1260px]:inline-block px-2.5 min-[1400px]:px-3 py-1.5 rounded-xl hover:text-white hover:bg-white/5 transition-colors shrink-0 cursor-pointer text-slate-300"
               >
                 {t('state_approvals')}
               </button>
@@ -236,22 +236,13 @@ export const HeaderNavbar: React.FC = () => {
               <button
                 id="nav-link-about"
                 onClick={() => handleNavClick('home', 'section-about')}
-                className="hidden min-[1350px]:inline-block px-3 py-1.5 rounded-xl hover:text-white hover:bg-white/5 transition-colors shrink-0 cursor-pointer text-slate-300"
+                className="hidden min-[1440px]:inline-block px-2.5 min-[1400px]:px-3 py-1.5 rounded-xl hover:text-white hover:bg-white/5 transition-colors shrink-0 cursor-pointer text-slate-300"
               >
                 Resources
               </button>
 
-              {/* Help */}
-              <button
-                id="nav-link-help"
-                onClick={() => handleNavClick('home', 'section-help')}
-                className="hidden min-[1400px]:inline-block px-3 py-1.5 rounded-xl hover:text-white hover:bg-white/5 transition-colors shrink-0 cursor-pointer text-slate-300"
-              >
-                {t('nav_help')}
-              </button>
-
               {/* Responsive More dropdown */}
-              <div className="relative min-[1400px]:hidden shrink-0" ref={moreRef}>
+              <div className="relative min-[1440px]:hidden shrink-0" ref={moreRef}>
                 <button
                   id="nav-link-more"
                   onClick={() => setIsMoreDropdownOpen(!isMoreDropdownOpen)}
@@ -273,14 +264,14 @@ export const HeaderNavbar: React.FC = () => {
                     >
                       <button
                         onClick={() => handleNavClick('home', 'section-states')}
-                        className="w-full text-left px-3.5 py-2 text-xs text-slate-300 hover:bg-white/10 hover:text-white transition-colors flex items-center space-x-2 min-[1200px]:hidden"
+                        className="w-full text-left px-3.5 py-2 text-xs text-slate-300 hover:bg-white/10 hover:text-white transition-colors flex items-center space-x-2 min-[1260px]:hidden"
                       >
                         <MapPin className="w-3.5 h-3.5 text-emerald-400" />
                         <span>{t('state_approvals')}</span>
                       </button>
                       <button
                         onClick={() => handleNavClick('home', 'section-about')}
-                        className="w-full text-left px-3.5 py-2 text-xs text-slate-300 hover:bg-white/10 hover:text-white transition-colors flex items-center space-x-2 min-[1350px]:hidden"
+                        className="w-full text-left px-3.5 py-2 text-xs text-slate-300 hover:bg-white/10 hover:text-white transition-colors flex items-center space-x-2 min-[1440px]:hidden"
                       >
                         <BookOpen className="w-3.5 h-3.5 text-sky-400" />
                         <span>Resources</span>
@@ -302,7 +293,7 @@ export const HeaderNavbar: React.FC = () => {
                 <button
                   id="nav-link-dashboard"
                   onClick={() => handleNavClick(userProfile.role === 'ADMIN' ? 'admin-dashboard' : 'dashboard')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 shrink-0 cursor-pointer ${
+                  className={`px-2.5 min-[1400px]:px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 shrink-0 cursor-pointer ${
                     currentView === 'dashboard' || currentView === 'admin-dashboard'
                       ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30' 
                       : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10 hover:text-white'
@@ -321,12 +312,12 @@ export const HeaderNavbar: React.FC = () => {
               <button
                 id="global-search-btn"
                 onClick={() => setIsSearchModalOpen(true)}
-                className="p-2 min-[1200px]:py-2 min-[1200px]:px-2.5 min-[1400px]:px-3 text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all flex items-center space-x-1.5 text-xs font-medium shrink-0 cursor-pointer w-auto min-[1200px]:w-[130px] min-[1400px]:w-[160px]"
+                className="p-2 min-[1200px]:py-2 min-[1200px]:px-2.5 min-[1400px]:px-3 text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all flex items-center space-x-1.5 text-xs font-medium shrink-0 cursor-pointer w-auto min-[1200px]:w-[115px] min-[1440px]:w-[140px]"
                 title="Search Approvals, Schemes, Departments (Cmd+K or /)"
               >
                 <Search className="w-4 h-4 text-sky-400 shrink-0" />
                 <span className="hidden min-[1200px]:inline text-slate-400 truncate">Search...</span>
-                <kbd className="hidden min-[1400px]:inline px-1.5 py-0.5 text-[9px] bg-white/10 rounded border border-white/15 text-slate-300 font-mono shrink-0 ml-auto">⌘K</kbd>
+                <kbd className="hidden min-[1440px]:inline px-1.5 py-0.5 text-[9px] bg-white/10 rounded border border-white/15 text-slate-300 font-mono shrink-0 ml-auto">⌘K</kbd>
               </button>
 
               {/* State Selector Dropdown (Watermelon Dropdown 8/12) */}

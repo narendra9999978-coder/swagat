@@ -288,10 +288,10 @@ tbody td { color: #e2e8f0 !important; }
 }
 
 .swagat-header-grid {
-  display: grid;
-  grid-template-columns: max-content minmax(0, 1fr) max-content;
+  display: flex;
   align-items: center;
-  column-gap: clamp(12px, 1.5vw, 24px);
+  justify-content: space-between;
+  gap: clamp(8px, 1.2vw, 16px);
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
@@ -299,9 +299,6 @@ tbody td { color: #e2e8f0 !important; }
 }
 
 .swagat-brand {
-  width: 235px;
-  min-width: 235px;
-  max-width: 235px;
   display: flex;
   align-items: center;
   flex-shrink: 0;
@@ -309,18 +306,19 @@ tbody td { color: #e2e8f0 !important; }
 }
 
 .swagat-primary-nav {
+  flex: 1 1 auto;
   min-width: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: clamp(4px, 1vw, 18px);
+  gap: clamp(3px, 0.6vw, 8px);
   white-space: nowrap;
 }
 
 .swagat-actions {
   display: flex;
   align-items: center;
-  gap: clamp(4px, 0.8vw, 10px);
+  gap: clamp(4px, 0.6vw, 8px);
   flex-shrink: 0;
   min-width: max-content;
 }
