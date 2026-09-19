@@ -102,7 +102,7 @@ export const HeroSection: React.FC = () => {
   };
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-[#07182C] via-[#0B2545] to-[#0D2F57] text-white pt-16 pb-24 lg:pt-20 lg:pb-32">
+    <section className="relative overflow-hidden bg-gradient-to-b from-[#07182C] via-[#0B2545] to-[#0D2F57] text-white pt-24 sm:pt-28 pb-24 lg:pt-36 lg:pb-32">
       
       {/* Background Subtle Digital Map of India & Circuit Mesh */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
