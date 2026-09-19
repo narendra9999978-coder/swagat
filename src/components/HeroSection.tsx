@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   Compass, 
   Layers, 
@@ -20,6 +20,7 @@ import { allIndianStatesList } from '../data/indiaStatesData';
 import { sectorsData } from '../data/sectorsData';
 import { InteractiveIndiaMap } from './InteractiveIndiaMap';
 import { IndiaBackgroundMap } from './IndiaBackgroundMap';
+import { GlassSelect, GlassSelectOption } from './ui/GlassSelect';
 
 export const HeroSection: React.FC = () => {
   const { 
@@ -32,6 +33,37 @@ export const HeroSection: React.FC = () => {
 
   const [selectedState, setSelectedState] = useState<string>('');
   const [selectedSector, setSelectedSector] = useState<string>('');
+
+  const stateOptions: GlassSelectOption[] = useMemo(() => {
+    return [
+      { value: 'All', label: 'All India / Central Approvals', badge: '1,400+' },
+      ...allIndianStatesList
+        .filter((s) => s.type === 'State')
+        .map((s) => ({
+          value: s.name,
+          label: s.name,
+          badge: `${s.approvalCount} Approvals`,
+          group: 'States (28)',
+        })),
+      ...allIndianStatesList
+        .filter((s) => s.type === 'UT')
+        .map((u) => ({
+          value: u.name,
+          label: u.name,
+          badge: `${u.approvalCount} Approvals`,
+          group: 'Union Territories (8)',
+        })),
+    ];
+  }, []);
+
+  const sectorOptions: GlassSelectOption[] = useMemo(() => {
+    return sectorsData.map((sec) => ({
+      value: sec.name,
+      label: sec.name,
+      badge: `${sec.approvalCount} Approvals`,
+      group: 'Industrial Sectors (24)',
+    }));
+  }, []);
 
   const handleFindApprovals = (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,7 +150,7 @@ export const HeroSection: React.FC = () => {
             </p>
 
             {/* Quick State + Sector Selection Card */}
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 p-4 sm:p-5 rounded-2xl shadow-xl space-y-3 max-w-2xl">
+            <div className="bg-black/85 backdrop-blur-3xl border border-white/20 p-4 sm:p-5 rounded-2xl shadow-2xl space-y-3 max-w-2xl ring-1 ring-white/15 relative z-30">
               <div className="text-xs font-bold uppercase tracking-wider text-amber-300 flex items-center space-x-1.5">
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>Instant Approvals Finder (State + Sector)</span>
@@ -128,48 +160,26 @@ export const HeroSection: React.FC = () => {
                 
                 {/* Dropdown 1: State / UT */}
                 <div className="sm:col-span-5 relative">
-                  <select
+                  <GlassSelect
                     id="hero-state-selector"
                     value={selectedState}
-                    onChange={(e) => setSelectedState(e.target.value)}
-                    className="w-full px-3.5 py-3 rounded-xl bg-slate-900/90 text-white border border-white/20 text-xs font-semibold appearance-none focus:outline-none focus:ring-2 focus:ring-amber-400 cursor-pointer"
-                  >
-                    <option value="">Select a State / Union Territory</option>
-                    <option value="All">All India / Central Approvals</option>
-                    <optgroup label="States (28)">
-                      {allIndianStatesList.filter(s => s.type === 'State').map(s => (
-                        <option key={s.code} value={s.name}>
-                          {s.name} ({s.approvalCount} Approvals)
-                        </option>
-                      ))}
-                    </optgroup>
-                    <optgroup label="Union Territories (8)">
-                      {allIndianStatesList.filter(s => s.type === 'UT').map(u => (
-                        <option key={u.code} value={u.name}>
-                          {u.name} ({u.approvalCount} Approvals)
-                        </option>
-                      ))}
-                    </optgroup>
-                  </select>
-                  <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    onChange={setSelectedState}
+                    options={stateOptions}
+                    placeholder="Select a State / Union Territory"
+                    searchable={true}
+                  />
                 </div>
 
                 {/* Dropdown 2: Sector */}
                 <div className="sm:col-span-4 relative">
-                  <select
+                  <GlassSelect
                     id="hero-sector-selector"
                     value={selectedSector}
-                    onChange={(e) => setSelectedSector(e.target.value)}
-                    className="w-full px-3.5 py-3 rounded-xl bg-slate-900/90 text-white border border-white/20 text-xs font-semibold appearance-none focus:outline-none focus:ring-2 focus:ring-amber-400 cursor-pointer"
-                  >
-                    <option value="">Select Sector</option>
-                    {sectorsData.map(sec => (
-                      <option key={sec.id} value={sec.name}>
-                        {sec.name} ({sec.approvalCount})
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    onChange={setSelectedSector}
+                    options={sectorOptions}
+                    placeholder="Select Sector"
+                    searchable={true}
+                  />
                 </div>
 
                 {/* CTA Submit Button */}
@@ -177,7 +187,7 @@ export const HeroSection: React.FC = () => {
                   <button
                     type="submit"
                     id="hero-find-approvals-btn"
-                    className="w-full py-3 px-4 bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 hover:from-amber-300 hover:to-amber-200 text-[#07182C] font-extrabold text-xs rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 flex items-center justify-center space-x-1"
+                    className="w-full py-3 px-4 bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 hover:from-amber-300 hover:to-amber-200 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg shadow-amber-400/20 transition-all transform hover:-translate-y-0.5 flex items-center justify-center space-x-1.5 cursor-pointer"
                   >
                     <span>Find My Approvals</span>
                     <ArrowRight className="w-3.5 h-3.5" />

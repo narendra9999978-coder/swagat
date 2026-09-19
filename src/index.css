@@ -2,60 +2,282 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─────────────────────────────────────────────────────────────────────────
+   DARK FOUNDATION — Force dark base on every element
+   ───────────────────────────────────────────────────────────────────────── */
 @layer base {
   html {
     scroll-behavior: smooth;
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
+    color-scheme: dark;
   }
-  
+
   body {
-    background-color: #F8FAFC;
-    color: #0F172A;
+    background-color: #000000 !important;
+    color: #e2e8f0 !important;
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
+    position: relative;
   }
 }
 
-/* Custom GovTech styling utilities */
-.gov-gradient-subtle {
-  background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 50%, #F8FAFC 100%);
+/* ─────────────────────────────────────────────────────────────────────────
+   NUCLEAR DARK OVERRIDE
+   All tailwind light-bg classes -> transparent dark equivalents
+   All light text classes        -> slate-200 / slate-300 / white
+   This fixes every section, card, modal without touching 50+ component files.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Section / page-level light backgrounds */
+section { background-color: transparent !important; }
+.bg-white { background-color: rgba(5, 5, 8, 0.94) !important; }
+.bg-slate-50 { background-color: rgba(6, 6, 10, 0.92) !important; }
+.bg-slate-100 { background-color: rgba(10, 10, 15, 0.90) !important; }
+.bg-gray-50 { background-color: rgba(6, 6, 10, 0.92) !important; }
+.bg-gray-100 { background-color: rgba(10, 10, 15, 0.90) !important; }
+.bg-slate-200 { background-color: rgba(15, 15, 20, 0.85) !important; }
+.bg-gray-200 { background-color: rgba(15, 15, 20, 0.85) !important; }
+
+/* Subtle light tint backgrounds -> dark equivalents */
+.bg-blue-50, [class*="bg-blue-50"] { background-color: rgba(14, 165, 233, 0.08) !important; }
+.bg-amber-50, [class*="bg-amber-50"] { background-color: rgba(245, 158, 11, 0.08) !important; }
+.bg-sky-50, [class*="bg-sky-50"] { background-color: rgba(14, 165, 233, 0.08) !important; }
+.bg-emerald-50, [class*="bg-emerald-50"] { background-color: rgba(16, 185, 129, 0.08) !important; }
+.bg-indigo-50, [class*="bg-indigo-50"] { background-color: rgba(99, 102, 241, 0.08) !important; }
+
+/* Inline hex overrides */
+[class*="bg-\[#F8FAFC\]"],
+[class*="bg-\[#f8fafc\]"] { background-color: rgba(7, 15, 30, 0.9) !important; }
+
+/* Border overrides */
+.border-slate-200,
+.border-slate-100,
+.border-gray-200,
+.border-gray-100,
+[class*="border-slate-200"],
+[class*="border-slate-300"] { border-color: rgba(255, 255, 255, 0.1) !important; }
+
+/* Global Headings in dark mode */
+h1, h2, h3, h4, h5, h6 {
+  color: #f8fafc !important;
 }
 
-.gov-hero-mesh {
-  background: radial-gradient(at 0% 0%, rgba(19, 64, 116, 0.08) 0px, transparent 50%),
-              radial-gradient(at 100% 0%, rgba(224, 90, 16, 0.06) 0px, transparent 50%),
-              radial-gradient(at 50% 100%, rgba(5, 122, 85, 0.05) 0px, transparent 50%);
+/* Hardcoded dark navy text classes -> high contrast light text */
+[class*="text-\[\#07182C\]"],
+[class*="text-\[\#07182c\]"],
+[class*="text-\[\#0B2545\]"],
+[class*="text-\[\#0b2545\]"],
+[class*="text-\[\#051329\]"],
+[class*="text-\[\#0a192f\]"] {
+  color: #f1f5f9 !important;
+}
+
+/* Dark text -> light text */
+.text-gray-900,
+.text-slate-900,
+.text-gray-800,
+.text-slate-800 { color: #f1f5f9 !important; }
+.text-gray-700,
+.text-slate-700 { color: #e2e8f0 !important; }
+.text-gray-600,
+.text-slate-600 { color: #cbd5e1 !important; }
+.text-gray-500,
+.text-slate-500 { color: #94a3b8 !important; }
+
+/* Hover light backgrounds - wildcard match handles all opacities like /60, /80 */
+.hover\:bg-white:hover,
+[class*="hover:bg-white"]:hover,
+[class*="hover:bg-slate-"]:hover,
+[class*="hover:bg-gray-"]:hover,
+[class*="hover:bg-blue-50"]:hover { 
+  background-color: rgba(255, 255, 255, 0.08) !important; 
+}
+
+/* Emerald badges and pills - avoid solid mint green blocks */
+[class*="bg-emerald-100"],
+[class*="bg-emerald-50"] {
+  background-color: rgba(16, 185, 129, 0.12) !important;
+}
+[class*="text-emerald-950"],
+[class*="text-emerald-900"],
+[class*="text-emerald-800"],
+[class*="text-emerald-700"] {
+  color: #6ee7b7 !important;
+}
+[class*="border-emerald-300"],
+[class*="border-emerald-200"] {
+  border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+/* Dark navy buttons -> visible glossy interactive buttons */
+button[class*="bg-\[\#07182C\]"],
+button[class*="bg-\[\#0b2545\]"],
+button[class*="bg-\[\#0B2545\]"] {
+  background: linear-gradient(135deg, rgba(30, 58, 102, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+}
+button[class*="bg-\[\#07182C\]"]:hover,
+button[class*="bg-\[\#0b2545\]"]:hover,
+button[class*="bg-\[\#0B2545\]"]:hover {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.9) 0%, rgba(29, 78, 216, 0.95) 100%) !important;
+  border-color: rgba(56, 189, 248, 0.4) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   CARDS — rounded cards with light bg
+   ───────────────────────────────────────────────────────────────────────── */
+.rounded-xl.bg-white,
+.rounded-2xl.bg-white,
+.rounded-3xl.bg-white,
+.rounded-lg.bg-white,
+.rounded-xl.bg-slate-50,
+.rounded-2xl.bg-slate-50,
+.rounded-xl.bg-gray-50,
+.rounded-2xl.bg-gray-50 {
+  background: rgba(12, 22, 44, 0.82) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Badge colours — soft coloured chips */
+.bg-emerald-100 { background-color: rgba(16, 185, 129, 0.12) !important; }
+.bg-sky-100 { background-color: rgba(14, 165, 233, 0.12) !important; }
+.bg-blue-100 { background-color: rgba(59, 130, 246, 0.12) !important; }
+.bg-amber-100 { background-color: rgba(245, 158, 11, 0.12) !important; }
+.bg-purple-100 { background-color: rgba(168, 85, 247, 0.12) !important; }
+.bg-red-100 { background-color: rgba(239, 68, 68, 0.12) !important; }
+.bg-orange-100 { background-color: rgba(249, 115, 22, 0.12) !important; }
+.bg-indigo-100 { background-color: rgba(99, 102, 241, 0.12) !important; }
+.bg-green-100 { background-color: rgba(34, 197, 94, 0.12) !important; }
+
+.border-emerald-200 { border-color: rgba(16, 185, 129, 0.25) !important; }
+.border-sky-200 { border-color: rgba(14, 165, 233, 0.25) !important; }
+.border-amber-200 { border-color: rgba(245, 158, 11, 0.25) !important; }
+.border-blue-200 { border-color: rgba(59, 130, 246, 0.25) !important; }
+.border-purple-200 { border-color: rgba(168, 85, 247, 0.25) !important; }
+
+/* Badge text */
+.text-emerald-800 { color: #34d399 !important; }
+.text-sky-800 { color: #38bdf8 !important; }
+.text-amber-800 { color: #fbbf24 !important; }
+.text-blue-800 { color: #60a5fa !important; }
+.text-purple-800 { color: #c084fc !important; }
+.text-red-800 { color: #f87171 !important; }
+.text-green-800 { color: #4ade80 !important; }
+.text-emerald-950 { color: #d1fae5 !important; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   FORM INPUTS — full dark
+   ───────────────────────────────────────────────────────────────────────── */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="search"],
+select,
+textarea {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  color: #f1f5f9 !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+input::placeholder,
+textarea::placeholder { color: #475569 !important; }
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  color: #64748b !important;
+}
+
+select option {
+  background-color: #0f172a;
+  color: #f1f5f9;
+}
+
+label { color: #94a3b8 !important; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   TABLES — dark
+   ───────────────────────────────────────────────────────────────────────── */
+table { background-color: transparent !important; }
+thead { background-color: rgba(255, 255, 255, 0.04) !important; }
+thead th { color: #94a3b8 !important; border-bottom-color: rgba(255, 255, 255, 0.07) !important; }
+tbody tr { border-bottom-color: rgba(255, 255, 255, 0.04) !important; }
+tbody tr:hover { background-color: rgba(255, 255, 255, 0.04) !important; }
+tbody td { color: #e2e8f0 !important; }
+.divide-slate-200 > :not([hidden]) ~ :not([hidden]),
+.divide-gray-200 > :not([hidden]) ~ :not([hidden]) { border-color: rgba(255, 255, 255, 0.06) !important; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   DARK GLASSMORPHISM MASTER TOKENS & UTILITIES
+   ───────────────────────────────────────────────────────────────────────── */
+.glass-panel {
+  background: rgba(11, 27, 47, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.glass-panel-subtle {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.glass-panel-glow {
+  background: rgba(11, 27, 47, 0.75);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 35px -5px rgba(224, 90, 16, 0.15), 0 20px 40px -15px rgba(0, 0, 0, 0.5);
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .glass-card-dark {
-  background: rgba(11, 37, 69, 0.95);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(7, 24, 44, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-.gov-border-gradient {
-  border-image: linear-gradient(to right, #E05A10, #0B2545, #057A55) 1;
+.micro-border { border: 1px solid rgba(255, 255, 255, 0.08); }
+.micro-border-glow {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   SWAGAT HEADER & NAVBAR — 3-COLUMN CSS GRID ARCHITECTURE
-   Column 1: Brand (auto, flex-shrink: 0)
-   Column 2: Primary Navigation (minmax(0, 1fr) - bounded, cannot overlap actions)
-   Column 3: Actions & Menu (auto, flex-shrink: 0)
-   ───────────────────────────────────────────────────────────────────────────── */
+.apple-ease { transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1); }
 
+.gov-gradient-subtle {
+  background: linear-gradient(135deg, rgba(7, 24, 44, 0.8) 0%, rgba(15, 23, 42, 0.6) 50%, rgba(7, 24, 44, 0.9) 100%);
+}
+
+.gov-hero-mesh {
+  background: radial-gradient(at 0% 0%, rgba(19, 64, 116, 0.25) 0px, transparent 50%),
+              radial-gradient(at 100% 0%, rgba(224, 90, 16, 0.18) 0px, transparent 50%),
+              radial-gradient(at 50% 100%, rgba(5, 122, 85, 0.15) 0px, transparent 50%);
+}
+
+.gov-border-gradient { border-image: linear-gradient(to right, #E05A10, #0B2545, #057A55) 1; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SWAGAT HEADER & NAVBAR — 3-COLUMN CSS GRID ARCHITECTURE
+   ───────────────────────────────────────────────────────────────────────── */
 .swagat-header {
   position: sticky;
   top: 0;
@@ -103,26 +325,17 @@
   min-width: max-content;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
+/* ─────────────────────────────────────────────────────────────────────────
+   DARK SCROLLBAR
+   ───────────────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #070f1e; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.22); }
 
-::-webkit-scrollbar-track {
-  background: #F1F5F9;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
-}
-
-/* Pulse glow keyframe */
+/* ─────────────────────────────────────────────────────────────────────────
+   KEYFRAMES
+   ───────────────────────────────────────────────────────────────────────── */
 @keyframes voice-wave {
   0%, 100% { height: 8px; }
   50% { height: 28px; }
@@ -133,3 +346,25 @@
 .voice-bar-3 { animation: voice-wave 0.7s ease-in-out infinite 0.3s; }
 .voice-bar-4 { animation: voice-wave 1.1s ease-in-out infinite 0.15s; }
 .voice-bar-5 { animation: voice-wave 0.85s ease-in-out infinite 0.25s; }
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-shimmer {
+  animation: shimmer 2.5s linear infinite;
+  background-size: 200% auto;
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.7; }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 9s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+
+

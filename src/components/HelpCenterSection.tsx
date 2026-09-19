@@ -6,16 +6,21 @@ import {
   Video, 
   FileQuestion, 
   Headphones, 
-  MessageSquare, 
   ChevronDown, 
-  ChevronUp, 
   Send, 
-  CheckCircle2,
   ExternalLink,
-  ShieldAlert
+  Sparkles
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useSwagat } from '../context/SwagatContext';
+import { FeedbackWidget } from './ui/FeedbackWidget';
 
+/**
+ * HelpCenterSection
+ * Curated from: https://ui.watermelon.sh/blocks/faq-3 (FAQ Sections)
+ * & https://ui.watermelon.sh/animated-components/feedback (Feedback Widget)
+ * Dark Glassmorphic Help & Knowledge Base with spring accordion
+ */
 export const HelpCenterSection: React.FC = () => {
   const { showToast } = useSwagat();
   const [searchFaq, setSearchFaq] = useState('');
@@ -62,19 +67,19 @@ export const HelpCenterSection: React.FC = () => {
   };
 
   return (
-    <section id="section-help" className="py-20 bg-slate-50 border-t border-slate-200">
+    <section id="section-help" className="py-20 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-blue-100 text-[#07182C] border border-blue-200 text-xs font-bold uppercase tracking-wider mb-3">
-            <HelpCircle className="w-4 h-4 text-[#07182C]" />
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/5 text-sky-400 border border-white/10 text-xs font-bold uppercase tracking-wider mb-3 backdrop-blur-md">
+            <HelpCircle className="w-4 h-4" />
             <span>Support &amp; Knowledge Base</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-[#07182C] tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-white tracking-tight">
             Resources &amp; Help Center
           </h2>
-          <p className="mt-3 text-slate-600 text-base">
+          <p className="mt-3 text-slate-300 text-sm sm:text-base leading-relaxed">
             Access step-by-step user manuals, compliance guides, video tutorials, and 24/7 technical grievance resolution.
           </p>
         </div>
@@ -87,87 +92,87 @@ export const HelpCenterSection: React.FC = () => {
               placeholder="Search how to start your business, approval rules, FAQs..."
               value={searchFaq}
               onChange={(e) => setSearchFaq(e.target.value)}
-              className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-white border border-slate-300 shadow-sm text-sm font-medium focus:ring-2 focus:ring-[#07182C]"
+              className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-white/5 border border-white/15 backdrop-blur-2xl shadow-xl text-sm font-medium text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition"
             />
-            <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+            <Search className="w-5 h-5 text-sky-400 absolute left-4 top-1/2 -translate-y-1/2" />
           </div>
         </div>
 
-        {/* 4 Quick Resource Cards */}
+        {/* 4 Quick Resource Cards with Dark Glassmorphism */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           
-          <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-xs hover:shadow-lg transition-all space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-100 text-[#07182C] flex items-center justify-center font-bold">
+          <div className="p-6 rounded-3xl bg-slate-950/60 border border-white/10 backdrop-blur-2xl shadow-xl hover:border-white/20 transition-all duration-300 hover:scale-[1.02] space-y-3">
+            <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center font-bold">
               <BookOpen className="w-5 h-5" />
             </div>
-            <h4 className="text-base font-bold text-[#07182C]">Step-by-Step Guides</h4>
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <h4 className="text-base font-bold text-white">Step-by-Step Guides</h4>
+            <p className="text-xs text-slate-300 leading-relaxed">
               Comprehensive manuals on SPICe+ incorporation, SPCB consent, and industrial electricity connections.
             </p>
             <button 
               onClick={() => showToast('Opening SWAGAT User Handbook PDF')}
-              className="text-xs font-bold text-blue-700 hover:underline inline-flex items-center"
+              className="text-xs font-bold text-sky-400 hover:text-sky-300 inline-flex items-center"
             >
               <span>Download Manual</span>
               <ExternalLink className="w-3 h-3 ml-1" />
             </button>
           </div>
 
-          <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-xs hover:shadow-lg transition-all space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-900 flex items-center justify-center font-bold">
+          <div className="p-6 rounded-3xl bg-slate-950/60 border border-white/10 backdrop-blur-2xl shadow-xl hover:border-white/20 transition-all duration-300 hover:scale-[1.02] space-y-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
               <Video className="w-5 h-5" />
             </div>
-            <h4 className="text-base font-bold text-[#07182C]">Video Walkthroughs</h4>
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <h4 className="text-base font-bold text-white">Video Walkthroughs</h4>
+            <p className="text-xs text-slate-300 leading-relaxed">
               Interactive video tutorials showing how to complete the KYA journey and link DigiLocker KYC documents.
             </p>
             <button 
               onClick={() => showToast('Playing SWAGAT Platform Video Tour')}
-              className="text-xs font-bold text-amber-700 hover:underline inline-flex items-center"
+              className="text-xs font-bold text-amber-400 hover:text-amber-300 inline-flex items-center"
             >
               <span>Watch Video Tour (4 mins)</span>
               <ExternalLink className="w-3 h-3 ml-1" />
             </button>
           </div>
 
-          <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-xs hover:shadow-lg transition-all space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-900 flex items-center justify-center font-bold">
+          <div className="p-6 rounded-3xl bg-slate-950/60 border border-white/10 backdrop-blur-2xl shadow-xl hover:border-white/20 transition-all duration-300 hover:scale-[1.02] space-y-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
               <FileQuestion className="w-5 h-5" />
             </div>
-            <h4 className="text-base font-bold text-[#07182C]">Approval Guides</h4>
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <h4 className="text-base font-bold text-white">Approval Guides</h4>
+            <p className="text-xs text-slate-300 leading-relaxed">
               Master checklist of statutory checklists, document formats, stability certificates, and fees.
             </p>
             <button 
               onClick={() => showToast('Viewing Statutory Checklists Directory')}
-              className="text-xs font-bold text-emerald-700 hover:underline inline-flex items-center"
+              className="text-xs font-bold text-emerald-400 hover:text-emerald-300 inline-flex items-center"
             >
               <span>View Checklist</span>
               <ExternalLink className="w-3 h-3 ml-1" />
             </button>
           </div>
 
-          <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-xs hover:shadow-lg transition-all space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-900 flex items-center justify-center font-bold">
+          <div className="p-6 rounded-3xl bg-slate-950/60 border border-white/10 backdrop-blur-2xl shadow-xl hover:border-white/20 transition-all duration-300 hover:scale-[1.02] space-y-3">
+            <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center font-bold">
               <Headphones className="w-5 h-5" />
             </div>
-            <h4 className="text-base font-bold text-[#07182C]">24/7 National Helpdesk</h4>
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <h4 className="text-base font-bold text-white">24/7 National Helpdesk</h4>
+            <p className="text-xs text-slate-300 leading-relaxed">
               Toll-Free helpline 1800-11-8005 and dedicated single-window facilitators in every state capital.
             </p>
-            <div className="text-xs font-bold text-purple-800">
+            <div className="text-xs font-bold text-purple-300 font-mono">
               Toll Free: 1800-11-8005
             </div>
           </div>
 
         </div>
 
-        {/* FAQs & Grievance Lodging Form */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Watermelon FAQ-3 Spring Accordion & Grievance Lodging Form */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-16">
           
-          {/* Left: FAQs */}
+          {/* Left: Watermelon FAQ-3 Spring Accordion */}
           <div className="lg:col-span-7 space-y-4">
-            <h3 className="text-2xl font-display font-bold text-[#07182C] mb-4">
+            <h3 className="text-2xl font-display font-extrabold text-white mb-4">
               Frequently Asked Questions
             </h3>
 
@@ -177,25 +182,42 @@ export const HelpCenterSection: React.FC = () => {
                 return (
                   <div
                     key={idx}
-                    className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-2xs transition-all"
+                    className={`rounded-2xl border transition-all duration-300 backdrop-blur-xl ${
+                      isOpen
+                        ? 'bg-white/8 border-white/20 shadow-lg'
+                        : 'bg-white/4 border-white/10 hover:border-white/15'
+                    }`}
                   >
                     <button
+                      type="button"
                       onClick={() => setActiveFaq(isOpen ? null : idx)}
-                      className="w-full text-left p-4 sm:p-5 flex items-center justify-between gap-3 font-bold text-sm text-[#07182C] hover:bg-slate-50"
+                      className="w-full text-left p-4 sm:p-5 flex items-center justify-between gap-3 font-bold text-xs sm:text-sm text-white"
                     >
-                      <span>{faq.q}</span>
-                      {isOpen ? (
-                        <ChevronUp className="w-4 h-4 text-slate-500 shrink-0" />
-                      ) : (
-                        <ChevronDown className="w-4 h-4 text-slate-500 shrink-0" />
-                      )}
+                      <span className="leading-snug">{faq.q}</span>
+                      <motion.div
+                        animate={{ rotate: isOpen ? 180 : 0 }}
+                        transition={{ duration: 0.25 }}
+                        className="shrink-0 p-1 rounded-lg bg-white/5"
+                      >
+                        <ChevronDown className="w-4 h-4 text-slate-400" />
+                      </motion.div>
                     </button>
 
-                    {isOpen && (
-                      <div className="px-5 pb-5 text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
-                        {faq.a}
-                      </div>
-                    )}
+                    <AnimatePresence initial={false}>
+                      {isOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-5 pb-5 text-xs text-slate-300 leading-relaxed border-t border-white/5 pt-3">
+                            {faq.a}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 );
               })}
@@ -203,58 +225,58 @@ export const HelpCenterSection: React.FC = () => {
           </div>
 
           {/* Right: Quick Grievance / Query Submission */}
-          <div className="lg:col-span-5 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-md">
-            <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-amber-600 mb-2">
-              <MessageSquare className="w-4 h-4" />
+          <div className="lg:col-span-5 bg-slate-950/70 rounded-3xl p-6 sm:p-8 border border-white/10 backdrop-blur-2xl shadow-xl text-white">
+            <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">
+              <Sparkles className="w-4 h-4" />
               <span>Direct Support Ticket</span>
             </div>
-            <h3 className="text-xl font-display font-bold text-[#07182C] mb-2">
+            <h3 className="text-xl font-display font-extrabold text-white mb-2">
               Lodge Query / Grievance
             </h3>
-            <p className="text-xs text-slate-500 mb-6">
+            <p className="text-xs text-slate-300 mb-6">
               Our single-window nodal facilitation officers respond within 24 business hours.
             </p>
 
             <form onSubmit={handleSubmitGrievance} className="space-y-4">
               <div>
-                <label className="text-[11px] font-bold text-slate-700 uppercase block mb-1">Your Full Name</label>
+                <label className="text-[11px] font-bold text-slate-300 uppercase block mb-1">Your Full Name</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Narendra Singh"
                   value={queryName}
                   onChange={(e) => setQueryName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-[#07182C]"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-500 text-xs focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/50"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-bold text-slate-700 uppercase block mb-1">Email / Phone</label>
+                <label className="text-[11px] font-bold text-slate-300 uppercase block mb-1">Email / Phone</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. contact@company.in"
                   value={queryEmail}
                   onChange={(e) => setQueryEmail(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-[#07182C]"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-500 text-xs focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/50"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-bold text-slate-700 uppercase block mb-1">Query / Assistance Needed</label>
+                <label className="text-[11px] font-bold text-slate-300 uppercase block mb-1">Query / Assistance Needed</label>
                 <textarea
                   rows={3}
                   required
                   placeholder="Describe your approval or application question..."
                   value={queryMessage}
                   onChange={(e) => setQueryMessage(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-[#07182C]"
-                ></textarea>
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-500 text-xs focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/50 resize-none"
+                />
               </div>
 
               <button
                 type="submit"
-                className="w-full py-3 bg-[#07182C] hover:bg-[#0B2545] text-white text-xs font-bold rounded-xl shadow-md transition flex items-center justify-center space-x-2"
+                className="w-full py-3 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-sky-500/20 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center space-x-2"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>Submit Ticket</span>
@@ -263,6 +285,13 @@ export const HelpCenterSection: React.FC = () => {
           </div>
 
         </div>
+
+        {/* Embedded Watermelon Feedback Widget */}
+        <FeedbackWidget
+          onSubmitFeedback={(rating, category, comment) => {
+            showToast(`Recorded ${rating}-star feedback for ${category}. Thank you!`);
+          }}
+        />
 
       </div>
     </section>

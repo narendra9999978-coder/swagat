@@ -80,7 +80,7 @@ export const StateDetailModal: React.FC = () => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-md overflow-y-auto">
       <div 
-        className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden my-6 max-h-[92vh] flex flex-col animate-in fade-in zoom-in-95 duration-200"
+        className="relative w-full max-w-4xl bg-slate-950/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/12 overflow-hidden my-6 max-h-[92vh] flex flex-col animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Top Header Banner */}
@@ -146,13 +146,13 @@ export const StateDetailModal: React.FC = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div className="border-b border-slate-200 bg-slate-50 px-6 shrink-0 flex space-x-6 overflow-x-auto text-xs font-bold">
+        <div className="border-b border-white/10 bg-black/40 backdrop-blur-md px-6 shrink-0 flex space-x-6 overflow-x-auto text-xs font-bold">
           <button
             onClick={() => setActiveTab('overview')}
             className={`py-3.5 border-b-2 transition-colors whitespace-nowrap ${
               activeTab === 'overview'
-                ? 'border-[#07182C] text-[#07182C]'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                ? 'border-sky-400 text-sky-300'
+                : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
             Overview &amp; Industrial Profile
@@ -161,12 +161,12 @@ export const StateDetailModal: React.FC = () => {
             onClick={() => setActiveTab('state-approvals')}
             className={`py-3.5 border-b-2 transition-colors whitespace-nowrap flex items-center space-x-1.5 ${
               activeTab === 'state-approvals'
-                ? 'border-[#07182C] text-[#07182C]'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                ? 'border-sky-400 text-sky-300'
+                : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
             <span>State Approvals &amp; Clearances</span>
-            <span className="px-1.5 py-0.2 rounded-full bg-slate-200 text-slate-700 text-[10px]">
+            <span className="px-1.5 py-0.5 rounded-full bg-white/8 text-slate-300 text-[10px]">
               {stateApprovals.length}
             </span>
           </button>
@@ -174,12 +174,12 @@ export const StateDetailModal: React.FC = () => {
             onClick={() => setActiveTab('central-applicable')}
             className={`py-3.5 border-b-2 transition-colors whitespace-nowrap flex items-center space-x-1.5 ${
               activeTab === 'central-applicable'
-                ? 'border-[#07182C] text-[#07182C]'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                ? 'border-sky-400 text-sky-300'
+                : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
             <span>Applicable Central Approvals</span>
-            <span className="px-1.5 py-0.2 rounded-full bg-sky-100 text-sky-800 text-[10px]">
+            <span className="px-1.5 py-0.5 rounded-full bg-sky-500/15 text-sky-300 text-[10px]">
               Pan-India
             </span>
           </button>
@@ -187,12 +187,12 @@ export const StateDetailModal: React.FC = () => {
             onClick={() => setActiveTab('schemes')}
             className={`py-3.5 border-b-2 transition-colors whitespace-nowrap flex items-center space-x-1.5 ${
               activeTab === 'schemes'
-                ? 'border-[#07182C] text-[#07182C]'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                ? 'border-sky-400 text-sky-300'
+                : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
             <span>Incentive Policies &amp; Schemes</span>
-            <span className="px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 text-[10px]">
+            <span className="px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 text-[10px]">
               {stateSchemes.length}
             </span>
           </button>
@@ -213,7 +213,7 @@ export const StateDetailModal: React.FC = () => {
                   {state.topIndustries.map((ind, i) => (
                     <span 
                       key={i}
-                      className="px-3 py-1.5 rounded-xl bg-blue-50 text-blue-950 border border-blue-200 text-xs font-semibold"
+                      className="px-3 py-1.5 rounded-xl bg-blue-500/10 text-blue-300 border border-blue-400/20 text-xs font-semibold"
                     >
                       {ind}
                     </span>
@@ -228,12 +228,12 @@ export const StateDetailModal: React.FC = () => {
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {state.categories.map((cat, idx) => (
-                    <div key={idx} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-start justify-between">
+                    <div key={idx} className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-start justify-between">
                       <div>
-                        <div className="text-xs font-bold text-slate-900">{cat.name}</div>
-                        <div className="text-[11px] text-slate-500 mt-0.5">{cat.description}</div>
+                        <div className="text-xs font-bold text-slate-200">{cat.name}</div>
+                        <div className="text-[11px] text-slate-400 mt-0.5">{cat.description}</div>
                       </div>
-                      <span className="text-xs font-black text-amber-700 bg-amber-100 px-2 py-0.5 rounded-lg shrink-0 ml-2">
+                      <span className="text-xs font-black text-amber-400 bg-amber-500/12 px-2 py-0.5 rounded-lg shrink-0 ml-2">
                         {cat.count} Clearances
                       </span>
                     </div>
@@ -270,7 +270,7 @@ export const StateDetailModal: React.FC = () => {
                   value={searchFilter}
                   onChange={(e) => setSearchFilter(e.target.value)}
                   placeholder={`Search ${state.name} approvals (e.g. 'Pollution', 'Land', 'Fire', 'Power')...`}
-                  className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-400/50"
+                  className="w-full pl-9 pr-4 py-2 rounded-xl border border-white/12 text-xs bg-white/5 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
                 />
               </div>
 
@@ -279,7 +279,7 @@ export const StateDetailModal: React.FC = () => {
                 {filteredStateApprovals.map((app) => (
                   <div 
                     key={app.id}
-                    className="p-4 rounded-2xl border border-slate-200 hover:border-amber-400/60 bg-white transition-all shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                    className="p-4 rounded-2xl border border-white/10 hover:border-amber-400/40 bg-white/5 backdrop-blur-md transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                   >
                     <div className="space-y-1 max-w-xl">
                       <div className="flex items-center space-x-2">
@@ -290,7 +290,7 @@ export const StateDetailModal: React.FC = () => {
                           SLA: {app.processingDays} Days
                         </span>
                       </div>
-                      <h5 className="text-sm font-bold text-slate-900">{app.name}</h5>
+                      <h5 className="text-sm font-bold text-white">{app.name}</h5>
                       <p className="text-xs text-slate-500 line-clamp-1">{app.department}</p>
                     </div>
 
@@ -300,7 +300,7 @@ export const StateDetailModal: React.FC = () => {
                           setSelectedApproval(app);
                           closeStateDetailModal();
                         }}
-                        className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg transition-colors"
+                        className="px-3 py-1.5 bg-white/8 hover:bg-white/14 text-slate-200 font-bold text-xs rounded-lg transition-colors"
                       >
                         View Details
                       </button>
@@ -330,7 +330,7 @@ export const StateDetailModal: React.FC = () => {
           {/* TAB 3: CENTRAL APPROVALS APPLICABLE */}
           {activeTab === 'central-applicable' && (
             <div className="space-y-4">
-              <div className="p-3.5 rounded-xl bg-sky-50 border border-sky-200 text-xs text-sky-900 flex items-start space-x-2.5">
+              <div className="p-3.5 rounded-xl bg-sky-500/10 border border-sky-400/20 text-xs text-sky-300 flex items-start space-x-2.5">
                 <Info className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
                 <span>
                   These Central Government statutory licenses and approvals apply uniformly across all districts in <strong>{state.name}</strong> and are pre-integrated into the SWAGAT national portal.
@@ -341,7 +341,7 @@ export const StateDetailModal: React.FC = () => {
                 {centralApprovals.slice(0, 8).map((app) => (
                   <div 
                     key={app.id}
-                    className="p-4 rounded-2xl border border-slate-200 hover:border-sky-300 bg-white transition-all shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                    className="p-4 rounded-2xl border border-white/10 hover:border-sky-400/40 bg-white/5 backdrop-blur-md transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                   >
                     <div className="space-y-1">
                       <div className="flex items-center space-x-2">
@@ -352,7 +352,7 @@ export const StateDetailModal: React.FC = () => {
                           Central Ministry
                         </span>
                       </div>
-                      <h5 className="text-sm font-bold text-slate-900">{app.name}</h5>
+                      <h5 className="text-sm font-bold text-white">{app.name}</h5>
                       <p className="text-xs text-slate-500 line-clamp-1">{app.ministry}</p>
                     </div>
 
@@ -362,7 +362,7 @@ export const StateDetailModal: React.FC = () => {
                           setSelectedApproval(app);
                           closeStateDetailModal();
                         }}
-                        className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg transition-colors"
+                        className="px-3 py-1.5 bg-white/8 hover:bg-white/14 text-slate-200 font-bold text-xs rounded-lg transition-colors"
                       >
                         Details
                       </button>
@@ -386,7 +386,7 @@ export const StateDetailModal: React.FC = () => {
           {/* TAB 4: SCHEMES & INCENTIVES */}
           {activeTab === 'schemes' && (
             <div className="space-y-4">
-              <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-950 flex items-start space-x-2.5">
+              <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-400/20 text-xs text-emerald-300 flex items-start space-x-2.5">
                 <Sparkles className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                 <span>
                   Industrial investment policies, MSME capital subsidies, stamp duty rebates, and power tariff subsidies offered by the Government of <strong>{state.name}</strong>.
@@ -397,7 +397,7 @@ export const StateDetailModal: React.FC = () => {
                 {stateSchemes.map((sch) => (
                   <div 
                     key={sch.id}
-                    className="p-4 rounded-2xl border border-slate-200 bg-white hover:border-emerald-400 transition-all shadow-xs space-y-2"
+                    className="p-4 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md hover:border-emerald-400/40 transition-all space-y-2"
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800">
@@ -407,13 +407,13 @@ export const StateDetailModal: React.FC = () => {
                         {sch.maxFinancialSupport}
                       </span>
                     </div>
-                    <h5 className="text-sm font-bold text-slate-900">{sch.name}</h5>
+                    <h5 className="text-sm font-bold text-white">{sch.name}</h5>
                     <p className="text-xs text-slate-600">{sch.benefits}</p>
                   </div>
                 ))}
 
                 {stateSchemes.length === 0 && (
-                  <div className="p-6 text-center text-xs text-slate-500 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                  <div className="p-6 text-center text-xs text-slate-400 bg-white/5 rounded-2xl border border-dashed border-white/15">
                     Specific state subsidy schemes are currently being updated by the state nodal cell. You can still apply for National PLI and MSME schemes.
                   </div>
                 )}
@@ -424,21 +424,21 @@ export const StateDetailModal: React.FC = () => {
         </div>
 
         {/* Modal Sticky Bottom Action Bar */}
-        <div className="p-4 sm:p-5 border-t border-slate-200 bg-slate-50 shrink-0 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="text-xs text-slate-500">
-            Official Nodal Helpdesk: <strong className="text-slate-800">{state.helpline}</strong>
+        <div className="p-4 sm:p-5 border-t border-white/10 bg-black/50 backdrop-blur-md shrink-0 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="text-xs text-slate-400">
+            Official Nodal Helpdesk: <strong className="text-slate-200">{state.helpline}</strong>
           </div>
 
           <div className="flex items-center space-x-3 w-full sm:w-auto">
             <button
               onClick={closeStateDetailModal}
-              className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-100 transition-colors"
+              className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-white/15 text-slate-300 font-bold text-xs hover:bg-white/8 transition-colors"
             >
               Close
             </button>
             <button
               onClick={handleStartKyaForState}
-              className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-[#07182C] hover:bg-slate-800 text-amber-300 font-extrabold text-xs shadow-md transition-all flex items-center justify-center space-x-1.5"
+              className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 border border-sky-400/25 text-sky-200 font-extrabold text-xs transition-all flex items-center justify-center space-x-1.5"
             >
               <span>Know Your Approvals for {state.name}</span>
               <ArrowRight className="w-3.5 h-3.5" />

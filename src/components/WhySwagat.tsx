@@ -47,18 +47,18 @@ export const WhySwagat: React.FC = () => {
   ];
 
   return (
-    <section className="py-16 sm:py-24 bg-white border-b border-slate-200/80">
+    <section className="py-16 sm:py-24 bg-transparent border-b border-white/8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-bold text-[#0B2545] uppercase tracking-wider mb-3">
+          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-400/20 text-xs font-bold text-blue-300 uppercase tracking-wider mb-3">
             <span>{t('why_badge')}</span>
           </div>
-          <h2 className="font-display font-bold text-3xl sm:text-4xl text-[#0B2545] tracking-tight">
+          <h2 className="font-display font-bold text-3xl sm:text-4xl text-white tracking-tight">
             {t('why_heading')}
           </h2>
-          <p className="mt-3 text-base sm:text-lg text-slate-600">
+          <p className="mt-3 text-base sm:text-lg text-slate-400">
             A fundamental paradigm shift — moving from confusing portal search to seamless journey guidance.
           </p>
         </div>
@@ -67,67 +67,67 @@ export const WhySwagat: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 max-w-5xl mx-auto">
           
           {/* Traditional Flow Card */}
-          <div className="bg-rose-50/40 rounded-3xl p-6 sm:p-7 border border-rose-200/80 flex flex-col justify-between">
+          <div className="bg-rose-500/8 backdrop-blur-xl rounded-3xl p-6 sm:p-7 border border-rose-400/20 flex flex-col justify-between">
             <div>
-              <div className="flex items-center space-x-2 text-rose-800 font-bold text-xs uppercase tracking-wider mb-4">
-                <XCircle className="w-4 h-4 text-rose-600" />
+              <div className="flex items-center space-x-2 text-rose-400 font-bold text-xs uppercase tracking-wider mb-4">
+                <XCircle className="w-4 h-4 text-rose-500" />
                 <span>Traditional Citizen Experience</span>
               </div>
 
-              <div className="space-y-3 font-medium text-xs sm:text-sm text-slate-700">
-                <div className="p-3 bg-white rounded-xl border border-rose-100 flex items-center space-x-2">
-                  <span className="w-5 h-5 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center text-[10px] font-bold">1</span>
+              <div className="space-y-3 font-medium text-xs sm:text-sm text-slate-300">
+                <div className="p-3 bg-white/5 backdrop-blur-md rounded-xl border border-rose-400/15 flex items-center space-x-2">
+                  <span className="w-5 h-5 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center text-[10px] font-bold shrink-0">1</span>
                   <span>Search on Google for vague keywords</span>
                 </div>
-                <div className="p-3 bg-white rounded-xl border border-rose-100 flex items-center space-x-2">
-                  <span className="w-5 h-5 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center text-[10px] font-bold">2</span>
+                <div className="p-3 bg-white/5 backdrop-blur-md rounded-xl border border-rose-400/15 flex items-center space-x-2">
+                  <span className="w-5 h-5 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center text-[10px] font-bold shrink-0">2</span>
                   <span>Navigate 4-5 different state &amp; central portals</span>
                 </div>
-                <div className="p-3 bg-white rounded-xl border border-rose-100 flex items-center space-x-2">
-                  <span className="w-5 h-5 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center text-[10px] font-bold">3</span>
+                <div className="p-3 bg-white/5 backdrop-blur-md rounded-xl border border-rose-400/15 flex items-center space-x-2">
+                  <span className="w-5 h-5 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center text-[10px] font-bold shrink-0">3</span>
                   <span>Struggle with legal definitions &amp; circulars</span>
                 </div>
-                <div className="p-3 bg-white rounded-xl border border-rose-100 flex items-center space-x-2">
-                  <span className="w-5 h-5 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center text-[10px] font-bold">4</span>
+                <div className="p-3 bg-white/5 backdrop-blur-md rounded-xl border border-rose-400/15 flex items-center space-x-2">
+                  <span className="w-5 h-5 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center text-[10px] font-bold shrink-0">4</span>
                   <span>Unaware of prerequisite documents until rejection</span>
                 </div>
               </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-rose-200 text-xs font-semibold text-rose-700">
+            <div className="mt-6 pt-4 border-t border-rose-400/20 text-xs font-semibold text-rose-400">
               Result: High friction, delays, and abandoned applications.
             </div>
           </div>
 
           {/* SWAGAT Flow Card */}
-          <div className="bg-gradient-to-b from-blue-50/70 to-emerald-50/50 rounded-3xl p-6 sm:p-7 border border-[#0B2545]/30 shadow-gov-md flex flex-col justify-between">
+          <div className="bg-gradient-to-b from-blue-500/10 to-emerald-500/8 backdrop-blur-xl rounded-3xl p-6 sm:p-7 border border-emerald-400/25 flex flex-col justify-between">
             <div>
-              <div className="flex items-center space-x-2 text-[#0B2545] font-bold text-xs uppercase tracking-wider mb-4">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <div className="flex items-center space-x-2 text-emerald-400 font-bold text-xs uppercase tracking-wider mb-4">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                 <span>SWAGAT Guided Journey</span>
               </div>
 
-              <div className="space-y-3 font-medium text-xs sm:text-sm text-slate-900">
-                <div className="p-3 bg-white rounded-xl border border-blue-200 flex items-center space-x-2 shadow-sm">
-                  <span className="w-5 h-5 rounded-full bg-[#0B2545] text-white flex items-center justify-center text-[10px] font-bold">1</span>
+              <div className="space-y-3 font-medium text-xs sm:text-sm text-slate-200">
+                <div className="p-3 bg-white/5 backdrop-blur-md rounded-xl border border-blue-400/20 flex items-center space-x-2">
+                  <span className="w-5 h-5 rounded-full bg-sky-500/30 text-sky-300 flex items-center justify-center text-[10px] font-bold shrink-0">1</span>
                   <span>Tell SWAGAT what you want to achieve</span>
                 </div>
-                <div className="p-3 bg-white rounded-xl border border-blue-200 flex items-center space-x-2 shadow-sm">
-                  <span className="w-5 h-5 rounded-full bg-[#0B2545] text-white flex items-center justify-center text-[10px] font-bold">2</span>
+                <div className="p-3 bg-white/5 backdrop-blur-md rounded-xl border border-blue-400/20 flex items-center space-x-2">
+                  <span className="w-5 h-5 rounded-full bg-sky-500/30 text-sky-300 flex items-center justify-center text-[10px] font-bold shrink-0">2</span>
                   <span>AI identifies all relevant services, schemes &amp; acts</span>
                 </div>
-                <div className="p-3 bg-white rounded-xl border border-blue-200 flex items-center space-x-2 shadow-sm">
-                  <span className="w-5 h-5 rounded-full bg-[#0B2545] text-white flex items-center justify-center text-[10px] font-bold">3</span>
+                <div className="p-3 bg-white/5 backdrop-blur-md rounded-xl border border-blue-400/20 flex items-center space-x-2">
+                  <span className="w-5 h-5 rounded-full bg-sky-500/30 text-sky-300 flex items-center justify-center text-[10px] font-bold shrink-0">3</span>
                   <span>Personalized roadmap with DigiLocker document sync</span>
                 </div>
-                <div className="p-3 bg-white rounded-xl border border-blue-200 flex items-center space-x-2 shadow-sm">
-                  <span className="w-5 h-5 rounded-full bg-[#E05A10] text-white flex items-center justify-center text-[10px] font-bold">4</span>
+                <div className="p-3 bg-white/5 backdrop-blur-md rounded-xl border border-blue-400/20 flex items-center space-x-2">
+                  <span className="w-5 h-5 rounded-full bg-amber-500/30 text-amber-300 flex items-center justify-center text-[10px] font-bold shrink-0">4</span>
                   <span>Clear Next Best Action directly into official portal</span>
                 </div>
               </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-emerald-200 text-xs font-bold text-emerald-800">
+            <div className="mt-6 pt-4 border-t border-emerald-400/20 text-xs font-bold text-emerald-400">
               Result: Clarity, confidence, and 100% official completion.
             </div>
           </div>
@@ -135,28 +135,30 @@ export const WhySwagat: React.FC = () => {
         </div>
 
         {/* Comparative Matrix Table */}
-        <div className="max-w-5xl mx-auto bg-[#F8FAFC] rounded-3xl p-6 sm:p-8 border border-slate-200 mb-12">
-          <h3 className="font-display font-bold text-lg text-[#0B2545] mb-4 text-center">
+        <div className="max-w-5xl mx-auto bg-white/4 backdrop-blur-xl rounded-3xl p-6 sm:p-8 border border-white/10 mb-12">
+          <h3 className="font-display font-bold text-lg text-white mb-4 text-center">
             Detailed Dimension Comparison
           </h3>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs sm:text-sm">
               <thead>
-                <tr className="border-b border-slate-200 text-slate-400 font-bold uppercase text-[11px]">
+                <tr className="border-b border-white/10 text-slate-400 font-bold uppercase text-[11px]">
                   <th className="pb-3">Dimension</th>
-                  <th className="pb-3 text-rose-700">Traditional Experience</th>
-                  <th className="pb-3 text-[#0B2545]">SWAGAT Experience</th>
+                  <th className="pb-3 text-rose-400">Traditional Experience</th>
+                  <th className="pb-3 text-emerald-400">SWAGAT Experience</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200/70">
+              <tbody className="divide-y divide-white/6">
                 {comparisonRows.map((row, idx) => (
-                  <tr key={idx} className="hover:bg-white/80 transition">
-                    <td className="py-3.5 font-bold text-slate-800 pr-3">{row.aspect}</td>
-                    <td className="py-3.5 text-slate-600 pr-3">{row.traditional}</td>
-                    <td className="py-3.5 text-emerald-800 font-semibold flex items-center space-x-1.5">
-                      <span className="text-emerald-600 font-bold">✓</span>
-                      <span>{row.swagat}</span>
+                  <tr key={idx} className="hover:bg-white/4 transition">
+                    <td className="py-3.5 font-bold text-slate-200 pr-3">{row.aspect}</td>
+                    <td className="py-3.5 text-slate-400 pr-3">{row.traditional}</td>
+                    <td className="py-3.5 text-emerald-400 font-semibold">
+                      <span className="flex items-center space-x-1.5">
+                        <span className="text-emerald-500 font-bold">✓</span>
+                        <span>{row.swagat}</span>
+                      </span>
                     </td>
                   </tr>
                 ))}
@@ -165,8 +167,8 @@ export const WhySwagat: React.FC = () => {
           </div>
         </div>
 
-        {/* Ecosystem Synergy Banner (Crucial Requirement!) */}
-        <div className="max-w-5xl mx-auto bg-[#07182C] text-white rounded-3xl p-6 sm:p-8 shadow-gov-xl border border-white/10">
+        {/* Ecosystem Synergy Banner */}
+        <div className="max-w-5xl mx-auto bg-white/5 backdrop-blur-2xl text-white rounded-3xl p-6 sm:p-8 border border-white/12">
           <div className="text-center max-w-2xl mx-auto mb-6">
             <span className="text-amber-400 text-xs font-bold uppercase tracking-wider">
               Complementary GovTech Ecosystem
@@ -174,16 +176,16 @@ export const WhySwagat: React.FC = () => {
             <h3 className="font-display font-extrabold text-xl sm:text-2xl text-white mt-1">
               {t('why_statement')}
             </h3>
-            <p className="text-xs text-slate-300 mt-2">
-              SWAGAT connects citizens seamlessly into India’s foundational digital public infrastructure.
+            <p className="text-xs text-slate-400 mt-2">
+              SWAGAT connects citizens seamlessly into India's foundational digital public infrastructure.
             </p>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {govPlatforms.map((p, i) => (
-              <div key={i} className="p-3 rounded-xl bg-white/5 border border-white/10 text-center">
+              <div key={i} className="p-3 rounded-xl bg-white/5 border border-white/10 text-center hover:bg-white/8 transition">
                 <div className="font-extrabold text-sm text-amber-300 mb-0.5">{p.name}</div>
-                <div className="text-[10px] text-slate-300 leading-tight">{p.role}</div>
+                <div className="text-[10px] text-slate-400 leading-tight">{p.role}</div>
               </div>
             ))}
           </div>

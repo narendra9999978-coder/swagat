@@ -16,6 +16,7 @@ import {
 import { useSwagat } from '../context/SwagatContext';
 import { indiaStatesData, allIndianStatesList, getStateDataByCode } from '../data/indiaStatesData';
 import { StateData, Approval } from '../types/swagat';
+import { GlassSelect, GlassSelectOption } from './ui/GlassSelect';
 
 export const StateApprovalsSection: React.FC = () => {
   const { 
@@ -29,6 +30,27 @@ export const StateApprovalsSection: React.FC = () => {
   
   const [selectedStateCode, setSelectedStateCode] = useState<string>('KA');
   const [selectedCategoryName, setSelectedCategoryName] = useState<string>('All');
+
+  const stateOptions: GlassSelectOption[] = React.useMemo(() => {
+    return [
+      ...allIndianStatesList
+        .filter((s) => s.type === 'State')
+        .map((st) => ({
+          value: st.code,
+          label: `${st.name} - ${st.zone} India`,
+          badge: `${st.approvalCount} Clearances`,
+          group: 'All 28 Indian States',
+        })),
+      ...allIndianStatesList
+        .filter((s) => s.type === 'UT')
+        .map((ut) => ({
+          value: ut.code,
+          label: ut.name,
+          badge: `${ut.approvalCount} Clearances`,
+          group: '8 Union Territories',
+        })),
+    ];
+  }, []);
   const [searchStateText, setSearchStateText] = useState<string>('');
 
   // Sync if selectedStateFilter changes
@@ -49,27 +71,27 @@ export const StateApprovalsSection: React.FC = () => {
   );
 
   return (
-    <section id="section-states" className="py-20 bg-white border-t border-slate-200">
+    <section id="section-states" className="py-20 bg-transparent border-t border-white/8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-emerald-100/80 border border-emerald-300 text-emerald-950 text-xs font-bold uppercase tracking-wider mb-3">
-            <MapPin className="w-4 h-4 text-emerald-700" />
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-sky-500/10 border border-sky-400/20 text-sky-300 text-xs font-bold uppercase tracking-wider mb-3 backdrop-blur-md">
+            <MapPin className="w-4 h-4 text-sky-400" />
             <span>State Single Window Clearance Systems</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-[#07182C] tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-white tracking-tight">
             Explore Approvals by State / UT
           </h2>
-          <p className="mt-3 text-slate-600 text-base">
+          <p className="mt-3 text-slate-300 text-base">
             Integrated with 28 State Single Window Systems &amp; Union Territory clearance portals for streamlined local licensing.
           </p>
         </div>
 
         {/* State Selection Bar */}
-        <div className="mb-10 bg-slate-50 rounded-2xl p-4 border border-slate-200 shadow-xs">
+        <div className="mb-10 bg-slate-900/60 backdrop-blur-2xl rounded-2xl p-4 sm:p-5 border border-white/10 shadow-xl relative z-20">
           <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-            <div className="text-xs font-bold uppercase tracking-wider text-slate-500">
+            <div className="text-xs font-bold uppercase tracking-wider text-amber-300">
               Select Industrial State / Region:
             </div>
             <div className="text-xs text-slate-400 font-medium">
@@ -80,29 +102,19 @@ export const StateApprovalsSection: React.FC = () => {
           {/* State Dropdown Selector for All 36 States/UTs */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-4">
             <div className="relative flex-1">
-              <select
+              <GlassSelect
+                id="state-section-selector"
                 value={selectedStateCode}
-                onChange={(e) => {
-                  setSelectedStateCode(e.target.value);
-                  setSelectedCategoryName('All');
+                onChange={(code) => {
+                  if (code) {
+                    setSelectedStateCode(code);
+                    setSelectedCategoryName('All');
+                  }
                 }}
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs font-bold bg-white text-[#07182C] focus:ring-2 focus:ring-[#07182C]"
-              >
-                <optgroup label="All 28 Indian States">
-                  {allIndianStatesList.filter(s => s.type === 'State').map((st) => (
-                    <option key={st.code} value={st.code}>
-                      {st.name} ({st.approvalCount} Clearances) - {st.zone} India
-                    </option>
-                  ))}
-                </optgroup>
-                <optgroup label="8 Union Territories">
-                  {allIndianStatesList.filter(s => s.type === 'UT').map((ut) => (
-                    <option key={ut.code} value={ut.code}>
-                      {ut.name} ({ut.approvalCount} Clearances)
-                    </option>
-                  ))}
-                </optgroup>
-              </select>
+                options={stateOptions}
+                placeholder="Select a State / Union Territory"
+                searchable={true}
+              />
             </div>
           </div>
 
@@ -120,8 +132,8 @@ export const StateApprovalsSection: React.FC = () => {
                   }}
                   className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 ${
                     selectedStateCode === st.code
-                      ? 'bg-[#07182C] text-amber-300 shadow-md ring-2 ring-[#07182C]'
-                      : 'bg-white text-slate-700 hover:bg-slate-200 border border-slate-200'
+                      ? 'bg-sky-500/20 text-sky-300 shadow-md ring-2 ring-sky-400/40 border border-sky-400/30'
+                      : 'bg-white/6 text-slate-300 hover:bg-white/12 border border-white/12'
                   }`}
                 >
                   <span>{st.name}</span>
@@ -214,17 +226,17 @@ export const StateApprovalsSection: React.FC = () => {
                   onClick={() => setSelectedCategoryName(isSelected ? 'All' : cat.name)}
                   className={`cursor-pointer p-4 rounded-2xl border transition-all ${
                     isSelected
-                      ? 'border-[#07182C] bg-blue-50/70 shadow-md ring-2 ring-[#07182C]'
-                      : 'border-slate-200 bg-slate-50 hover:bg-white hover:shadow-xs'
+                      ? 'border-sky-400/40 bg-sky-500/12 shadow-md ring-2 ring-sky-400/30'
+                      : 'border-white/10 bg-white/5 hover:bg-white/8 hover:border-white/20'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs font-bold text-[#07182C] truncate">{cat.name}</span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#07182C] text-white">
+                    <span className="text-xs font-bold text-slate-200 truncate">{cat.name}</span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-sky-500/20 text-sky-300 border border-sky-400/20">
                       {cat.count}
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                  <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
                     {cat.description}
                   </p>
                 </div>
@@ -236,10 +248,10 @@ export const StateApprovalsSection: React.FC = () => {
         {/* List of State Approvals */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h4 className="text-lg font-display font-bold text-[#07182C]">
+            <h4 className="text-lg font-display font-bold text-white">
               Clearances for {currentState.name}
             </h4>
-            <div className="text-xs font-medium text-slate-500">
+            <div className="text-xs font-medium text-slate-400">
               Showing statutory forms integrated into SWAGAT
             </div>
           </div>
@@ -248,7 +260,7 @@ export const StateApprovalsSection: React.FC = () => {
             {stateApprovalsList.map((app) => (
               <div
                 key={app.id}
-                className="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs hover:shadow-lg transition-all flex flex-col justify-between space-y-4"
+                className="bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 p-6 hover:border-white/20 transition-all flex flex-col justify-between space-y-4"
               >
                 <div className="space-y-2.5">
                   <div className="flex items-center justify-between">
@@ -272,15 +284,15 @@ export const StateApprovalsSection: React.FC = () => {
                     {app.description}
                   </p>
 
-                  <div className="pt-2 text-[11px] text-slate-500 font-medium">
-                    Fee: <strong className="text-slate-800">{app.statutoryFee}</strong>
+                  <div className="pt-2 text-[11px] text-slate-400 font-medium">
+                    Fee: <strong className="text-slate-200">{app.statutoryFee}</strong>
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                <div className="pt-3 border-t border-white/8 flex items-center justify-between">
                   <button
                     onClick={() => setSelectedApproval(app)}
-                    className="text-xs font-semibold text-slate-700 hover:text-slate-900"
+                    className="text-xs font-semibold text-slate-400 hover:text-slate-200 transition"
                   >
                     View Details
                   </button>
@@ -288,7 +300,7 @@ export const StateApprovalsSection: React.FC = () => {
                   <button
                     id={`state-apply-${app.id}`}
                     onClick={() => startApplication(app)}
-                    className="px-4 py-2 text-xs font-bold text-white bg-[#07182C] hover:bg-[#0B2545] rounded-xl shadow-xs transition"
+                    className="px-4 py-2 text-xs font-bold text-white bg-sky-500/20 hover:bg-sky-500/30 border border-sky-400/25 rounded-xl transition"
                   >
                     Apply Now →
                   </button>

@@ -69,7 +69,7 @@ export const ExploreIndiaSection: React.FC = () => {
   }, [selectedStateCode]);
 
   return (
-    <section id="section-explore-india" className="py-20 bg-white border-t border-slate-200 relative overflow-hidden">
+    <section id="section-explore-india" className="py-20 bg-transparent border-t border-white/8 relative overflow-hidden">
       
       {/* Background Accent Gradients */}
       <div className="absolute top-1/4 -left-20 w-80 h-80 bg-blue-50/80 rounded-full blur-3xl pointer-events-none" />
@@ -79,14 +79,14 @@ export const ExploreIndiaSection: React.FC = () => {
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-emerald-100/80 border border-emerald-300 text-emerald-950 text-xs font-bold uppercase tracking-wider mb-3">
-            <MapPin className="w-4 h-4 text-emerald-700" />
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-sky-500/10 border border-sky-400/20 text-sky-300 text-xs font-bold uppercase tracking-wider mb-3 backdrop-blur-md">
+            <MapPin className="w-4 h-4 text-sky-400" />
             <span>Pan-India Single Window Coverage</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-[#07182C] tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-white tracking-tight">
             Explore clearance coverage and approval status across India
           </h2>
-          <p className="mt-3 text-slate-600 text-base">
+          <p className="mt-3 text-slate-300 text-base">
             Click any State or Union Territory to view available statutory approvals, processing times, and state-specific incentive policies.
           </p>
         </div>
@@ -309,3 +309,4 @@ export const ExploreIndiaSection: React.FC = () => {
     </section>
   );
 };
+

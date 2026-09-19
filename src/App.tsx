@@ -28,6 +28,7 @@ import { SchemeDetailModal } from './components/SchemeDetailModal';
 import { GlobalSearchModal } from './components/GlobalSearchModal';
 import { QueryModal } from './components/QueryModal';
 import { DocumentPreviewModal } from './components/DocumentPreviewModal';
+import { AmbientBackground } from './components/AmbientBackground';
 import { CheckCircle2 } from 'lucide-react';
 
 const AppContent: React.FC = () => {
@@ -110,7 +111,9 @@ const AppContent: React.FC = () => {
   const isInDashboard = (currentView === 'dashboard' || currentView === 'admin-dashboard' || currentView === 'wizard') && userProfile !== null;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-[#07182C] flex flex-col font-sans selection:bg-amber-400/30 selection:text-[#07182C]">
+    <div className="min-h-screen bg-black text-slate-100 flex flex-col font-sans selection:bg-amber-400/30 selection:text-white relative">
+      {/* Reactbits Beams & Dot-Field Ambient Background */}
+      <AmbientBackground />
       
       {/* Splash */}
       {showSplash && (
@@ -154,12 +157,16 @@ const AppContent: React.FC = () => {
       <QueryModal />
       <DocumentPreviewModal />
 
-      {/* Toast Notification */}
+      {/* Watermelon Notification-3 Glass Toast */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-[100] animate-in fade-in slide-in-from-bottom-3 duration-300 max-w-md">
-          <div className="p-4 rounded-2xl bg-slate-900 text-white shadow-2xl border border-white/20 text-xs font-semibold flex items-center space-x-3">
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-            <span className="leading-snug">{toastMessage}</span>
+          <div className="relative overflow-hidden p-4 rounded-2xl bg-slate-950/85 text-white shadow-2xl border border-white/15 backdrop-blur-2xl text-xs font-semibold flex items-center space-x-3">
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            </div>
+            <span className="leading-snug pr-2 text-slate-200">{toastMessage}</span>
+            {/* Watermelon Toast Progress Line */}
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-sky-400 via-emerald-400 to-amber-400 animate-shimmer" />
           </div>
         </div>
       )}
