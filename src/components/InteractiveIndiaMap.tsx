@@ -216,9 +216,9 @@ export const InteractiveIndiaMap: React.FC<InteractiveIndiaMapProps> = ({
             </g>
 
             {/* Central Geometric Ashoka Chakra Ambient Watermark */}
-            <g opacity={0.12} transform="translate(420, 480)">
-              <circle r="90" stroke="#38BDF8" strokeWidth="2" fill="none" />
-              <circle r="25" stroke="#38BDF8" strokeWidth="1.5" fill="none" />
+            <g opacity={0.18} transform="translate(420, 480)">
+              <circle r="90" stroke="#000080" strokeWidth="2" fill="none" />
+              <circle r="25" stroke="#000080" strokeWidth="1.5" fill="none" />
               {[0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180, 195, 210, 225, 240, 255, 270, 285, 300, 315, 330, 345].map((deg) => (
                 <line
                   key={deg}
@@ -226,7 +226,7 @@ export const InteractiveIndiaMap: React.FC<InteractiveIndiaMapProps> = ({
                   y1="25"
                   x2="0"
                   y2="90"
-                  stroke="#38BDF8"
+                  stroke="#000080"
                   strokeWidth="1.5"
                   transform={`rotate(${deg})`}
                 />

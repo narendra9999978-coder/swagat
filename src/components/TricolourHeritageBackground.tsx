@@ -116,13 +116,13 @@ export const TricolourHeritageBackground: React.FC<TricolourHeritageBackgroundPr
             viewBox="0 0 200 200"
             className="w-full h-full animate-spin [animation-duration:180s]"
             fill="none"
-            stroke="#5BAFD6"
-            strokeOpacity={0.22}
+            stroke="#1E40AF"
+            strokeOpacity={0.35}
           >
             <circle cx="100" cy="100" r="92" strokeWidth="1.6" />
             <circle cx="100" cy="100" r="86" strokeWidth="0.75" strokeDasharray="3 3" />
             <circle cx="100" cy="100" r="22" strokeWidth="1.6" />
-            <circle cx="100" cy="100" r="5" fill="#5BAFD6" fillOpacity={0.22} />
+            <circle cx="100" cy="100" r="5" fill="#1E40AF" fillOpacity={0.35} />
             {[0,15,30,45,60,75,90,105,120,135,150,165,180,195,210,225,240,255,270,285,300,315,330,345].map((deg) => (
               <line
                 key={deg}
@@ -259,13 +259,13 @@ export const TricolourHeritageBackground: React.FC<TricolourHeritageBackgroundPr
       <div className="absolute -bottom-16 -right-16 sm:-bottom-24 sm:-right-24 w-[340px] h-[340px] sm:w-[460px] sm:h-[460px] pointer-events-none z-0">
         <svg
           viewBox="0 0 200 200"
-          className="w-full h-full animate-spin [animation-duration:180s] opacity-[0.055] text-[#000080]"
+          className="w-full h-full animate-spin [animation-duration:180s] opacity-[0.20] text-[#000080]"
           fill="none"
           stroke="currentColor"
         >
-          <circle cx="100" cy="100" r="92" strokeWidth="1.6" />
-          <circle cx="100" cy="100" r="86" strokeWidth="0.75" strokeDasharray="3 3" />
-          <circle cx="100" cy="100" r="22" strokeWidth="1.6" />
+          <circle cx="100" cy="100" r="92" strokeWidth="1.8" />
+          <circle cx="100" cy="100" r="86" strokeWidth="0.8" strokeDasharray="3 3" />
+          <circle cx="100" cy="100" r="22" strokeWidth="1.8" />
           <circle cx="100" cy="100" r="5" fill="currentColor" />
           {[0,15,30,45,60,75,90,105,120,135,150,165,180,195,210,225,240,255,270,285,300,315,330,345].map((deg) => (
             <line
