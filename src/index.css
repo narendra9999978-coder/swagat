@@ -2,22 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─────────────────────────────────────────────────────────────────────────
-   DARK FOUNDATION — Force dark base on every element
-   ───────────────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   SWAGAT — PREMIUM INDIAN DIGITAL INFRASTRUCTURE DESIGN SYSTEM
+   Tricolour: Saffron #FF9933 · White #FFFFFF · Green #138808 · Ashoka Blue #000080
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --text-primary: #102A43;
+  --text-secondary: #52657A;
+  --text-muted: #64748B;
+  --surface: #FFFFFF;
+  --surface-secondary: #F8FAFC;
+  --surface-card: #FFFFFF;
+  --border: #CBD5E1;
+  --border-subtle: #D8E2EE;
+  --accent-saffron: #FF9933;
+  --accent-green: #138808;
+  --accent-blue: #000080;
+}
+
+.dark, [data-theme="dark"] {
+  --text-primary: #F1F6FA;
+  --text-secondary: #C2D1DF;
+  --text-muted: #8FA6B8;
+  --surface: #071A2D;
+  --surface-secondary: #0B2238;
+  --surface-card: #0B2238;
+  --border: rgba(140, 175, 210, 0.18);
+  --border-subtle: rgba(120, 160, 195, 0.12);
+  --accent-saffron: #FFBE45;
+  --accent-green: #45D39A;
+  --accent-blue: #58B8E8;
+}
+
+/* ─── Foundation ─── */
 @layer base {
   html {
     scroll-behavior: smooth;
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
-    color-scheme: dark;
+    background-color: #FFFFFF;
   }
-
+  html.dark {
+    background-color: #071A2D;
+  }
   body {
-    background-color: #000000 !important;
-    color: #e2e8f0 !important;
+    background-color: transparent !important;
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    color: var(--text-primary);
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
@@ -25,344 +58,323 @@
   }
 }
 
-/* ─────────────────────────────────────────────────────────────────────────
-   NUCLEAR DARK OVERRIDE
-   All tailwind light-bg classes -> transparent dark equivalents
-   All light text classes        -> slate-200 / slate-300 / white
-   This fixes every section, card, modal without touching 50+ component files.
-   ───────────────────────────────────────────────────────────────────────── */
-
-/* Section / page-level light backgrounds */
 section { background-color: transparent !important; }
-.bg-white { background-color: rgba(5, 5, 8, 0.94) !important; }
-.bg-slate-50 { background-color: rgba(6, 6, 10, 0.92) !important; }
-.bg-slate-100 { background-color: rgba(10, 10, 15, 0.90) !important; }
-.bg-gray-50 { background-color: rgba(6, 6, 10, 0.92) !important; }
-.bg-gray-100 { background-color: rgba(10, 10, 15, 0.90) !important; }
-.bg-slate-200 { background-color: rgba(15, 15, 20, 0.85) !important; }
-.bg-gray-200 { background-color: rgba(15, 15, 20, 0.85) !important; }
 
-/* Subtle light tint backgrounds -> dark equivalents */
-.bg-blue-50, [class*="bg-blue-50"] { background-color: rgba(14, 165, 233, 0.08) !important; }
-.bg-amber-50, [class*="bg-amber-50"] { background-color: rgba(245, 158, 11, 0.08) !important; }
-.bg-sky-50, [class*="bg-sky-50"] { background-color: rgba(14, 165, 233, 0.08) !important; }
-.bg-emerald-50, [class*="bg-emerald-50"] { background-color: rgba(16, 185, 129, 0.08) !important; }
-.bg-indigo-50, [class*="bg-indigo-50"] { background-color: rgba(99, 102, 241, 0.08) !important; }
+/* ═══════════════════════════════════════════════════════════════════════════
+   DARK THEME OVERRIDES
+   ═══════════════════════════════════════════════════════════════════════════ */
+.dark { color-scheme: dark; }
 
-/* Inline hex overrides */
-[class*="bg-\[#F8FAFC\]"],
-[class*="bg-\[#f8fafc\]"] { background-color: rgba(7, 15, 30, 0.9) !important; }
+/* Card/surface backgrounds — premium navy, not black */
+.dark .bg-white { background-color: #0B2238 !important; }
+.dark .bg-slate-50 { background-color: #0D2740 !important; }
+.dark .bg-slate-100 { background-color: #102B46 !important; }
+.dark .bg-gray-50 { background-color: #0D2740 !important; }
+.dark .bg-gray-100 { background-color: #102B46 !important; }
+.dark .bg-slate-200 { background-color: #1A3B58 !important; }
 
-/* Border overrides */
-.border-slate-200,
-.border-slate-100,
-.border-gray-200,
-.border-gray-100,
-[class*="border-slate-200"],
-[class*="border-slate-300"] { border-color: rgba(255, 255, 255, 0.1) !important; }
+/* Border refinements */
+.dark .border-slate-200,
+.dark .border-slate-100,
+.dark .border-gray-200,
+.dark .border-gray-100 { border-color: rgba(140,175,210,0.18) !important; }
 
-/* Global Headings in dark mode */
-h1, h2, h3, h4, h5, h6 {
-  color: #f8fafc !important;
+/* Typography — warm off-white, never pure black */
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 { color: #F1F6FA !important; }
+.dark .text-gray-900, .dark .text-slate-900,
+.dark .text-gray-800, .dark .text-slate-800 { color: #EAF2F8 !important; }
+.dark .text-gray-700, .dark .text-slate-700 { color: #C2D1DF !important; }
+.dark .text-gray-600, .dark .text-slate-600 { color: #A8BFD0 !important; }
+.dark .text-gray-500, .dark .text-slate-500 { color: #8FA6B8 !important; }
+
+/* Dark input controls — navy, not black */
+.dark input[type="text"],
+.dark input[type="email"],
+.dark input[type="password"],
+.dark input[type="number"],
+.dark input[type="tel"],
+.dark input[type="search"],
+.dark textarea {
+  background-color: #102B46 !important;
+  color: #E5EEF6 !important;
+  border-color: #31516D !important;
+}
+.dark input::placeholder, .dark textarea::placeholder { color: #91A8BC !important; }
+.dark select option { background-color: #0B2238; color: #F1F6FA; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LIGHT THEME TYPOGRAPHY & SURFACES
+   ═══════════════════════════════════════════════════════════════════════════ */
+.light { color-scheme: light; }
+
+.light h1, .light h2, .light h3, .light h4, .light h5, .light h6 {
+  color: #102A43;
 }
 
-/* Hardcoded dark navy text classes -> high contrast light text */
-[class*="text-\[\#07182C\]"],
-[class*="text-\[\#07182c\]"],
-[class*="text-\[\#0B2545\]"],
-[class*="text-\[\#0b2545\]"],
-[class*="text-\[\#051329\]"],
-[class*="text-\[\#0a192f\]"] {
-  color: #f1f5f9 !important;
+/* Light form inputs */
+.light input[type="text"],
+.light input[type="email"],
+.light input[type="password"],
+.light input[type="number"],
+.light input[type="tel"],
+.light input[type="search"],
+.light textarea {
+  background-color: #ffffff !important;
+  color: #102A43 !important;
+  border-color: #cbd5e1 !important;
+}
+.light input::placeholder, .light textarea::placeholder { color: #64748b !important; }
+.light select option { background-color: #ffffff; color: #102A43; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TRICOLOUR ANIMATED CARD HOVER SYSTEM
+   Premium Indian tricolour border sweep on hover — saffron → white → green
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Keyframe: shimmer the gradient along the border */
+@keyframes tricolour-border-spin {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
-/* Dark text -> light text */
-.text-gray-900,
-.text-slate-900,
-.text-gray-800,
-.text-slate-800 { color: #f1f5f9 !important; }
-.text-gray-700,
-.text-slate-700 { color: #e2e8f0 !important; }
-.text-gray-600,
-.text-slate-600 { color: #cbd5e1 !important; }
-.text-gray-500,
-.text-slate-500 { color: #94a3b8 !important; }
-
-/* Hover light backgrounds - wildcard match handles all opacities like /60, /80 */
-.hover\:bg-white:hover,
-[class*="hover:bg-white"]:hover,
-[class*="hover:bg-slate-"]:hover,
-[class*="hover:bg-gray-"]:hover,
-[class*="hover:bg-blue-50"]:hover { 
-  background-color: rgba(255, 255, 255, 0.08) !important; 
+/* Base card — neutral at rest */
+.swagat-card {
+  position: relative;
+  border: 1px solid #D9E3EE;
+  background: #FFFFFF;
+  box-shadow: 0 4px 15px rgba(15, 35, 60, 0.05);
+  transition:
+    transform 0.28s ease,
+    box-shadow 0.28s ease,
+    border-color 0.28s ease;
+  overflow: hidden;
 }
 
-/* Emerald badges and pills - avoid solid mint green blocks */
-[class*="bg-emerald-100"],
-[class*="bg-emerald-50"] {
-  background-color: rgba(16, 185, 129, 0.12) !important;
-}
-[class*="text-emerald-950"],
-[class*="text-emerald-900"],
-[class*="text-emerald-800"],
-[class*="text-emerald-700"] {
-  color: #6ee7b7 !important;
-}
-[class*="border-emerald-300"],
-[class*="border-emerald-200"] {
-  border-color: rgba(16, 185, 129, 0.25) !important;
-}
-
-/* Dark navy buttons -> visible glossy interactive buttons */
-button[class*="bg-\[\#07182C\]"],
-button[class*="bg-\[\#0b2545\]"],
-button[class*="bg-\[\#0B2545\]"] {
-  background: linear-gradient(135deg, rgba(30, 58, 102, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  color: #ffffff !important;
-}
-button[class*="bg-\[\#07182C\]"]:hover,
-button[class*="bg-\[\#0b2545\]"]:hover,
-button[class*="bg-\[\#0B2545\]"]:hover {
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.9) 0%, rgba(29, 78, 216, 0.95) 100%) !important;
-  border-color: rgba(56, 189, 248, 0.4) !important;
+/* Pseudo-element that renders the animated tricolour gradient border */
+.swagat-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    #FF9933 0%,
+    #FFB347 20%,
+    #FFFFFF 40%,
+    #ffffff 50%,
+    #45C148 70%,
+    #138808 100%
+  );
+  background-size: 300% 300%;
+  opacity: 0;
+  z-index: 0;
+  transition: opacity 0.28s ease;
+  pointer-events: none;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────
-   CARDS — rounded cards with light bg
-   ───────────────────────────────────────────────────────────────────────── */
-.rounded-xl.bg-white,
-.rounded-2xl.bg-white,
-.rounded-3xl.bg-white,
-.rounded-lg.bg-white,
-.rounded-xl.bg-slate-50,
-.rounded-2xl.bg-slate-50,
-.rounded-xl.bg-gray-50,
-.rounded-2xl.bg-gray-50 {
-  background: rgba(12, 22, 44, 0.82) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+/* Inner content sits above the pseudo border */
+.swagat-card > * {
+  position: relative;
+  z-index: 1;
 }
 
-/* Badge colours — soft coloured chips */
-.bg-emerald-100 { background-color: rgba(16, 185, 129, 0.12) !important; }
-.bg-sky-100 { background-color: rgba(14, 165, 233, 0.12) !important; }
-.bg-blue-100 { background-color: rgba(59, 130, 246, 0.12) !important; }
-.bg-amber-100 { background-color: rgba(245, 158, 11, 0.12) !important; }
-.bg-purple-100 { background-color: rgba(168, 85, 247, 0.12) !important; }
-.bg-red-100 { background-color: rgba(239, 68, 68, 0.12) !important; }
-.bg-orange-100 { background-color: rgba(249, 115, 22, 0.12) !important; }
-.bg-indigo-100 { background-color: rgba(99, 102, 241, 0.12) !important; }
-.bg-green-100 { background-color: rgba(34, 197, 94, 0.12) !important; }
-
-.border-emerald-200 { border-color: rgba(16, 185, 129, 0.25) !important; }
-.border-sky-200 { border-color: rgba(14, 165, 233, 0.25) !important; }
-.border-amber-200 { border-color: rgba(245, 158, 11, 0.25) !important; }
-.border-blue-200 { border-color: rgba(59, 130, 246, 0.25) !important; }
-.border-purple-200 { border-color: rgba(168, 85, 247, 0.25) !important; }
-
-/* Badge text */
-.text-emerald-800 { color: #34d399 !important; }
-.text-sky-800 { color: #38bdf8 !important; }
-.text-amber-800 { color: #fbbf24 !important; }
-.text-blue-800 { color: #60a5fa !important; }
-.text-purple-800 { color: #c084fc !important; }
-.text-red-800 { color: #f87171 !important; }
-.text-green-800 { color: #4ade80 !important; }
-.text-emerald-950 { color: #d1fae5 !important; }
-
-/* ─────────────────────────────────────────────────────────────────────────
-   FORM INPUTS — full dark
-   ───────────────────────────────────────────────────────────────────────── */
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"],
-input[type="tel"],
-input[type="search"],
-select,
-textarea {
-  background-color: rgba(255, 255, 255, 0.05) !important;
-  color: #f1f5f9 !important;
-  border-color: rgba(255, 255, 255, 0.12) !important;
+/* Light mode hover: show tricolour border, lift card */
+.light .swagat-card:hover {
+  transform: translateY(-3px);
+  border-color: transparent;
+  box-shadow:
+    0 14px 32px rgba(15, 35, 60, 0.10),
+    -6px 0 20px -4px rgba(255, 153, 51, 0.28),
+     6px 0 20px -4px rgba(19, 136, 8, 0.22);
 }
 
-input::placeholder,
-textarea::placeholder { color: #475569 !important; }
-
-input:disabled,
-select:disabled,
-textarea:disabled {
-  background-color: rgba(255, 255, 255, 0.03) !important;
-  color: #64748b !important;
+.light .swagat-card:hover::before {
+  opacity: 1;
+  animation: tricolour-border-spin 3s ease infinite;
 }
 
-select option {
-  background-color: #0f172a;
-  color: #f1f5f9;
+/* White fill behind the pseudo border so card bg shows */
+.light .swagat-card::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: calc(inherit - 1px);
+  background: #FFFFFF;
+  z-index: 0;
+  pointer-events: none;
 }
 
-label { color: #94a3b8 !important; }
-
-/* ─────────────────────────────────────────────────────────────────────────
-   TABLES — dark
-   ───────────────────────────────────────────────────────────────────────── */
-table { background-color: transparent !important; }
-thead { background-color: rgba(255, 255, 255, 0.04) !important; }
-thead th { color: #94a3b8 !important; border-bottom-color: rgba(255, 255, 255, 0.07) !important; }
-tbody tr { border-bottom-color: rgba(255, 255, 255, 0.04) !important; }
-tbody tr:hover { background-color: rgba(255, 255, 255, 0.04) !important; }
-tbody td { color: #e2e8f0 !important; }
-.divide-slate-200 > :not([hidden]) ~ :not([hidden]),
-.divide-gray-200 > :not([hidden]) ~ :not([hidden]) { border-color: rgba(255, 255, 255, 0.06) !important; }
-
-/* ─────────────────────────────────────────────────────────────────────────
-   DARK GLASSMORPHISM MASTER TOKENS & UTILITIES
-   ───────────────────────────────────────────────────────────────────────── */
-.glass-panel {
-  background: rgba(11, 27, 47, 0.65);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+/* Dark mode — navy card base, NOT transparent/black */
+.dark .swagat-card {
+  background: #0B2238;
+  border-color: rgba(140, 175, 210, 0.18);
 }
 
-.glass-panel-subtle {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+/* Dark mode uses its own tricolour pseudo border (brighter for dark bg) */
+.dark .swagat-card::before {
+  display: block;
+  background: linear-gradient(
+    135deg,
+    #FF9933 0%,
+    #FFBE45 22%,
+    rgba(255,255,255,0.9) 42%,
+    rgba(255,255,255,0.9) 50%,
+    #45D39A 68%,
+    #138808 100%
+  );
+  background-size: 300% 300%;
 }
 
-.glass-panel-glow {
-  background: rgba(11, 27, 47, 0.75);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 0 35px -5px rgba(224, 90, 16, 0.15), 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+/* Dark mode inner fill — navy so card bg shows through */
+.dark .swagat-card::after {
+  display: block;
+  background: #0B2238;
 }
 
-.glass-card {
-  background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.dark .swagat-card:hover {
+  transform: translateY(-3px);
+  border-color: transparent;
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.45),
+    -6px 0 22px -4px rgba(255, 153, 51, 0.22),
+     6px 0 22px -4px rgba(69, 211, 154, 0.20);
 }
 
-.glass-card-dark {
-  background: rgba(7, 24, 44, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+.dark .swagat-card:hover::before {
+  opacity: 1;
+  animation: tricolour-border-spin 3.5s ease infinite;
 }
 
-.micro-border { border: 1px solid rgba(255, 255, 255, 0.08); }
-.micro-border-glow {
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.1);
+/* Text headings and paragraphs stay readable during hover — never let colour bleed onto text */
+.swagat-card:hover h1,
+.swagat-card:hover h2,
+.swagat-card:hover h3,
+.swagat-card:hover h4,
+.swagat-card:hover h5,
+.swagat-card:hover p {
+  color: inherit;
 }
 
-.apple-ease { transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1); }
-
-.gov-gradient-subtle {
-  background: linear-gradient(135deg, rgba(7, 24, 44, 0.8) 0%, rgba(15, 23, 42, 0.6) 50%, rgba(7, 24, 44, 0.9) 100%);
+/* Ensure buttons, badges, and elements with text-white ALWAYS remain white on card hover */
+.swagat-card .text-white,
+.swagat-card .text-white *,
+.swagat-card [class*="text-white"],
+.swagat-card [class*="text-white"] *,
+.swagat-card:hover .text-white,
+.swagat-card:hover .text-white *,
+.swagat-card:hover [class*="text-white"],
+.swagat-card:hover [class*="text-white"] *,
+.swagat-card button.bg-sky-500,
+.swagat-card button.bg-sky-500 *,
+.swagat-card:hover button.bg-sky-500,
+.swagat-card:hover button.bg-sky-500 *,
+.swagat-card button[class*="from-orange"],
+.swagat-card button[class*="from-orange"] *,
+.swagat-card button[class*="from-amber"],
+.swagat-card button[class*="from-amber"] *,
+.swagat-card:hover button[class*="from-orange"],
+.swagat-card:hover button[class*="from-orange"] *,
+.swagat-card:hover button[class*="from-amber"],
+.swagat-card:hover button[class*="from-amber"] * {
+  color: #FFFFFF !important;
+  fill: #FFFFFF !important;
 }
 
-.gov-hero-mesh {
-  background: radial-gradient(at 0% 0%, rgba(19, 64, 116, 0.25) 0px, transparent 50%),
-              radial-gradient(at 100% 0%, rgba(224, 90, 16, 0.18) 0px, transparent 50%),
-              radial-gradient(at 50% 100%, rgba(5, 122, 85, 0.15) 0px, transparent 50%);
+/* ═══════════════════════════════════════════════════════════════════════════
+   SECTOR CHITS / PILLS — SUBTLE TRICOLOUR BORDER HOVER
+   ═══════════════════════════════════════════════════════════════════════════ */
+.industry-chit {
+  position: relative;
+  background-color: #F1F5F9;
+  border: 1px solid #CBD5E1;
+  color: #334E68;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer;
+  user-select: none;
 }
 
-.gov-border-gradient { border-image: linear-gradient(to right, #E05A10, #0B2545, #057A55) 1; }
-
-/* ─────────────────────────────────────────────────────────────────────────
-   SWAGAT HEADER & NAVBAR — 3-COLUMN CSS GRID ARCHITECTURE
-   ───────────────────────────────────────────────────────────────────────── */
-.swagat-header {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
+.industry-chit:hover {
+  background-color: #FFF8F2 !important;
+  color: #102A43 !important;
+  font-weight: 700 !important;
+  border-color: #FF9933 !important;
+  box-shadow: 0 2px 10px -2px rgba(255, 153, 51, 0.30), 0 2px 10px -2px rgba(19, 136, 8, 0.18) !important;
+  transform: translateY(-1.5px) !important;
 }
 
-.swagat-header-grid {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: clamp(8px, 1.2vw, 16px);
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  height: 80px;
+.industry-chit-badge {
+  position: relative;
+  background-color: #F8FAFC;
+  border: 1px solid #CBD5E1;
+  color: #334E68;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer;
 }
 
-.swagat-brand {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-  white-space: nowrap;
+.industry-chit-badge:hover {
+  background-color: #FFF8F2 !important;
+  color: #102A43 !important;
+  font-weight: 700 !important;
+  border-color: #FF9933 !important;
+  box-shadow: 0 2px 8px -2px rgba(255, 153, 51, 0.25) !important;
+  transform: translateY(-1px) !important;
 }
 
-.swagat-primary-nav {
-  flex: 1 1 auto;
-  min-width: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: clamp(3px, 0.6vw, 8px);
-  white-space: nowrap;
+/* Dark mode chits */
+.dark .industry-chit {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #D9E7F5;
+}
+.dark .industry-chit:hover {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  color: #FFFFFF !important;
+  border-color: #38BDF8 !important;
 }
 
-.swagat-actions {
-  display: flex;
-  align-items: center;
-  gap: clamp(4px, 0.6vw, 8px);
-  flex-shrink: 0;
-  min-width: max-content;
+.dark .industry-chit-badge {
+  background-color: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #AFC4D8;
+}
+.dark .industry-chit-badge:hover {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  color: #FFFFFF !important;
+  border-color: #38BDF8 !important;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────
-   DARK SCROLLBAR
-   ───────────────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   BUTTON HOVER EFFECTS
+   ═══════════════════════════════════════════════════════════════════════════ */
+@keyframes btn-tricolour-glow {
+  0% { box-shadow: -4px 0 16px -4px rgba(255, 153, 51, 0.3), 4px 0 16px -4px rgba(19, 136, 8, 0.1); }
+  50% { box-shadow: -4px 0 16px -4px rgba(255, 153, 51, 0.1), 4px 0 16px -4px rgba(19, 136, 8, 0.3); }
+  100% { box-shadow: -4px 0 16px -4px rgba(255, 153, 51, 0.3), 4px 0 16px -4px rgba(19, 136, 8, 0.1); }
+}
+
+button[class*="from-amber-"]:hover,
+button[class*="bg-amber-"]:hover,
+.btn-tricolour:hover {
+  animation: btn-tricolour-glow 2s ease-in-out infinite;
+  transform: translateY(-2px);
+}
+
+button[class*="from-sky-"]:hover,
+button[class*="bg-sky-"]:hover,
+button[class*="from-blue-"]:hover {
+  box-shadow: 0 4px 18px -4px rgba(14, 165, 233, 0.3), 0 2px 12px -4px rgba(19, 136, 8, 0.15);
+  transform: translateY(-1px);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SCROLLBAR
+   ═══════════════════════════════════════════════════════════════════════════ */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #070f1e; }
-::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.22); }
+.dark ::-webkit-scrollbar-track { background: #07182C; }
+.dark ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 4px; }
+.dark ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.25); }
 
-/* ─────────────────────────────────────────────────────────────────────────
-   KEYFRAMES
-   ───────────────────────────────────────────────────────────────────────── */
-@keyframes voice-wave {
-  0%, 100% { height: 8px; }
-  50% { height: 28px; }
-}
-
-.voice-bar-1 { animation: voice-wave 0.8s ease-in-out infinite 0.1s; }
-.voice-bar-2 { animation: voice-wave 0.9s ease-in-out infinite 0.2s; }
-.voice-bar-3 { animation: voice-wave 0.7s ease-in-out infinite 0.3s; }
-.voice-bar-4 { animation: voice-wave 1.1s ease-in-out infinite 0.15s; }
-.voice-bar-5 { animation: voice-wave 0.85s ease-in-out infinite 0.25s; }
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-.animate-shimmer {
-  animation: shimmer 2.5s linear infinite;
-  background-size: 200% auto;
-}
-
-@keyframes pulse-subtle {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.7; }
-}
-
-.animate-pulse-subtle {
-  animation: pulse-subtle 9s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-
-
+.light ::-webkit-scrollbar-track { background: #F1F5F9; }
+.light ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+.light ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }

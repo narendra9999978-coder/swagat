@@ -1,133 +1,135 @@
 import React from 'react';
 
 interface SwagatLogoProps {
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   showWordmark?: boolean;
   showTagline?: boolean;
   theme?: 'dark' | 'light';
   animated?: boolean;
   className?: string;
+  useImage?: boolean;
 }
 
 export const SwagatLogo: React.FC<SwagatLogoProps> = ({
   size = 'md',
   showWordmark = true,
   showTagline = false,
-  theme = 'light',
+  theme = 'dark',
   animated = false,
-  className = ''
+  className = '',
+  useImage = false
 }) => {
+  // If useImage is true, display the generated master horizontal banner directly
+  if (useImage) {
+    const imgHeights = {
+      sm: 'h-9 sm:h-10',
+      md: 'h-12 sm:h-14',
+      lg: 'h-16 sm:h-20',
+      xl: 'h-24 sm:h-28'
+    };
+    return (
+      <img
+        src="/swagat_official_logo.jpg"
+        alt="SWAGAT – India’s Single Window Gateway"
+        className={`${imgHeights[size]} w-auto object-contain rounded-xl shadow-lg select-none ${className}`}
+      />
+    );
+  }
+
+  // Enhanced, noticeably bigger sizing scale with generous text and icon presence
   const sizeMap = {
-    sm: { box: 'w-8 h-8', icon: 'w-5 h-5', text: 'text-lg', sub: 'text-[9px]' },
-    md: { box: 'w-10 h-10', icon: 'w-6 h-6', text: 'text-xl', sub: 'text-[10px]' },
-    lg: { box: 'w-14 h-14', icon: 'w-8 h-8', text: 'text-2xl', sub: 'text-xs' },
-    xl: { box: 'w-24 h-24', icon: 'w-14 h-14', text: 'text-4xl', sub: 'text-sm' }
+    xs: {
+      icon: 'w-9 h-9 sm:w-10 sm:h-10',
+      text: 'text-lg sm:text-xl',
+      tagline: 'text-[9px]',
+      divider: 'h-6 sm:h-7',
+      gap: 'space-x-2.5'
+    },
+    sm: {
+      icon: 'w-11 h-11 sm:w-12 sm:h-12',
+      text: 'text-2xl sm:text-3xl',
+      tagline: 'text-[10.5px] sm:text-xs',
+      divider: 'h-8 sm:h-9',
+      gap: 'space-x-3'
+    },
+    md: {
+      icon: 'w-14 h-14 sm:w-16 sm:h-16',
+      text: 'text-3xl sm:text-4xl',
+      tagline: 'text-xs sm:text-sm',
+      divider: 'h-10 sm:h-12',
+      gap: 'space-x-3.5'
+    },
+    lg: {
+      icon: 'w-18 h-18 sm:w-20 sm:h-20',
+      text: 'text-4xl sm:text-5xl',
+      tagline: 'text-sm sm:text-base',
+      divider: 'h-14 sm:h-16',
+      gap: 'space-x-4'
+    },
+    xl: {
+      icon: 'w-24 h-24 sm:w-28 sm:h-28',
+      text: 'text-5xl sm:text-6xl',
+      tagline: 'text-base sm:text-lg',
+      divider: 'h-18 sm:h-22',
+      gap: 'space-x-5'
+    }
   };
 
   const s = sizeMap[size];
 
   return (
-    <div className={`flex items-center space-x-2.5 sm:space-x-3 select-none shrink-0 ${className}`}>
-      {/* Emblem */}
-      <div className={`relative flex items-center justify-center ${s.box} rounded-2xl bg-gradient-to-br from-[#06152B] via-[#0D284E] to-[#06152B] text-white shadow-md border border-white/15 overflow-hidden group shrink-0`}>
-        {/* Glow behind */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,153,51,0.25),transparent_60%)]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,rgba(19,136,8,0.25),transparent_60%)]"></div>
+    <div className={`inline-flex items-center ${s.gap} select-none shrink-0 ${className}`}>
+      {/* LEFT EMBLEM: Free-standing circular tricolour emblem (Zero square artifacts) */}
+      <div className="relative flex items-center justify-center shrink-0 group">
+        {/* Soft, circular ambient tricolour glow behind emblem */}
+        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#FF9933]/25 via-sky-400/10 to-[#138808]/25 blur-md pointer-events-none scale-110"></div>
 
-        {/* SVG Emblem: Circular S with Ashoka Chakra and Tricolour accents */}
-        <svg
-          viewBox="0 0 100 100"
-          className={`${s.icon} z-10 transition-transform duration-500 group-hover:scale-105`}
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <defs>
-            <linearGradient id="swagatSaffron" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#FF9933" />
-              <stop offset="100%" stopColor="#FF6600" />
-            </linearGradient>
-            <linearGradient id="swagatGreen" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#19A745" />
-              <stop offset="100%" stopColor="#138808" />
-            </linearGradient>
-            <linearGradient id="swagatChakra" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#38BDF8" />
-              <stop offset="100%" stopColor="#0284C7" />
-            </linearGradient>
-          </defs>
-
-          {/* Outer S Ribbon Top Arc (Saffron) */}
-          <path
-            d="M 68 18 C 52 14, 26 22, 26 40 C 26 54, 52 50, 52 64 C 52 74, 38 78, 28 72"
-            stroke="url(#swagatSaffron)"
-            strokeWidth="8.5"
-            strokeLinecap="round"
-            fill="none"
-          />
-
-          {/* Outer S Ribbon Bottom Arc (India Green) */}
-          <path
-            d="M 32 82 C 48 86, 74 78, 74 60 C 74 46, 48 50, 48 36 C 48 26, 62 22, 72 28"
-            stroke="url(#swagatGreen)"
-            strokeWidth="8.5"
-            strokeLinecap="round"
-            fill="none"
-          />
-
-          {/* Center Ashoka Chakra Hub */}
-          <circle cx="50" cy="50" r="13" stroke="url(#swagatChakra)" strokeWidth="2.5" fill="#06152B" />
-          <circle cx="50" cy="50" r="4" fill="#38BDF8" />
-
-          {/* Ashoka Chakra Spokes (24 geometric rays stylized) */}
-          <g className={animated ? 'animate-spin origin-center [animation-duration:20s]' : ''}>
-            {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg) => (
-              <line
-                key={deg}
-                x1="50"
-                y1="40"
-                x2="50"
-                y2="43"
-                stroke="#38BDF8"
-                strokeWidth="1.5"
-                transform={`rotate(${deg} 50 50)`}
-              />
-            ))}
-          </g>
-
-          {/* High-tech node dots */}
-          <circle cx="70" cy="18" r="3.5" fill="#FF9933" />
-          <circle cx="30" cy="82" r="3.5" fill="#19A745" />
-        </svg>
-
-        {/* Dynamic corner light reflection */}
-        <div className="absolute top-0 right-0 w-4 h-4 bg-white/10 rounded-bl-full pointer-events-none"></div>
+        {/* Clean, tight-cropped, anti-aliased Emblem (100% transparent background) */}
+        <img
+          src="/swagat-emblem-clean.png"
+          alt="SWAGAT Emblem"
+          className={`${s.icon} object-contain select-none z-10 transition-transform duration-300 group-hover:scale-105 drop-shadow-[0_4px_16px_rgba(0,0,0,0.45)] ${
+            animated ? 'animate-[pulse_3s_infinite]' : ''
+          }`}
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).src = '/swagat-emblem-transparent.png';
+          }}
+        />
       </div>
 
-      {/* Wordmark */}
+      {/* SLEEK VERTICAL DIVIDER LINE */}
       {showWordmark && (
-        <div className="flex flex-col leading-tight min-w-0 shrink-0">
-          <span
-            className={`font-display font-extrabold tracking-tight shrink-0 ${s.text} ${
-              theme === 'dark' ? 'text-white' : 'text-[#07182C]'
-            }`}
-          >
-            SWAGAT
-          </span>
+        <div className={`${s.divider} w-[1.5px] bg-gradient-to-b from-transparent via-sky-400/40 to-transparent shrink-0 mx-0.5`} />
+      )}
 
-          {showTagline ? (
-            <span
-              className={`font-semibold tracking-widest uppercase ${s.sub} ${
-                theme === 'dark' ? 'text-slate-300' : 'text-slate-500'
-              }`}
-            >
-              INNOVATE | BUILD | SERVE
+      {/* RIGHT WORDMARK */}
+      {showWordmark && (
+        <div className="flex flex-col leading-none min-w-0 shrink-0">
+          <div className="flex items-center tracking-wider font-black font-display">
+            <span className={`${s.text} ${theme === 'dark' ? 'text-white' : 'text-[#061525]'}`}>
+              SWA
             </span>
-          ) : (
+            {/* The letter 'G' with Indian tricolour gradient */}
             <span
-              className={`text-[10px] font-medium leading-none block whitespace-nowrap hidden min-[601px]:block ${
-                theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
+              className={`${s.text} ${
+                theme === 'dark'
+                  ? 'bg-gradient-to-b from-[#FF9933] via-white to-[#138808]'
+                  : 'bg-gradient-to-b from-[#E05A10] via-[#061525] to-[#138808]'
+              } bg-clip-text text-transparent font-black drop-shadow-[0_1px_1px_rgba(0,0,0,0.12)]`}
+            >
+              G
+            </span>
+            <span className={`${s.text} ${theme === 'dark' ? 'text-white' : 'text-[#061525]'}`}>
+              AT
+            </span>
+          </div>
+
+          {/* OFFICIAL TAGLINE */}
+          {showTagline && (
+            <span
+              className={`font-semibold tracking-wide mt-1.5 whitespace-nowrap ${s.tagline} ${
+                theme === 'dark' ? 'text-slate-300' : 'text-slate-600'
               }`}
-              title="India’s Single Window Gateway"
             >
               India’s Single Window Gateway
             </span>

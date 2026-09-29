@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useJourney } from '../context/JourneyContext';
+import { useSwagat } from '../context/SwagatContext';
 import { 
   MessageSquareQuote, 
   BrainCircuit, 
@@ -15,6 +16,8 @@ import {
 export const HowItWorks: React.FC = () => {
   const { t } = useLanguage();
   const { openAskModal } = useJourney();
+  const { theme } = useSwagat();
+  const isDark = theme === 'dark';
   const [activeStep, setActiveStep] = useState(0);
 
   const steps = [
@@ -22,7 +25,7 @@ export const HowItWorks: React.FC = () => {
       number: '01',
       title: t('how_step1_title'),
       desc: t('how_step1_desc'),
-      example: '“I want to start a small bakery in Pune, Maharashtra.”',
+      example: '"I want to start a small bakery in Pune, Maharashtra."',
       icon: MessageSquareQuote,
       color: 'bg-blue-600',
       badge: 'Input Phase',
@@ -32,7 +35,7 @@ export const HowItWorks: React.FC = () => {
       number: '02',
       title: t('how_step2_title'),
       desc: t('how_step2_desc'),
-      example: 'SWAGAT clarifies: “Will your annual turnover exceed ₹12 Lakhs? Do you plan to employ more than 10 workers?”',
+      example: 'SWAGAT clarifies: "Will your annual turnover exceed ₹12 Lakhs? Do you plan to employ more than 10 workers?"',
       icon: BrainCircuit,
       color: 'bg-amber-600',
       badge: 'Intent Extraction',
@@ -62,7 +65,7 @@ export const HowItWorks: React.FC = () => {
       number: '05',
       title: t('how_step5_title'),
       desc: t('how_step5_desc'),
-      example: 'Next Best Action: “Upload premises rent agreement to generate pre-filled FSSAI submission on FoSCoS portal.”',
+      example: 'Next Best Action: "Upload premises rent agreement to generate pre-filled FSSAI submission on FoSCoS portal."',
       icon: Sparkles,
       color: 'bg-[#E05A10]',
       badge: 'Guaranteed Action',
@@ -71,18 +74,30 @@ export const HowItWorks: React.FC = () => {
   ];
 
   return (
-    <section id="how-it-works" className="py-16 sm:py-24 bg-white border-b border-slate-200/80">
+    <section id="how-it-works" className={`py-16 sm:py-24 border-b transition-colors ${
+      isDark
+        ? 'bg-transparent border-white/8'
+        : 'bg-white border-slate-200/80'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-bold text-[#0B2545] uppercase tracking-wider mb-3">
+          <div className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full border text-xs font-bold uppercase tracking-wider mb-3 ${
+            isDark
+              ? 'bg-blue-500/10 border-blue-400/20 text-blue-300'
+              : 'bg-blue-50 border-blue-200 text-[#0B2545]'
+          }`}>
             <span>{t('how_badge')}</span>
           </div>
-          <h2 className="font-display font-bold text-3xl sm:text-4xl text-[#0B2545] tracking-tight">
+          <h2 className={`font-display font-bold text-3xl sm:text-4xl tracking-tight ${
+            isDark ? 'text-white' : 'text-[#0B2545]'
+          }`}>
             {t('how_heading')}
           </h2>
-          <p className="mt-3 text-base sm:text-lg text-slate-600">
+          <p className={`mt-3 text-base sm:text-lg ${
+            isDark ? 'text-slate-400' : 'text-slate-600'
+          }`}>
             {t('how_subheading')}
           </p>
         </div>
@@ -99,13 +114,19 @@ export const HowItWorks: React.FC = () => {
                 onClick={() => setActiveStep(idx)}
                 className={`cursor-pointer rounded-2xl p-5 border transition-all duration-300 flex flex-col justify-between relative ${
                   isSelected
-                    ? 'bg-gradient-to-b from-blue-50/80 to-white border-[#0B2545] shadow-gov-lg ring-2 ring-[#0B2545]/15 scale-[1.02]'
-                    : 'bg-slate-50/60 border-slate-200/80 hover:bg-slate-50 hover:border-slate-300'
+                    ? isDark
+                      ? 'bg-gradient-to-b from-blue-500/15 to-slate-900/80 border-sky-400/50 shadow-lg ring-2 ring-sky-400/20 scale-[1.02]'
+                      : 'bg-gradient-to-b from-blue-50/80 to-white border-[#0B2545] shadow-gov-lg ring-2 ring-[#0B2545]/15 scale-[1.02]'
+                    : isDark
+                      ? 'bg-white/[0.04] border-white/10 hover:bg-white/[0.08] hover:border-white/20'
+                      : 'bg-slate-50/60 border-slate-200/80 hover:bg-slate-50 hover:border-slate-300'
                 }`}
               >
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <span className="font-display font-black text-2xl text-slate-300 group-hover:text-slate-400">
+                    <span className={`font-display font-black text-2xl ${
+                      isDark ? 'text-slate-500' : 'text-slate-300'
+                    }`}>
                       {step.number}
                     </span>
                     <div className={`w-9 h-9 rounded-xl ${step.color} text-white flex items-center justify-center shadow-sm`}>
@@ -113,20 +134,30 @@ export const HowItWorks: React.FC = () => {
                     </div>
                   </div>
 
-                  <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200 mb-2">
+                  <span className={`inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border mb-2 ${
+                    isDark
+                      ? 'text-slate-400 bg-white/5 border-white/10'
+                      : 'text-slate-500 bg-white border-slate-200'
+                  }`}>
                     {step.badge}
                   </span>
 
-                  <h3 className="font-bold text-base text-[#0B2545] mb-2 leading-snug">
+                  <h3 className={`font-bold text-base mb-2 leading-snug ${
+                    isDark ? 'text-white' : 'text-[#0B2545]'
+                  }`}>
                     {step.title}
                   </h3>
 
-                  <p className="text-xs text-slate-600 leading-relaxed mb-4">
+                  <p className={`text-xs leading-relaxed mb-4 ${
+                    isDark ? 'text-slate-400' : 'text-slate-600'
+                  }`}>
                     {step.desc}
                   </p>
                 </div>
 
-                <div className="pt-3 border-t border-slate-200/60 text-[11px] text-[#057A55] font-semibold flex items-center space-x-1">
+                <div className={`pt-3 border-t text-[11px] font-semibold flex items-center space-x-1 ${
+                  isDark ? 'border-white/10 text-emerald-400' : 'border-slate-200/60 text-[#057A55]'
+                }`}>
                   <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                   <span>{step.citizenBenefit}</span>
                 </div>
@@ -136,7 +167,11 @@ export const HowItWorks: React.FC = () => {
         </div>
 
         {/* Interactive Step Preview Panel */}
-        <div className="bg-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-gov-xl border border-slate-800 relative overflow-hidden">
+        <div className={`rounded-3xl p-6 sm:p-8 shadow-gov-xl border relative overflow-hidden ${
+          isDark
+            ? 'bg-slate-900 text-white border-slate-800'
+            : 'bg-[#0B2545] text-white border-[#0B2545]'
+        }`}>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-3 max-w-2xl">
               <div className="flex items-center space-x-2">

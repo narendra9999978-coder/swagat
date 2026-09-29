@@ -25,8 +25,10 @@ export const StateApprovalsSection: React.FC = () => {
     startApplication, 
     showToast,
     selectedStateFilter,
-    setSelectedStateFilter 
+    setSelectedStateFilter,
+    theme
   } = useSwagat();
+  const isDark = theme === 'dark';
   
   const [selectedStateCode, setSelectedStateCode] = useState<string>('KA');
   const [selectedCategoryName, setSelectedCategoryName] = useState<string>('All');
@@ -51,7 +53,6 @@ export const StateApprovalsSection: React.FC = () => {
         })),
     ];
   }, []);
-  const [searchStateText, setSearchStateText] = useState<string>('');
 
   // Sync if selectedStateFilter changes
   React.useEffect(() => {
@@ -71,30 +72,44 @@ export const StateApprovalsSection: React.FC = () => {
   );
 
   return (
-    <section id="section-states" className="py-20 bg-transparent border-t border-white/8">
+    <section id="section-states" className={`py-20 bg-transparent border-t ${isDark ? 'border-white/10' : 'border-slate-200'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-sky-500/10 border border-sky-400/20 text-sky-300 text-xs font-bold uppercase tracking-wider mb-3 backdrop-blur-md">
-            <MapPin className="w-4 h-4 text-sky-400" />
+          <div className={`inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-3 backdrop-blur-md border ${
+            isDark ? 'bg-sky-500/10 border-sky-400/20 text-sky-300' : 'bg-sky-100 border-sky-300 text-sky-700'
+          }`}>
+            <MapPin className={`w-4 h-4 ${isDark ? 'text-sky-400' : 'text-sky-600'}`} />
             <span>State Single Window Clearance Systems</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-white tracking-tight">
+          <h2 className={`text-3xl sm:text-4xl font-display font-extrabold tracking-tight ${
+            isDark ? 'text-white' : 'text-[#102A43]'
+          }`}>
             Explore Approvals by State / UT
           </h2>
-          <p className="mt-3 text-slate-300 text-base">
+          <p className={`mt-3 text-base ${
+            isDark ? 'text-[#AFC4D8]' : 'text-[#52657A]'
+          }`}>
             Integrated with 28 State Single Window Systems &amp; Union Territory clearance portals for streamlined local licensing.
           </p>
         </div>
 
         {/* State Selection Bar */}
-        <div className="mb-10 bg-slate-900/60 backdrop-blur-2xl rounded-2xl p-4 sm:p-5 border border-white/10 shadow-xl relative z-20">
+        <div className={`mb-10 rounded-2xl p-4 sm:p-5 border shadow-xl relative z-20 backdrop-blur-2xl transition-colors ${
+          isDark 
+            ? 'bg-[#07182C] border-white/15 shadow-black/40' 
+            : 'bg-white border-[#D8E2EE] shadow-[0_10px_30px_rgba(0,0,0,0.05)]'
+        }`}>
           <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-            <div className="text-xs font-bold uppercase tracking-wider text-amber-300">
+            <div className={`text-xs font-bold uppercase tracking-wider ${
+              isDark ? 'text-amber-300' : 'text-[#0B2545]'
+            }`}>
               Select Industrial State / Region:
             </div>
-            <div className="text-xs text-slate-400 font-medium">
+            <div className={`text-xs font-medium ${
+              isDark ? 'text-[#AFC4D8]' : 'text-[#64748B]'
+            }`}>
               Click any state below to view its localized statutory clearances
             </div>
           </div>
@@ -123,6 +138,7 @@ export const StateApprovalsSection: React.FC = () => {
             {['KA', 'MH', 'GJ', 'TN', 'TS', 'UP', 'RJ', 'HR', 'DL', 'KL'].map((code) => {
               const st = allIndianStatesList.find(s => s.code === code);
               if (!st) return null;
+              const isSelected = selectedStateCode === st.code;
               return (
                 <button
                   key={st.code}
@@ -130,55 +146,99 @@ export const StateApprovalsSection: React.FC = () => {
                     setSelectedStateCode(st.code);
                     setSelectedCategoryName('All');
                   }}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 ${
-                    selectedStateCode === st.code
-                      ? 'bg-sky-500/20 text-sky-300 shadow-md ring-2 ring-sky-400/40 border border-sky-400/30'
-                      : 'bg-white/6 text-slate-300 hover:bg-white/12 border border-white/12'
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 cursor-pointer ${
+                    isSelected
+                      ? isDark
+                        ? 'bg-sky-500/25 text-white shadow-md ring-2 ring-sky-400/40 border border-sky-400/50'
+                        : 'bg-[#EEF7FA] text-[#102A43] shadow-xs ring-2 ring-sky-500/30 border border-[#0284C7]'
+                      : isDark
+                        ? 'bg-white/10 text-[#D9E7F5] hover:bg-white/15 border border-white/10'
+                        : 'bg-[#F8FAFC] text-[#334E68] hover:bg-slate-100 border border-[#CBD5E1]'
                   }`}
                 >
                   <span>{st.name}</span>
-                  <span className="text-[10px] opacity-70 px-1 py-0.2 rounded bg-black/10">{st.code}</span>
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
+                    isSelected
+                      ? isDark ? 'bg-sky-900/60 text-sky-200' : 'bg-sky-100 text-[#0369A1]'
+                      : isDark ? 'bg-black/30 text-[#AFC4D8]' : 'bg-[#E8EEF5] text-[#52657A]'
+                  }`}>{st.code}</span>
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* State Profile Banner */}
-        <div className="bg-gradient-to-br from-[#07182C] via-[#0D2F57] to-[#07182C] rounded-3xl p-6 sm:p-8 text-white shadow-xl mb-10 border border-white/10">
+        {/* State Profile Banner — Clean Light Card in Light Theme (Option A) */}
+        <div className={`rounded-3xl p-6 sm:p-8 shadow-xl mb-10 border transition-all ${
+          isDark 
+            ? 'bg-[#12365F] border-white/15 text-white shadow-black/40' 
+            : 'bg-white border-[#D8E2EE] text-[#102A43] shadow-[0_12px_36px_rgba(0,0,0,0.06)]'
+        }`}>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
             <div className="lg:col-span-8 space-y-4">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                  isDark
+                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                    : 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                }`}>
                   {currentState.integrationStatus}
                 </span>
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                  isDark
+                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+                    : 'bg-amber-50 text-amber-800 border-amber-300'
+                }`}>
                   Ease of Doing Business Rank #{currentState.easeOfDoingBusinessRank}
                 </span>
               </div>
 
-              <h3 className="text-3xl font-display font-extrabold text-white">
+              <h3 className={`text-3xl font-display font-extrabold ${
+                isDark ? 'text-white' : 'text-[#102A43]'
+              }`}>
                 {currentState.name} Approvals &amp; Clearances
               </h3>
 
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl">
+              <p className={`text-xs sm:text-sm leading-relaxed max-w-2xl ${
+                isDark ? 'text-[#D9E7F5]' : 'text-[#52657A]'
+              }`}>
                 {currentState.description}
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
-                <div className="bg-white/10 rounded-xl p-3 border border-white/10">
-                  <div className="text-[10px] uppercase text-slate-400 font-semibold">Nodal Agency</div>
-                  <div className="font-bold text-white truncate">{currentState.nodalAgency}</div>
+                <div className={`rounded-xl p-3.5 border ${
+                  isDark ? 'bg-white/10 border-white/10' : 'bg-[#F8FAFC] border-[#D8E2EE]'
+                }`}>
+                  <div className={`text-[10px] uppercase font-semibold ${
+                    isDark ? 'text-[#AFC4D8]' : 'text-[#64748B]'
+                  }`}>Nodal Agency</div>
+                  <div className={`font-bold truncate mt-0.5 ${
+                    isDark ? 'text-white' : 'text-[#102A43]'
+                  }`}>{currentState.nodalAgency}</div>
                 </div>
-                <div className="bg-white/10 rounded-xl p-3 border border-white/10">
-                  <div className="text-[10px] uppercase text-slate-400 font-semibold">Average SLA Turnaround</div>
-                  <div className="font-bold text-emerald-300">{currentState.clearanceDaysAvg} Business Days</div>
+
+                <div className={`rounded-xl p-3.5 border ${
+                  isDark ? 'bg-white/10 border-white/10' : 'bg-[#F8FAFC] border-[#D8E2EE]'
+                }`}>
+                  <div className={`text-[10px] uppercase font-semibold ${
+                    isDark ? 'text-[#AFC4D8]' : 'text-[#64748B]'
+                  }`}>Average SLA Turnaround</div>
+                  <div className={`font-bold mt-0.5 ${
+                    isDark ? 'text-emerald-300' : 'text-emerald-700'
+                  }`}>{currentState.clearanceDaysAvg} Business Days</div>
                 </div>
-                <div className="bg-white/10 rounded-xl p-3 border border-white/10">
-                  <div className="text-[10px] uppercase text-slate-400 font-semibold">State Support Helpline</div>
-                  <div className="font-bold text-amber-300 flex items-center space-x-1">
-                    <PhoneCall className="w-3 h-3" />
+
+                <div className={`rounded-xl p-3.5 border ${
+                  isDark ? 'bg-white/10 border-white/10' : 'bg-[#F8FAFC] border-[#D8E2EE]'
+                }`}>
+                  <div className={`text-[10px] uppercase font-semibold ${
+                    isDark ? 'text-[#AFC4D8]' : 'text-[#64748B]'
+                  }`}>State Support Helpline</div>
+                  <div className={`font-bold flex items-center space-x-1 mt-0.5 ${
+                    isDark ? 'text-amber-300' : 'text-amber-700'
+                  }`}>
+                    <PhoneCall className="w-3.5 h-3.5" />
                     <span>{currentState.helpline}</span>
                   </div>
                 </div>
@@ -186,21 +246,31 @@ export const StateApprovalsSection: React.FC = () => {
             </div>
 
             {/* Top Industries in State */}
-            <div className="lg:col-span-4 bg-white/10 rounded-2xl p-5 border border-white/15 space-y-3">
-              <div className="text-xs font-bold uppercase tracking-wider text-amber-300">
-                Key Industrial Hubs &amp; Sectors
+            <div className={`lg:col-span-4 rounded-2xl p-5 border space-y-3 ${
+              isDark ? 'bg-white/10 border-white/15' : 'bg-[#F8FAFC] border-[#D8E2EE]'
+            }`}>
+              <div className={`text-xs font-bold uppercase tracking-wider flex items-center justify-between ${
+                isDark ? 'text-amber-300' : 'text-[#102A43]'
+              }`}>
+                <span>Key Industrial Hubs &amp; Sectors</span>
               </div>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-2">
                 {currentState.topIndustries.map((ind, i) => (
-                  <span key={i} className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-white/15 text-slate-200">
+                  <span 
+                    key={i} 
+                    className="industry-chit px-3 py-1.5 rounded-xl text-xs font-semibold"
+                    title={`${ind} in ${currentState.name}`}
+                  >
                     {ind}
                   </span>
                 ))}
               </div>
 
-              <div className="pt-2 border-t border-white/10">
-                <div className="text-[11px] text-slate-300">
-                  Single Window Portal: <strong className="text-white">{currentState.portalName}</strong>
+              <div className={`pt-2 border-t ${
+                isDark ? 'border-white/10 text-[#D9E7F5]' : 'border-[#D8E2EE] text-[#52657A]'
+              }`}>
+                <div className="text-[11px]">
+                  Single Window Portal: <strong className={isDark ? 'text-white' : 'text-[#102A43]'}>{currentState.portalName}</strong>
                 </div>
               </div>
             </div>
@@ -208,13 +278,17 @@ export const StateApprovalsSection: React.FC = () => {
           </div>
         </div>
 
-        {/* State Approval Categories Grid (Requested: Business Registration, Factory & Labour, Pollution, Fire, Land, Electricity, Construction, Trade, etc.) */}
+        {/* State Approval Categories Grid */}
         <div className="mb-10">
           <div className="flex items-center justify-between mb-4">
-            <h4 className="text-lg font-display font-bold text-[#07182C]">
+            <h4 className={`text-lg font-display font-bold ${
+              isDark ? 'text-white' : 'text-[#102A43]'
+            }`}>
               Statutory Categories in {currentState.name}
             </h4>
-            <span className="text-xs text-slate-500">{currentState.categories.length} Clearance Domains</span>
+            <span className={`text-xs font-semibold ${isDark ? 'text-[#AFC4D8]' : 'text-[#64748B]'}`}>
+              {currentState.categories.length} Clearance Domains
+            </span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -226,17 +300,31 @@ export const StateApprovalsSection: React.FC = () => {
                   onClick={() => setSelectedCategoryName(isSelected ? 'All' : cat.name)}
                   className={`cursor-pointer p-4 rounded-2xl border transition-all ${
                     isSelected
-                      ? 'border-sky-400/40 bg-sky-500/12 shadow-md ring-2 ring-sky-400/30'
-                      : 'border-white/10 bg-white/5 hover:bg-white/8 hover:border-white/20'
+                      ? isDark
+                        ? 'border-sky-400/50 bg-sky-500/20 shadow-md ring-2 ring-sky-400/30'
+                        : 'border-[#0284C7] bg-[#EEF7FA] shadow-sm ring-2 ring-sky-500/20'
+                      : isDark
+                        ? 'border-white/10 bg-[#07182C] hover:bg-[#0D223D] hover:border-white/20'
+                        : 'border-[#D8E2EE] bg-white hover:border-[#0284C7]/50 shadow-xs'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs font-bold text-slate-200 truncate">{cat.name}</span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-sky-500/20 text-sky-300 border border-sky-400/20">
+                    <span className={`text-xs font-bold truncate ${
+                      isDark ? 'text-[#F8FAFC]' : 'text-[#102A43]'
+                    }`}>
+                      {cat.name}
+                    </span>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold border ${
+                      isDark
+                        ? 'bg-sky-500/20 text-sky-300 border-sky-400/20'
+                        : 'bg-[#E8EEF5] text-[#334E68] border-[#CBD5E1]'
+                    }`}>
                       {cat.count}
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
+                  <p className={`text-[11px] line-clamp-2 leading-relaxed ${
+                    isDark ? 'text-[#AFC4D8]' : 'text-[#52657A]'
+                  }`}>
                     {cat.description}
                   </p>
                 </div>
@@ -248,10 +336,14 @@ export const StateApprovalsSection: React.FC = () => {
         {/* List of State Approvals */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h4 className="text-lg font-display font-bold text-white">
+            <h4 className={`text-lg font-display font-bold ${
+              isDark ? 'text-white' : 'text-[#102A43]'
+            }`}>
               Clearances for {currentState.name}
             </h4>
-            <div className="text-xs font-medium text-slate-400">
+            <div className={`text-xs font-medium ${
+              isDark ? 'text-[#AFC4D8]' : 'text-[#64748B]'
+            }`}>
               Showing statutory forms integrated into SWAGAT
             </div>
           </div>
@@ -260,39 +352,59 @@ export const StateApprovalsSection: React.FC = () => {
             {stateApprovalsList.map((app) => (
               <div
                 key={app.id}
-                className="bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 p-6 hover:border-white/20 transition-all flex flex-col justify-between space-y-4"
+                className={`rounded-3xl border p-6 transition-all flex flex-col justify-between space-y-4 ${
+                  isDark
+                    ? 'bg-[#07182C] border-white/15 hover:border-white/25 shadow-xl'
+                    : 'bg-white border-[#D8E2EE] hover:border-[#0284C7]/60 shadow-[0_8px_24px_rgba(0,0,0,0.04)]'
+                }`}
               >
                 <div className="space-y-2.5">
                   <div className="flex items-center justify-between">
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
                       {currentState.name} State
                     </span>
-                    <span className="text-[10px] font-semibold text-slate-500">
+                    <span className={`text-[10px] font-semibold ${
+                      isDark ? 'text-[#AFC4D8]' : 'text-[#64748B]'
+                    }`}>
                       SLA: {app.processingDays} Days
                     </span>
                   </div>
 
-                  <h5 className="text-base font-bold text-[#07182C] leading-snug">
+                  <h5 className={`text-base font-bold leading-snug ${
+                    isDark ? 'text-white' : 'text-[#102A43]'
+                  }`}>
                     {app.name}
                   </h5>
 
-                  <div className="text-xs text-slate-500">
+                  <div className={`text-xs font-medium ${
+                    isDark ? 'text-[#AFC4D8]' : 'text-[#64748B]'
+                  }`}>
                     {app.department}
                   </div>
 
-                  <p className="text-xs text-slate-600 line-clamp-2">
+                  <p className={`text-xs line-clamp-2 leading-relaxed ${
+                    isDark ? 'text-[#D9E7F5]' : 'text-[#52657A]'
+                  }`}>
                     {app.description}
                   </p>
 
-                  <div className="pt-2 text-[11px] text-slate-400 font-medium">
-                    Fee: <strong className="text-slate-200">{app.statutoryFee}</strong>
+                  <div className={`pt-2 text-[11px] font-medium ${
+                    isDark ? 'text-[#AFC4D8]' : 'text-[#64748B]'
+                  }`}>
+                    Fee: <strong className={isDark ? 'text-white' : 'text-[#102A43]'}>{app.statutoryFee}</strong>
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-white/8 flex items-center justify-between">
+                <div className={`pt-3 border-t flex items-center justify-between ${
+                  isDark ? 'border-white/10' : 'border-slate-100'
+                }`}>
                   <button
                     onClick={() => setSelectedApproval(app)}
-                    className="text-xs font-semibold text-slate-400 hover:text-slate-200 transition"
+                    className={`text-xs font-semibold transition cursor-pointer ${
+                      isDark 
+                        ? 'text-slate-300 hover:text-white' 
+                        : 'text-[#334E68] hover:text-[#102A43] px-3 py-1.5 rounded-lg border border-[#CBD5E1] hover:bg-[#F8FAFC]'
+                    }`}
                   >
                     View Details
                   </button>
@@ -300,7 +412,7 @@ export const StateApprovalsSection: React.FC = () => {
                   <button
                     id={`state-apply-${app.id}`}
                     onClick={() => startApplication(app)}
-                    className="px-4 py-2 text-xs font-bold text-white bg-sky-500/20 hover:bg-sky-500/30 border border-sky-400/25 rounded-xl transition"
+                    className="px-4 py-2 text-xs font-bold !text-white bg-sky-500 hover:bg-sky-600 rounded-xl transition shadow-md shadow-sky-500/20 active:scale-95 cursor-pointer"
                   >
                     Apply Now →
                   </button>

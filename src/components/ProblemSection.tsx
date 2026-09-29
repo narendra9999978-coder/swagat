@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import { useSwagat } from '../context/SwagatContext';
 import { 
   Globe2, 
   BookX, 
@@ -13,6 +14,8 @@ import {
 
 export const ProblemSection: React.FC = () => {
   const { t } = useLanguage();
+  const { theme } = useSwagat();
+  const isDark = theme === 'dark';
 
   const problems = [
     {
@@ -22,7 +25,8 @@ export const ProblemSection: React.FC = () => {
       desc: t('problem_card1_desc'),
       stat: '50+ Portals',
       statLabel: 'per citizen lifecycle',
-      color: 'from-rose-500/10 to-red-500/10',
+      colorDark: 'from-rose-500/15 to-red-500/15',
+      colorLight: 'from-rose-500/10 to-red-500/10',
       iconColor: 'text-rose-600',
       borderColor: 'border-rose-200'
     },
@@ -33,7 +37,8 @@ export const ProblemSection: React.FC = () => {
       desc: t('problem_card2_desc'),
       stat: '74% Citizens',
       statLabel: 'struggle with official terms',
-      color: 'from-amber-500/10 to-orange-500/10',
+      colorDark: 'from-amber-500/15 to-orange-500/15',
+      colorLight: 'from-amber-500/10 to-orange-500/10',
       iconColor: 'text-amber-600',
       borderColor: 'border-amber-200'
     },
@@ -44,7 +49,8 @@ export const ProblemSection: React.FC = () => {
       desc: t('problem_card3_desc'),
       stat: '1st Step Barrier',
       statLabel: 'which ministry applies?',
-      color: 'from-blue-500/10 to-indigo-500/10',
+      colorDark: 'from-blue-500/15 to-indigo-500/15',
+      colorLight: 'from-blue-500/10 to-indigo-500/10',
       iconColor: 'text-blue-600',
       borderColor: 'border-blue-200'
     },
@@ -55,25 +61,38 @@ export const ProblemSection: React.FC = () => {
       desc: t('problem_card4_desc'),
       stat: '3,000+ Schemes',
       statLabel: 'scattered across sites',
-      color: 'from-purple-500/10 to-violet-500/10',
+      colorDark: 'from-purple-500/15 to-violet-500/15',
+      colorLight: 'from-purple-500/10 to-violet-500/10',
       iconColor: 'text-purple-600',
       borderColor: 'border-purple-200'
     }
   ];
 
   return (
-    <section className="py-16 sm:py-24 bg-[#F8FAFC] border-b border-slate-200/80 relative">
+    <section className={`py-16 sm:py-24 border-b relative transition-colors ${
+      isDark
+        ? 'bg-transparent border-white/8'
+        : 'bg-[#F8FAFC] border-slate-200/80'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-orange-50 border border-orange-200 text-xs font-bold text-[#E05A10] uppercase tracking-wider mb-3">
+          <div className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full border text-xs font-bold uppercase tracking-wider mb-3 ${
+            isDark
+              ? 'bg-orange-500/10 border-orange-400/20 text-orange-400'
+              : 'bg-orange-50 border-orange-200 text-[#E05A10]'
+          }`}>
             <span>{t('problem_badge')}</span>
           </div>
-          <h2 className="font-display font-bold text-3xl sm:text-4xl text-[#0B2545] tracking-tight">
+          <h2 className={`font-display font-bold text-3xl sm:text-4xl tracking-tight ${
+            isDark ? 'text-white' : 'text-[#0B2545]'
+          }`}>
             {t('problem_heading')}
           </h2>
-          <p className="mt-3 text-base sm:text-lg text-slate-600">
+          <p className={`mt-3 text-base sm:text-lg ${
+            isDark ? 'text-slate-400' : 'text-slate-600'
+          }`}>
             {t('problem_subheading')}
           </p>
         </div>
@@ -85,25 +104,35 @@ export const ProblemSection: React.FC = () => {
             return (
               <div
                 key={prob.id}
-                className="bg-white rounded-2xl p-6 border border-slate-200 shadow-gov-sm hover:shadow-gov-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
+                className={`rounded-2xl p-6 border transition-all duration-300 flex flex-col justify-between hover:-translate-y-1 ${
+                  isDark
+                    ? 'bg-slate-950/70 border-white/10 hover:border-white/20 shadow-xl hover:shadow-2xl'
+                    : 'bg-white border-slate-200 shadow-gov-sm hover:shadow-gov-md'
+                }`}
               >
                 <div>
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${prob.color} flex items-center justify-center ${prob.iconColor} mb-5 border ${prob.borderColor}`}>
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${isDark ? prob.colorDark : prob.colorLight} flex items-center justify-center ${prob.iconColor} mb-5 border ${isDark ? 'border-white/10' : prob.borderColor}`}>
                     <Icon className="w-6 h-6" />
                   </div>
 
-                  <h3 className="font-display font-bold text-lg text-slate-900 mb-2.5">
+                  <h3 className={`font-display font-bold text-lg mb-2.5 ${
+                    isDark ? 'text-white' : 'text-slate-900'
+                  }`}>
                     {prob.title}
                   </h3>
 
-                  <p className="text-sm text-slate-600 leading-relaxed">
+                  <p className={`text-sm leading-relaxed ${
+                    isDark ? 'text-slate-400' : 'text-slate-600'
+                  }`}>
                     {prob.desc}
                   </p>
                 </div>
 
-                <div className="pt-6 mt-6 border-t border-slate-100 flex items-baseline justify-between text-xs">
-                  <span className="font-bold text-slate-900">{prob.stat}</span>
-                  <span className="text-slate-400 font-medium">{prob.statLabel}</span>
+                <div className={`pt-6 mt-6 border-t flex items-baseline justify-between text-xs ${
+                  isDark ? 'border-white/10' : 'border-slate-100'
+                }`}>
+                  <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{prob.stat}</span>
+                  <span className={`font-medium ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{prob.statLabel}</span>
                 </div>
               </div>
             );

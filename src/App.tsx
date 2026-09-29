@@ -28,16 +28,54 @@ import { SchemeDetailModal } from './components/SchemeDetailModal';
 import { GlobalSearchModal } from './components/GlobalSearchModal';
 import { QueryModal } from './components/QueryModal';
 import { DocumentPreviewModal } from './components/DocumentPreviewModal';
-import { AmbientBackground } from './components/AmbientBackground';
+import { TricolourHeritageBackground } from './components/TricolourHeritageBackground';
 import { CheckCircle2 } from 'lucide-react';
 
 const AppContent: React.FC = () => {
   const [showSplash, setShowSplash] = useState(true);
-  const { currentView, setCurrentView, toastMessage, userProfile, wizardSession, showToast } = useSwagat();
+  const { 
+    currentView, 
+    setCurrentView, 
+    toastMessage, 
+    userProfile, 
+    wizardSession, 
+    showToast, 
+    theme,
+    setIsAuthModalOpen,
+    setAuthModalMode
+  } = useSwagat();
 
   const handleSplashComplete = React.useCallback(() => {
     setShowSplash(false);
   }, []);
+
+  const [urlRoute, setUrlRoute] = useState<'home' | 'login' | 'admin-login' | 'signup'>('home');
+
+  // Direct URL navigation for /login, /admin-login, /signup
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleUrlRoute = () => {
+      const path = window.location.pathname;
+      if (path === '/login' || path === '/user-login') {
+        setUrlRoute('login');
+        setAuthModalMode('signin-user');
+        setIsAuthModalOpen(true);
+      } else if (path === '/admin-login' || path === '/admin/login') {
+        setUrlRoute('admin-login');
+        setAuthModalMode('signin-admin');
+        setIsAuthModalOpen(true);
+      } else if (path === '/signup' || path === '/register') {
+        setUrlRoute('signup');
+        setAuthModalMode('signup-user');
+        setIsAuthModalOpen(true);
+      } else {
+        setUrlRoute('home');
+      }
+    };
+    handleUrlRoute();
+    window.addEventListener('popstate', handleUrlRoute);
+    return () => window.removeEventListener('popstate', handleUrlRoute);
+  }, [setIsAuthModalOpen, setAuthModalMode]);
 
   // ── Protected Route Guarding & URL Synchronization ──────────────────────────
   useEffect(() => {
@@ -111,9 +149,11 @@ const AppContent: React.FC = () => {
   const isInDashboard = (currentView === 'dashboard' || currentView === 'admin-dashboard' || currentView === 'wizard') && userProfile !== null;
 
   return (
-    <div className="min-h-screen bg-black text-slate-100 flex flex-col font-sans selection:bg-amber-400/30 selection:text-white relative">
-      {/* Reactbits Beams & Dot-Field Ambient Background */}
-      <AmbientBackground />
+    <div className={`min-h-screen flex flex-col font-sans transition-colors duration-500 selection:bg-amber-400/30 relative ${
+      theme === 'light' ? 'text-slate-900 selection:text-slate-900' : 'text-slate-100 selection:text-white'
+    }`}>
+      {/* Tricolour Heritage Background (with Tricolour Ribbons, India Gate at corner, Ashoka Chakra, and India Map) */}
+      <TricolourHeritageBackground theme={theme} />
       
       {/* Splash */}
       {showSplash && (
@@ -123,6 +163,16 @@ const AppContent: React.FC = () => {
       {/* Main App Layout */}
       {isInDashboard ? (
         renderDashboard()
+      ) : urlRoute !== 'home' ? (
+        <>
+          <HeaderNavbar />
+
+          <main className="flex-grow flex items-center justify-center pt-28 pb-16 px-4">
+            <AuthModal isPageMode={true} />
+          </main>
+
+          <Footer />
+        </>
       ) : (
         <>
           <HeaderNavbar />
@@ -148,7 +198,7 @@ const AppContent: React.FC = () => {
       )}
 
       {/* Interactive Modals */}
-      <AuthModal />
+      {urlRoute === 'home' && <AuthModal />}
       <ApplyModal />
       <ApprovalDetailModal />
       <StateDetailModal />

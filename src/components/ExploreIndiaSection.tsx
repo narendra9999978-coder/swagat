@@ -17,7 +17,8 @@ import { useSwagat } from '../context/SwagatContext';
 import { IndiaVectorMap } from './IndiaVectorMap';
 
 export const ExploreIndiaSection: React.FC = () => {
-  const { openStateDetailModal, setSelectedStateFilter, updateKyaState } = useSwagat();
+  const { openStateDetailModal, setSelectedStateFilter, updateKyaState, theme } = useSwagat();
+  const isDark = theme === 'dark';
   const [selectedStateName, setSelectedStateName] = useState<string>('Karnataka');
   const [selectedStateCode, setSelectedStateCode] = useState<string>('KA');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -69,24 +70,29 @@ export const ExploreIndiaSection: React.FC = () => {
   }, [selectedStateCode]);
 
   return (
-    <section id="section-explore-india" className="py-20 bg-transparent border-t border-white/8 relative overflow-hidden">
+    <section id="section-explore-india" className={`py-20 relative overflow-hidden border-t transition-colors duration-500 ${
+      isDark ? 'border-white/10' : 'border-slate-200'
+    }`}>
       
-      {/* Background Accent Gradients */}
-      <div className="absolute top-1/4 -left-20 w-80 h-80 bg-blue-50/80 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 -right-20 w-80 h-80 bg-amber-50/80 rounded-full blur-3xl pointer-events-none" />
+      {/* Background Decorative Pattern */}
+      <div className={`absolute inset-0 pointer-events-none ${isDark ? 'bg-[radial-gradient(rgba(255,255,255,0.06)_1px,transparent_1px)]' : 'bg-[radial-gradient(rgba(0,0,0,0.03)_1px,transparent_1px)]'} [background-size:24px_24px]`} />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-sky-500/10 border border-sky-400/20 text-sky-300 text-xs font-bold uppercase tracking-wider mb-3 backdrop-blur-md">
-            <MapPin className="w-4 h-4 text-sky-400" />
+          <div className={`inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-3 backdrop-blur-md border ${
+            isDark ? 'bg-sky-500/10 border-sky-400/20 text-sky-300' : 'bg-sky-100 border-sky-300 text-sky-800'
+          }`}>
+            <MapPin className={`w-4 h-4 ${isDark ? 'text-sky-400' : 'text-sky-600'}`} />
             <span>Pan-India Single Window Coverage</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-white tracking-tight">
+          <h2 className={`text-3xl sm:text-4xl font-display font-extrabold tracking-tight ${
+            isDark ? 'text-white' : 'text-[#102A43]'
+          }`}>
             Explore clearance coverage and approval status across India
           </h2>
-          <p className="mt-3 text-slate-300 text-base">
+          <p className={`mt-3 text-base ${isDark ? 'text-[#AFC4D8]' : 'text-[#52657A]'}`}>
             Click any State or Union Territory to view available statutory approvals, processing times, and state-specific incentive policies.
           </p>
         </div>
@@ -98,15 +104,17 @@ export const ExploreIndiaSection: React.FC = () => {
           <div className="lg:col-span-7 flex flex-col space-y-4">
             
             {/* Interactive Map Wrapper Card */}
-            <div className="bg-[#07182C] rounded-3xl p-6 sm:p-7 shadow-xl border border-white/10 text-white relative">
+            <div className={`rounded-3xl p-6 sm:p-7 shadow-xl border relative transition-colors duration-300 ${
+              isDark ? 'bg-[#07182C] border-white/15 text-white' : 'bg-white border-[#D8E2EE] text-[#102A43] shadow-[0_8px_24px_rgba(0,0,0,0.04)]'
+            }`}>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center space-x-2">
                   <div className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
-                  <span className="text-xs font-bold uppercase tracking-wider text-amber-300">
+                  <span className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-amber-300' : 'text-[#102A43]'}`}>
                     National Clearance Map
                   </span>
                 </div>
-                <span className="text-[11px] text-slate-400">
+                <span className={`text-[11px] ${isDark ? 'text-[#AFC4D8]' : 'text-[#64748B]'}`}>
                   Hover or click any node
                 </span>
               </div>
@@ -121,27 +129,31 @@ export const ExploreIndiaSection: React.FC = () => {
               </div>
 
               {/* Bottom Map Active State Bar */}
-              <div className="mt-4 pt-4 border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white/5 p-3.5 rounded-2xl">
+              <div className={`mt-4 pt-4 border-t flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3.5 rounded-2xl ${
+                isDark ? 'border-white/10 bg-white/5' : 'border-[#D8E2EE] bg-[#F8FAFC]'
+              }`}>
                 <div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-base font-extrabold text-white">
+                    <span className={`text-base font-extrabold ${isDark ? 'text-white' : 'text-[#102A43]'}`}>
                       {selectedStateData.name}
                     </span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
+                      isDark ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30' : 'bg-amber-100 text-amber-900 border border-amber-300'
+                    }`}>
                       {selectedStateData.code}
                     </span>
-                    <span className="text-[10px] text-emerald-400 font-semibold">
+                    <span className="text-[10px] text-emerald-600 font-bold">
                       Rank #{selectedStateData.easeOfDoingBusinessRank} EoDB
                     </span>
                   </div>
-                  <div className="text-xs text-slate-300 mt-0.5">
-                    Nodal Agency: <strong className="text-white">{selectedStateData.nodalAgency}</strong> • {selectedStateData.totalApprovals} Clearances
+                  <div className={`text-xs mt-0.5 ${isDark ? 'text-[#D9E7F5]' : 'text-[#52657A]'}`}>
+                    Nodal Agency: <strong className={isDark ? 'text-white' : 'text-[#102A43]'}>{selectedStateData.nodalAgency}</strong> • {selectedStateData.totalApprovals} Clearances
                   </div>
                 </div>
 
                 <button
                   onClick={() => handleOpenDetail(selectedStateData.code)}
-                  className="px-4 py-2 bg-gradient-to-r from-amber-400 to-amber-300 text-[#07182C] hover:from-amber-300 hover:to-amber-200 text-xs font-bold rounded-xl transition-all shadow-md flex items-center space-x-1.5 shrink-0"
+                  className="px-4 py-2 bg-gradient-to-r from-amber-400 to-amber-300 text-[#07182C] hover:from-amber-300 hover:to-amber-200 text-xs font-bold rounded-xl transition-all shadow-md flex items-center space-x-1.5 shrink-0 cursor-pointer"
                 >
                   <span>View {selectedStateData.name} Clearances</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -153,36 +165,39 @@ export const ExploreIndiaSection: React.FC = () => {
           </div>
 
           {/* RIGHT SIDE (5 COLS): Searchable/Filterable State Directory */}
-          <div className="lg:col-span-5 flex flex-col bg-slate-50 rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-4">
+          <div className={`lg:col-span-5 flex flex-col rounded-3xl p-5 sm:p-6 border shadow-sm space-y-4 transition-colors duration-300 ${
+            isDark ? 'bg-[#07182C] border-white/15 text-white' : 'bg-white border-[#D8E2EE] text-[#102A43] shadow-[0_8px_24px_rgba(0,0,0,0.04)]'
+          }`}>
             
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-base font-bold text-[#07182C]">
+                <h3 className={`text-base font-bold ${isDark ? 'text-white' : 'text-[#102A43]'}`}>
                   All 28 States &amp; 8 Union Territories
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className={`text-xs mt-0.5 ${isDark ? 'text-[#AFC4D8]' : 'text-[#64748B]'}`}>
                   Select a state to inspect localized single-window regulations
                 </p>
               </div>
-              <span className="text-xs font-bold text-slate-700 bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-2xs">
-                {filteredStates.length} Active
-              </span>
             </div>
 
-            {/* Search Input */}
+            {/* Search Input Filter */}
             <div className="relative">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Search className={`w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 ${isDark ? 'text-slate-400' : 'text-[#64748B]'}`} />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search state or UT (e.g. Karnataka, Gujarat)..."
-                className="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-amber-400/50 text-slate-800"
+                placeholder="Search state name or code..."
+                className={`w-full pl-9 pr-8 py-2 text-xs rounded-xl border focus:outline-none transition ${
+                  isDark
+                    ? 'border-white/15 bg-slate-900 text-white placeholder-slate-400 focus:border-sky-400'
+                    : 'border-[#CBD5E1] bg-[#F8FAFC] text-[#102A43] placeholder-[#64748B] focus:border-[#0284C7] focus:bg-white'
+                }`}
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 cursor-pointer"
                 >
                   Clear
                 </button>
@@ -195,10 +210,14 @@ export const ExploreIndiaSection: React.FC = () => {
                 <button
                   key={zone.id}
                   onClick={() => setActiveZone(zone.id)}
-                  className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-colors ${
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer border ${
                     activeZone === zone.id
-                      ? 'bg-[#07182C] text-amber-300 shadow-2xs'
-                      : 'bg-white text-slate-600 hover:bg-slate-200 border border-slate-200'
+                      ? isDark
+                        ? 'bg-amber-400 text-slate-950 font-bold border-amber-400'
+                        : 'bg-[#EEF7FA] text-[#102A43] font-bold border-[#0284C7]'
+                      : isDark
+                      ? 'bg-white/5 text-[#AFC4D8] hover:bg-white/10 border-white/10'
+                      : 'bg-[#F8FAFC] text-[#52657A] hover:bg-slate-100 border-[#CBD5E1]'
                   }`}
                 >
                   {zone.label}
@@ -207,8 +226,8 @@ export const ExploreIndiaSection: React.FC = () => {
             </div>
 
             {/* Popular Hubs Fast Track Row */}
-            <div className="pt-2 border-t border-slate-200">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">
+            <div className={`pt-2 border-t ${isDark ? 'border-white/10' : 'border-[#D8E2EE]'}`}>
+              <div className={`text-[10px] font-bold uppercase tracking-wider mb-2 ${isDark ? 'text-[#AFC4D8]' : 'text-[#64748B]'}`}>
                 Popular Industrial Destinations:
               </div>
               <div className="flex flex-wrap gap-1.5">
@@ -220,10 +239,14 @@ export const ExploreIndiaSection: React.FC = () => {
                     <button
                       key={item.code}
                       onClick={() => handleMapSelectState(item.name, item.code)}
-                      className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all ${
+                      className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer border ${
                         isSelected
-                          ? 'bg-amber-400 text-[#07182C] font-bold ring-1 ring-amber-500'
-                          : 'bg-white text-slate-700 hover:bg-slate-200 border border-slate-200'
+                          ? isDark
+                            ? 'bg-amber-400 text-[#07182C] font-bold border-amber-400'
+                            : 'bg-[#EEF7FA] text-[#102A43] font-bold border-[#0284C7]'
+                          : isDark
+                          ? 'bg-white/5 text-[#AFC4D8] hover:bg-white/10 border-white/10'
+                          : 'bg-[#F8FAFC] text-[#334E68] hover:bg-slate-100 border-[#CBD5E1]'
                       }`}
                     >
                       {item.name}
@@ -244,34 +267,42 @@ export const ExploreIndiaSection: React.FC = () => {
                     onClick={() => handleMapSelectState(st.name, st.code)}
                     className={`cursor-pointer p-3 rounded-xl border transition-all flex items-center justify-between ${
                       isSelected
-                        ? 'bg-white border-[#07182C] shadow-md ring-2 ring-[#07182C]/20'
-                        : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                        ? isDark
+                          ? 'bg-white/10 border-amber-400/50 shadow-md ring-1 ring-amber-400/30'
+                          : 'bg-[#EEF7FA] border-[#0284C7] shadow-xs ring-1 ring-sky-500/20'
+                        : isDark
+                        ? 'bg-[#07182C] border-white/10 hover:border-white/20 hover:bg-[#0D223D] text-slate-200'
+                        : 'bg-white border-[#D8E2EE] hover:border-slate-300 hover:bg-[#F8FAFC]'
                     }`}
                   >
                     <div className="flex items-center space-x-2.5 min-w-0">
                       <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${
                         isSelected 
-                          ? 'bg-[#07182C] text-amber-300' 
-                          : 'bg-slate-100 text-slate-700'
+                          ? isDark
+                            ? 'bg-amber-400 text-slate-950 font-bold'
+                            : 'bg-amber-100 text-amber-900 font-bold border border-amber-300'
+                          : isDark
+                          ? 'bg-white/10 text-slate-300'
+                          : 'bg-[#F1F5F9] text-[#334E68] border border-[#CBD5E1]'
                       }`}>
                         {st.code}
                       </div>
 
                       <div className="min-w-0">
                         <div className="flex items-center space-x-1.5 truncate">
-                          <span className="text-xs font-bold text-slate-900 truncate">
+                          <span className={`text-xs font-bold truncate ${isDark ? 'text-white' : 'text-[#102A43]'}`}>
                             {st.name}
                           </span>
                           {isPopular && (
-                            <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-100 text-amber-900 shrink-0">
+                            <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-100 text-amber-900 shrink-0 border border-amber-300">
                               Hub
                             </span>
                           )}
-                          <span className="text-[9px] text-slate-400 uppercase shrink-0">
+                          <span className={`text-[9px] uppercase shrink-0 ${isDark ? 'text-slate-400' : 'text-[#64748B]'}`}>
                             {st.type}
                           </span>
                         </div>
-                        <div className="text-[11px] text-slate-500">
+                        <div className={`text-[11px] ${isDark ? 'text-[#AFC4D8]' : 'text-[#52657A]'}`}>
                           {st.approvalCount} Approvals • {st.zone}
                         </div>
                       </div>
@@ -283,7 +314,11 @@ export const ExploreIndiaSection: React.FC = () => {
                           e.stopPropagation();
                           handleOpenDetail(st.code);
                         }}
-                        className="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors flex items-center space-x-0.5"
+                        className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-colors flex items-center space-x-0.5 cursor-pointer border ${
+                          isDark
+                            ? 'bg-white/10 hover:bg-white/20 text-slate-200 border-white/10'
+                            : 'bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#102A43] border-[#CBD5E1]'
+                        }`}
                       >
                         <span>View</span>
                         <ChevronRight className="w-3 h-3" />
@@ -295,7 +330,7 @@ export const ExploreIndiaSection: React.FC = () => {
               })}
 
               {filteredStates.length === 0 && (
-                <div className="text-center py-8 text-xs text-slate-400">
+                <div className={`text-center py-8 text-xs ${isDark ? 'text-slate-400' : 'text-[#64748B]'}`}>
                   No state or territory found matching "{searchQuery}".
                 </div>
               )}
@@ -309,4 +344,3 @@ export const ExploreIndiaSection: React.FC = () => {
     </section>
   );
 };
-

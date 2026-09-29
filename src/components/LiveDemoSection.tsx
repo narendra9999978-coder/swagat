@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useJourney } from '../context/JourneyContext';
+import { useSwagat } from '../context/SwagatContext';
 import { DEMO_SCENARIOS } from '../data/scenarios';
 import { 
   Sparkles, 
@@ -20,6 +21,8 @@ import {
 export const LiveDemoSection: React.FC = () => {
   const { t } = useLanguage();
   const { currentScenario, selectScenario, openAskModal } = useJourney();
+  const { theme } = useSwagat();
+  const isDark = theme === 'dark';
   const [activeTab, setActiveTab] = useState<string>(currentScenario.id);
 
   const scenarioTabs = [
@@ -43,19 +46,31 @@ export const LiveDemoSection: React.FC = () => {
   };
 
   return (
-    <section id="live-demo" className="py-16 sm:py-24 bg-gradient-to-b from-[#F8FAFC] to-white border-b border-slate-200/80">
+    <section id="live-demo" className={`py-16 sm:py-24 border-b transition-colors ${
+      isDark
+        ? 'bg-transparent border-white/8'
+        : 'bg-gradient-to-b from-[#F8FAFC] to-white border-slate-200/80'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-800 uppercase tracking-wider mb-3">
-            <Zap className="w-3.5 h-3.5 text-emerald-600" />
+          <div className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full border text-xs font-bold uppercase tracking-wider mb-3 ${
+            isDark
+              ? 'bg-emerald-500/10 border-emerald-400/20 text-emerald-300'
+              : 'bg-emerald-50 border-emerald-200 text-emerald-800'
+          }`}>
+            <Zap className={`w-3.5 h-3.5 ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`} />
             <span>{t('demo_badge')}</span>
           </div>
-          <h2 className="font-display font-bold text-3xl sm:text-4xl text-[#0B2545] tracking-tight">
+          <h2 className={`font-display font-bold text-3xl sm:text-4xl tracking-tight ${
+            isDark ? 'text-white' : 'text-[#0B2545]'
+          }`}>
             {t('demo_heading')}
           </h2>
-          <p className="mt-3 text-base sm:text-lg text-slate-600">
+          <p className={`mt-3 text-base sm:text-lg ${
+            isDark ? 'text-slate-400' : 'text-slate-600'
+          }`}>
             {t('demo_subheading')}
           </p>
         </div>
@@ -72,11 +87,15 @@ export const LiveDemoSection: React.FC = () => {
                 onClick={() => handleScenarioChange(tab.id)}
                 className={`inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 ${
                   isSelected
-                    ? 'bg-[#0B2545] text-white shadow-gov-md ring-2 ring-[#0B2545]/20 scale-105'
-                    : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 shadow-sm'
+                    ? isDark
+                      ? 'bg-sky-500/20 text-white shadow-lg ring-2 ring-sky-400/30 scale-105 border border-sky-400/30'
+                      : 'bg-[#0B2545] text-white shadow-gov-md ring-2 ring-[#0B2545]/20 scale-105'
+                    : isDark
+                      ? 'bg-white/[0.05] text-slate-300 hover:bg-white/[0.1] border border-white/10'
+                      : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 shadow-sm'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isSelected ? 'text-amber-400' : 'text-[#E05A10]'}`} />
+                <Icon className={`w-4 h-4 ${isSelected ? 'text-amber-400' : isDark ? 'text-amber-400' : 'text-[#E05A10]'}`} />
                 <span>{tab.label}</span>
               </button>
             );
@@ -84,7 +103,11 @@ export const LiveDemoSection: React.FC = () => {
         </div>
 
         {/* Product Simulator Container */}
-        <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-gov-xl border border-slate-200/90 overflow-hidden">
+        <div className={`max-w-4xl mx-auto rounded-3xl shadow-gov-xl overflow-hidden border ${
+          isDark
+            ? 'bg-slate-950/80 border-white/10'
+            : 'bg-white border-slate-200/90'
+        }`}>
           
           {/* Top Window Bar */}
           <div className="bg-slate-900 px-5 py-3.5 border-b border-slate-800 flex items-center justify-between text-xs text-slate-300">
@@ -105,17 +128,29 @@ export const LiveDemoSection: React.FC = () => {
             
             {/* User Query Message Bubble */}
             <div className="flex items-start space-x-3.5 max-w-2xl">
-              <div className="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 shrink-0 font-bold text-sm">
+              <div className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 font-bold text-sm ${
+                isDark
+                  ? 'bg-white/10 border-white/10 text-slate-300'
+                  : 'bg-slate-100 border-slate-200 text-slate-700'
+              }`}>
                 {currentScenario.persona.avatar}
               </div>
-              <div className="bg-slate-100 rounded-2xl rounded-tl-none p-4 text-slate-900 border border-slate-200/80 shadow-sm">
-                <div className="text-[11px] font-bold text-slate-500 mb-1 flex items-center space-x-2">
+              <div className={`rounded-2xl rounded-tl-none p-4 border shadow-sm ${
+                isDark
+                  ? 'bg-white/5 border-white/10 text-white'
+                  : 'bg-slate-100 border-slate-200/80 text-slate-900'
+              }`}>
+                <div className={`text-[11px] font-bold mb-1 flex items-center space-x-2 ${
+                  isDark ? 'text-slate-400' : 'text-slate-500'
+                }`}>
                   <span>{currentScenario.persona.name} ({currentScenario.persona.location})</span>
                   <span>•</span>
                   <span>Goal Statement</span>
                 </div>
-                <div className="text-sm sm:text-base font-semibold italic text-[#0B2545]">
-                  “{currentScenario.query}”
+                <div className={`text-sm sm:text-base font-semibold italic ${
+                  isDark ? 'text-white' : 'text-[#0B2545]'
+                }`}>
+                  "{currentScenario.query}"
                 </div>
               </div>
             </div>
@@ -126,7 +161,11 @@ export const LiveDemoSection: React.FC = () => {
                 <Bot className="w-5 h-5 text-amber-300" />
               </div>
 
-              <div className="flex-1 bg-gradient-to-b from-blue-50/50 to-white rounded-2xl rounded-tl-none p-5 sm:p-6 border border-blue-100 shadow-sm space-y-6">
+              <div className={`flex-1 rounded-2xl rounded-tl-none p-5 sm:p-6 border shadow-sm space-y-6 ${
+                isDark
+                  ? 'bg-gradient-to-b from-blue-500/10 to-slate-900/60 border-blue-400/20'
+                  : 'bg-gradient-to-b from-blue-50/50 to-white border-blue-100'
+              }`}>
                 
                 {/* AI Header Response */}
                 <div>
@@ -134,19 +173,31 @@ export const LiveDemoSection: React.FC = () => {
                     <span className="text-xs font-bold uppercase tracking-wider text-[#E05A10]">
                       SWAGAT Journey Assistant
                     </span>
-                    <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      isDark
+                        ? 'bg-emerald-500/20 text-emerald-300'
+                        : 'bg-emerald-100 text-emerald-800'
+                    }`}>
                       Verified Jurisdictional Match
                     </span>
                   </div>
-                  <p className="text-sm sm:text-base font-bold text-[#0B2545]">
+                  <p className={`text-sm sm:text-base font-bold ${
+                    isDark ? 'text-white' : 'text-[#0B2545]'
+                  }`}>
                     {currentScenario.summary}
                   </p>
                 </div>
 
                 {/* We can help you explore (Checklist Grid) */}
-                <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm">
-                  <h4 className="font-bold text-xs uppercase tracking-wider text-slate-500 mb-3 flex items-center space-x-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <div className={`rounded-2xl p-4 sm:p-5 border shadow-sm ${
+                  isDark
+                    ? 'bg-white/5 border-white/10'
+                    : 'bg-white border-slate-200'
+                }`}>
+                  <h4 className={`font-bold text-xs uppercase tracking-wider mb-3 flex items-center space-x-1.5 ${
+                    isDark ? 'text-slate-400' : 'text-slate-500'
+                  }`}>
+                    <CheckCircle2 className={`w-4 h-4 ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`} />
                     <span>{t('demo_help_explore')}</span>
                   </h4>
 
@@ -154,12 +205,18 @@ export const LiveDemoSection: React.FC = () => {
                     {currentScenario.relevantServices.map((srv, idx) => (
                       <div 
                         key={idx}
-                        className="flex items-start space-x-2.5 p-2 rounded-lg bg-slate-50 border border-slate-100 text-xs"
+                        className={`flex items-start space-x-2.5 p-2 rounded-lg border text-xs ${
+                          isDark
+                            ? 'bg-white/[0.03] border-white/5'
+                            : 'bg-slate-50 border-slate-100'
+                        }`}
                       >
-                        <span className="text-emerald-600 font-bold">✓</span>
+                        <span className={`font-bold ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`}>✓</span>
                         <div>
-                          <div className="font-bold text-slate-800">{srv.name}</div>
-                          <div className="text-[11px] text-slate-500">{srv.department} • <span className="text-blue-700 font-medium">{srv.portal}</span></div>
+                          <div className={`font-bold ${isDark ? 'text-white' : 'text-slate-800'}`}>{srv.name}</div>
+                          <div className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                            {srv.department} • <span className={`font-medium ${isDark ? 'text-sky-300' : 'text-blue-700'}`}>{srv.portal}</span>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -168,7 +225,9 @@ export const LiveDemoSection: React.FC = () => {
 
                 {/* Personalized Journey Roadmap Preview */}
                 <div>
-                  <h4 className="font-bold text-xs uppercase tracking-wider text-slate-500 mb-3">
+                  <h4 className={`font-bold text-xs uppercase tracking-wider mb-3 ${
+                    isDark ? 'text-slate-400' : 'text-slate-500'
+                  }`}>
                     {t('demo_personalized_roadmap')}
                   </h4>
 
@@ -176,25 +235,29 @@ export const LiveDemoSection: React.FC = () => {
                     {currentScenario.journeySteps.map((step, idx) => (
                       <div
                         key={step.id}
-                        className="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200/90 text-xs shadow-sm hover:border-blue-300 transition"
+                        className={`flex items-center justify-between p-3 rounded-xl border text-xs shadow-sm transition ${
+                          isDark
+                            ? 'bg-white/[0.04] border-white/10 hover:border-sky-400/30'
+                            : 'bg-white border-slate-200/90 hover:border-blue-300'
+                        }`}
                       >
                         <div className="flex items-center space-x-3">
                           <span className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-[11px] ${
                             step.status === 'completed'
-                              ? 'bg-emerald-100 text-emerald-700'
+                              ? isDark ? 'bg-emerald-500/20 text-emerald-300' : 'bg-emerald-100 text-emerald-700'
                               : step.status === 'current'
-                              ? 'bg-amber-100 text-amber-800 ring-2 ring-amber-300'
-                              : 'bg-slate-100 text-slate-600'
+                              ? isDark ? 'bg-amber-500/20 text-amber-300 ring-2 ring-amber-400/30' : 'bg-amber-100 text-amber-800 ring-2 ring-amber-300'
+                              : isDark ? 'bg-white/10 text-slate-400' : 'bg-slate-100 text-slate-600'
                           }`}>
                             {idx + 1}
                           </span>
                           <div>
-                            <span className="font-bold text-slate-900">{step.title}</span>
-                            <div className="text-[11px] text-slate-500">{step.department}</div>
+                            <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{step.title}</span>
+                            <div className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{step.department}</div>
                           </div>
                         </div>
 
-                        <span className="text-[11px] font-semibold text-slate-400 shrink-0">
+                        <span className={`text-[11px] font-semibold shrink-0 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                           {step.estimatedDays}
                         </span>
                       </div>
@@ -203,9 +266,11 @@ export const LiveDemoSection: React.FC = () => {
                 </div>
 
                 {/* Primary CTA: "Build My Journey ->" */}
-                <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-blue-100">
-                  <div className="flex items-center space-x-2 text-xs text-slate-500">
-                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                <div className={`pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t ${
+                  isDark ? 'border-white/10' : 'border-blue-100'
+                }`}>
+                  <div className={`flex items-center space-x-2 text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    <ShieldCheck className={`w-4 h-4 ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`} />
                     <span>Cross-referenced with State &amp; Central portals</span>
                   </div>
 

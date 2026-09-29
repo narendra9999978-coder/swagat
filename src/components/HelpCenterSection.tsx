@@ -19,10 +19,12 @@ import { FeedbackWidget } from './ui/FeedbackWidget';
  * HelpCenterSection
  * Curated from: https://ui.watermelon.sh/blocks/faq-3 (FAQ Sections)
  * & https://ui.watermelon.sh/animated-components/feedback (Feedback Widget)
- * Dark Glassmorphic Help & Knowledge Base with spring accordion
+ * Dual-Theme Glassmorphic Help & Knowledge Base with spring accordion
  */
 export const HelpCenterSection: React.FC = () => {
-  const { showToast } = useSwagat();
+  const { showToast, theme } = useSwagat();
+  const isDark = theme === 'dark';
+
   const [searchFaq, setSearchFaq] = useState('');
   const [activeFaq, setActiveFaq] = useState<number | null>(0);
   const [queryName, setQueryName] = useState('');
@@ -67,19 +69,23 @@ export const HelpCenterSection: React.FC = () => {
   };
 
   return (
-    <section id="section-help" className="py-20 relative">
+    <section id="section-help" className={`py-20 relative bg-transparent border-t ${isDark ? 'border-white/8' : 'border-slate-200'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/5 text-sky-400 border border-white/10 text-xs font-bold uppercase tracking-wider mb-3 backdrop-blur-md">
-            <HelpCircle className="w-4 h-4" />
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-400/20 text-xs font-bold uppercase tracking-wider mb-3 backdrop-blur-md">
+            <HelpCircle className="w-4 h-4 text-sky-400" />
             <span>Support &amp; Knowledge Base</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-white tracking-tight">
+          <h2 className={`text-3xl sm:text-4xl font-display font-extrabold tracking-tight ${
+            isDark ? 'text-white' : 'text-slate-900'
+          }`}>
             Resources &amp; Help Center
           </h2>
-          <p className="mt-3 text-slate-300 text-sm sm:text-base leading-relaxed">
+          <p className={`mt-3 text-sm sm:text-base leading-relaxed ${
+            isDark ? 'text-slate-300' : 'text-slate-600'
+          }`}>
             Access step-by-step user manuals, compliance guides, video tutorials, and 24/7 technical grievance resolution.
           </p>
         </div>
@@ -92,87 +98,109 @@ export const HelpCenterSection: React.FC = () => {
               placeholder="Search how to start your business, approval rules, FAQs..."
               value={searchFaq}
               onChange={(e) => setSearchFaq(e.target.value)}
-              className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-white/5 border border-white/15 backdrop-blur-2xl shadow-xl text-sm font-medium text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition"
+              className={`w-full pl-12 pr-4 py-3.5 rounded-2xl border shadow-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition backdrop-blur-2xl ${
+                isDark 
+                  ? 'bg-slate-950/60 border-white/15 text-white placeholder:text-slate-500' 
+                  : 'bg-white/90 border-slate-200 text-slate-800 placeholder:text-slate-400 shadow-slate-200/50'
+              }`}
             />
             <Search className="w-5 h-5 text-sky-400 absolute left-4 top-1/2 -translate-y-1/2" />
           </div>
         </div>
 
-        {/* 4 Quick Resource Cards with Dark Glassmorphism */}
+        {/* 4 Quick Resource Cards with Glassmorphism */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           
-          <div className="p-6 rounded-3xl bg-slate-950/60 border border-white/10 backdrop-blur-2xl shadow-xl hover:border-white/20 transition-all duration-300 hover:scale-[1.02] space-y-3">
+          <div className={`swagat-card p-6 rounded-3xl border transition-all duration-300 space-y-3 ${
+            isDark 
+              ? 'bg-slate-950/70 border-white/10 hover:border-white/20 text-white' 
+              : 'bg-white/90 border-slate-200 text-[#102A43]'
+          }`}>
             <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center font-bold">
               <BookOpen className="w-5 h-5" />
             </div>
-            <h4 className="text-base font-bold text-white">Step-by-Step Guides</h4>
-            <p className="text-xs text-slate-300 leading-relaxed">
+            <h4 className={`text-base font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Step-by-Step Guides</h4>
+            <p className={`text-xs leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
               Comprehensive manuals on SPICe+ incorporation, SPCB consent, and industrial electricity connections.
             </p>
             <button 
               onClick={() => showToast('Opening SWAGAT User Handbook PDF')}
-              className="text-xs font-bold text-sky-400 hover:text-sky-300 inline-flex items-center"
+              className="text-xs font-bold text-sky-500 hover:text-sky-600 inline-flex items-center cursor-pointer"
             >
               <span>Download Manual</span>
               <ExternalLink className="w-3 h-3 ml-1" />
             </button>
           </div>
 
-          <div className="p-6 rounded-3xl bg-slate-950/60 border border-white/10 backdrop-blur-2xl shadow-xl hover:border-white/20 transition-all duration-300 hover:scale-[1.02] space-y-3">
+          <div className={`swagat-card p-6 rounded-3xl border transition-all duration-300 space-y-3 ${
+            isDark 
+              ? 'bg-slate-950/70 border-white/10 hover:border-white/20 text-white' 
+              : 'bg-white/90 border-slate-200 text-[#102A43]'
+          }`}>
             <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
               <Video className="w-5 h-5" />
             </div>
-            <h4 className="text-base font-bold text-white">Video Walkthroughs</h4>
-            <p className="text-xs text-slate-300 leading-relaxed">
+            <h4 className={`text-base font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Video Walkthroughs</h4>
+            <p className={`text-xs leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
               Interactive video tutorials showing how to complete the KYA journey and link DigiLocker KYC documents.
             </p>
             <button 
               onClick={() => showToast('Playing SWAGAT Platform Video Tour')}
-              className="text-xs font-bold text-amber-400 hover:text-amber-300 inline-flex items-center"
+              className="text-xs font-bold text-amber-500 hover:text-amber-600 inline-flex items-center cursor-pointer"
             >
               <span>Watch Video Tour (4 mins)</span>
               <ExternalLink className="w-3 h-3 ml-1" />
             </button>
           </div>
 
-          <div className="p-6 rounded-3xl bg-slate-950/60 border border-white/10 backdrop-blur-2xl shadow-xl hover:border-white/20 transition-all duration-300 hover:scale-[1.02] space-y-3">
+          <div className={`swagat-card p-6 rounded-3xl border transition-all duration-300 space-y-3 ${
+            isDark 
+              ? 'bg-slate-950/70 border-white/10 hover:border-white/20 text-white' 
+              : 'bg-white/90 border-slate-200 text-[#102A43]'
+          }`}>
             <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
               <FileQuestion className="w-5 h-5" />
             </div>
-            <h4 className="text-base font-bold text-white">Approval Guides</h4>
-            <p className="text-xs text-slate-300 leading-relaxed">
+            <h4 className={`text-base font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Approval Guides</h4>
+            <p className={`text-xs leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
               Master checklist of statutory checklists, document formats, stability certificates, and fees.
             </p>
             <button 
               onClick={() => showToast('Viewing Statutory Checklists Directory')}
-              className="text-xs font-bold text-emerald-400 hover:text-emerald-300 inline-flex items-center"
+              className="text-xs font-bold text-emerald-500 hover:text-emerald-600 inline-flex items-center cursor-pointer"
             >
               <span>View Checklist</span>
               <ExternalLink className="w-3 h-3 ml-1" />
             </button>
           </div>
 
-          <div className="p-6 rounded-3xl bg-slate-950/60 border border-white/10 backdrop-blur-2xl shadow-xl hover:border-white/20 transition-all duration-300 hover:scale-[1.02] space-y-3">
+          <div className={`swagat-card p-6 rounded-3xl border transition-all duration-300 space-y-3 ${
+            isDark 
+              ? 'bg-slate-950/70 border-white/10 hover:border-white/20 text-white' 
+              : 'bg-white/90 border-slate-200 text-[#102A43]'
+          }`}>
             <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center font-bold">
               <Headphones className="w-5 h-5" />
             </div>
-            <h4 className="text-base font-bold text-white">24/7 National Helpdesk</h4>
-            <p className="text-xs text-slate-300 leading-relaxed">
+            <h4 className={`text-base font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>24/7 National Helpdesk</h4>
+            <p className={`text-xs leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
               Toll-Free helpline 1800-11-8005 and dedicated single-window facilitators in every state capital.
             </p>
-            <div className="text-xs font-bold text-purple-300 font-mono">
+            <div className={`text-xs font-bold font-mono ${isDark ? 'text-purple-300' : 'text-purple-600'}`}>
               Toll Free: 1800-11-8005
             </div>
           </div>
 
         </div>
 
-        {/* Watermelon FAQ-3 Spring Accordion & Grievance Lodging Form */}
+        {/* FAQ-3 Spring Accordion & Grievance Lodging Form */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-16">
           
-          {/* Left: Watermelon FAQ-3 Spring Accordion */}
+          {/* Left: Spring Accordion */}
           <div className="lg:col-span-7 space-y-4">
-            <h3 className="text-2xl font-display font-extrabold text-white mb-4">
+            <h3 className={`text-2xl font-display font-extrabold mb-4 ${
+              isDark ? 'text-white' : 'text-slate-900'
+            }`}>
               Frequently Asked Questions
             </h3>
 
@@ -184,20 +212,26 @@ export const HelpCenterSection: React.FC = () => {
                     key={idx}
                     className={`rounded-2xl border transition-all duration-300 backdrop-blur-xl ${
                       isOpen
-                        ? 'bg-white/8 border-white/20 shadow-lg'
-                        : 'bg-white/4 border-white/10 hover:border-white/15'
+                        ? isDark
+                          ? 'bg-slate-900/80 border-sky-400/40 shadow-lg'
+                          : 'bg-white border-sky-400/60 shadow-md'
+                        : isDark
+                          ? 'bg-slate-950/60 border-white/10 hover:border-white/20'
+                          : 'bg-white/80 border-slate-200 hover:border-[#FF9933]/50 shadow-xs'
                     }`}
                   >
                     <button
                       type="button"
                       onClick={() => setActiveFaq(isOpen ? null : idx)}
-                      className="w-full text-left p-4 sm:p-5 flex items-center justify-between gap-3 font-bold text-xs sm:text-sm text-white"
+                      className={`w-full text-left p-4 sm:p-5 flex items-center justify-between gap-3 font-bold text-xs sm:text-sm transition-colors ${
+                        isDark ? 'text-white' : 'text-slate-900'
+                      }`}
                     >
                       <span className="leading-snug">{faq.q}</span>
                       <motion.div
                         animate={{ rotate: isOpen ? 180 : 0 }}
                         transition={{ duration: 0.25 }}
-                        className="shrink-0 p-1 rounded-lg bg-white/5"
+                        className={`shrink-0 p-1 rounded-lg ${isDark ? 'bg-white/5' : 'bg-slate-100'}`}
                       >
                         <ChevronDown className="w-4 h-4 text-slate-400" />
                       </motion.div>
@@ -212,7 +246,9 @@ export const HelpCenterSection: React.FC = () => {
                           transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
                           className="overflow-hidden"
                         >
-                          <div className="px-5 pb-5 text-xs text-slate-300 leading-relaxed border-t border-white/5 pt-3">
+                          <div className={`px-5 pb-5 text-xs leading-relaxed border-t pt-3 ${
+                            isDark ? 'border-white/5 text-slate-300' : 'border-slate-100 text-slate-600'
+                          }`}>
                             {faq.a}
                           </div>
                         </motion.div>
@@ -225,58 +261,84 @@ export const HelpCenterSection: React.FC = () => {
           </div>
 
           {/* Right: Quick Grievance / Query Submission */}
-          <div className="lg:col-span-5 bg-slate-950/70 rounded-3xl p-6 sm:p-8 border border-white/10 backdrop-blur-2xl shadow-xl text-white">
-            <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">
-              <Sparkles className="w-4 h-4" />
+          <div className={`lg:col-span-5 rounded-3xl p-6 sm:p-8 border shadow-xl backdrop-blur-2xl transition-all ${
+            isDark 
+              ? 'bg-slate-950/70 border-white/10 text-white' 
+              : 'bg-white/95 border-slate-200 text-slate-800 shadow-slate-200/50'
+          }`}>
+            <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-amber-500 mb-2">
+              <Sparkles className="w-4 h-4 text-amber-500" />
               <span>Direct Support Ticket</span>
             </div>
-            <h3 className="text-xl font-display font-extrabold text-white mb-2">
+            <h3 className={`text-xl font-display font-extrabold mb-2 ${
+              isDark ? 'text-white' : 'text-slate-900'
+            }`}>
               Lodge Query / Grievance
             </h3>
-            <p className="text-xs text-slate-300 mb-6">
+            <p className={`text-xs mb-6 ${
+              isDark ? 'text-slate-300' : 'text-slate-600'
+            }`}>
               Our single-window nodal facilitation officers respond within 24 business hours.
             </p>
 
             <form onSubmit={handleSubmitGrievance} className="space-y-4">
               <div>
-                <label className="text-[11px] font-bold text-slate-300 uppercase block mb-1">Your Full Name</label>
+                <label className={`text-[11px] font-bold uppercase block mb-1 ${
+                  isDark ? 'text-slate-300' : 'text-slate-700'
+                }`}>Your Full Name</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Narendra Singh"
                   value={queryName}
                   onChange={(e) => setQueryName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-500 text-xs focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/50"
+                  className={`w-full px-3.5 py-2.5 rounded-xl border text-xs focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/50 transition ${
+                    isDark 
+                      ? 'bg-white/5 border-white/10 text-white placeholder:text-slate-500' 
+                      : 'bg-white border-slate-200 text-slate-800 placeholder:text-slate-400'
+                  }`}
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-bold text-slate-300 uppercase block mb-1">Email / Phone</label>
+                <label className={`text-[11px] font-bold uppercase block mb-1 ${
+                  isDark ? 'text-slate-300' : 'text-slate-700'
+                }`}>Email / Phone</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. contact@company.in"
                   value={queryEmail}
                   onChange={(e) => setQueryEmail(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-500 text-xs focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/50"
+                  className={`w-full px-3.5 py-2.5 rounded-xl border text-xs focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/50 transition ${
+                    isDark 
+                      ? 'bg-white/5 border-white/10 text-white placeholder:text-slate-500' 
+                      : 'bg-white border-slate-200 text-slate-800 placeholder:text-slate-400'
+                  }`}
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-bold text-slate-300 uppercase block mb-1">Query / Assistance Needed</label>
+                <label className={`text-[11px] font-bold uppercase block mb-1 ${
+                  isDark ? 'text-slate-300' : 'text-slate-700'
+                }`}>Query / Assistance Needed</label>
                 <textarea
                   rows={3}
                   required
                   placeholder="Describe your approval or application question..."
                   value={queryMessage}
                   onChange={(e) => setQueryMessage(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-500 text-xs focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/50 resize-none"
+                  className={`w-full px-3.5 py-2.5 rounded-xl border text-xs focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/50 resize-none transition ${
+                    isDark 
+                      ? 'bg-white/5 border-white/10 text-white placeholder:text-slate-500' 
+                      : 'bg-white border-slate-200 text-slate-800 placeholder:text-slate-400'
+                  }`}
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full py-3 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-sky-500/20 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center space-x-2"
+                className="w-full py-3 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-sky-500/20 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center space-x-2 cursor-pointer"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>Submit Ticket</span>
@@ -286,7 +348,7 @@ export const HelpCenterSection: React.FC = () => {
 
         </div>
 
-        {/* Embedded Watermelon Feedback Widget */}
+        {/* Embedded Feedback Widget */}
         <FeedbackWidget
           onSubmitFeedback={(rating, category, comment) => {
             showToast(`Recorded ${rating}-star feedback for ${category}. Thank you!`);

@@ -32,7 +32,9 @@ export const ApprovalsDirectory: React.FC = () => {
     showToast,
     selectedSectorFilter,
     selectedStateFilter,
+    theme,
   } = useSwagat();
+  const isDark = theme === 'dark';
   const { t } = useLanguage();
 
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -144,8 +146,8 @@ export const ApprovalsDirectory: React.FC = () => {
       header: 'Statutory Approval',
       render: (app) => (
         <div>
-          <span className="font-bold text-white block">{app.name}</span>
-          <span className="text-[11px] text-slate-400">{app.department}</span>
+          <span className={`font-bold block ${isDark ? 'text-white' : 'text-[#102A43]'}`}>{app.name}</span>
+          <span className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-[#52657A]'}`}>{app.department}</span>
         </div>
       ),
     },
@@ -155,8 +157,8 @@ export const ApprovalsDirectory: React.FC = () => {
       render: (app) => (
         <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
           app.centralOrState === 'Central'
-            ? 'bg-sky-500/15 text-sky-300 border border-sky-500/30'
-            : 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+            ? isDark ? 'bg-sky-500/15 text-sky-300 border border-sky-500/30' : 'bg-sky-50 text-sky-800 border border-sky-200'
+            : isDark ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
         }`}>
           {app.centralOrState === 'Central' ? 'Central Pan-India' : app.stateName || 'State'}
         </span>
@@ -165,12 +167,12 @@ export const ApprovalsDirectory: React.FC = () => {
     {
       key: 'processingDays',
       header: 'Statutory SLA',
-      render: (app) => <span className="font-bold text-amber-300">{app.processingDays} Days</span>,
+      render: (app) => <span className={`font-bold ${isDark ? 'text-amber-300' : 'text-amber-700'}`}>{app.processingDays} Days</span>,
     },
     {
       key: 'statutoryFee',
       header: 'Statutory Fee',
-      render: (app) => <span className="text-slate-300">{app.statutoryFee}</span>,
+      render: (app) => <span className={isDark ? 'text-slate-300' : 'text-[#52657A]'}>{app.statutoryFee}</span>,
     },
     {
       key: 'actions',
@@ -182,7 +184,11 @@ export const ApprovalsDirectory: React.FC = () => {
               e.stopPropagation();
               setSelectedApproval(app);
             }}
-            className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/15 text-white text-[11px] font-semibold transition"
+            className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition ${
+              isDark 
+                ? 'bg-white/10 hover:bg-white/15 text-white' 
+                : 'bg-slate-100 hover:bg-slate-200 text-[#102A43] border border-slate-200'
+            }`}
           >
             Details
           </button>
@@ -207,14 +213,18 @@ export const ApprovalsDirectory: React.FC = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
           <div>
-            <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-sky-400 text-xs font-bold uppercase tracking-wider mb-2 backdrop-blur-md">
+            <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-sky-500/10 border border-sky-400/20 text-sky-400 text-xs font-bold uppercase tracking-wider mb-2 backdrop-blur-md">
               <Layers className="w-4 h-4" />
               <span>National Clearance Directory</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-white tracking-tight">
+            <h2 className={`text-3xl sm:text-4xl font-display font-extrabold tracking-tight ${
+              isDark ? 'text-white' : 'text-slate-900'
+            }`}>
               All Business Approvals &amp; Clearances
             </h2>
-            <p className="mt-1 text-slate-300 text-sm">
+            <p className={`mt-1 text-sm ${
+              isDark ? 'text-slate-300' : 'text-slate-600'
+            }`}>
               Discover and initiate pre-establishment, operating licenses, and periodic NOCs across Central and State ministries.
             </p>
           </div>
@@ -227,14 +237,19 @@ export const ApprovalsDirectory: React.FC = () => {
               onChange={(id) => setSelectedLevel(id as any)}
               layoutId="directory-level-tab"
               size="sm"
+              theme={theme}
             />
 
-            <div className="flex items-center p-1 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl">
+            <div className={`flex items-center p-1 rounded-2xl border backdrop-blur-xl ${
+              isDark ? 'bg-white/5 border-white/10' : 'bg-white/90 border-slate-200 shadow-sm'
+            }`}>
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
                 className={`p-1.5 rounded-xl transition ${
-                  viewMode === 'grid' ? 'bg-white/15 text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                  viewMode === 'grid' 
+                    ? isDark ? 'bg-white/15 text-white shadow-xs' : 'bg-slate-100 text-slate-900 shadow-xs' 
+                    : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'
                 }`}
                 title="Grid View"
               >
@@ -244,7 +259,9 @@ export const ApprovalsDirectory: React.FC = () => {
                 type="button"
                 onClick={() => setViewMode('table')}
                 className={`p-1.5 rounded-xl transition ${
-                  viewMode === 'table' ? 'bg-white/15 text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                  viewMode === 'table' 
+                    ? isDark ? 'bg-white/15 text-white shadow-xs' : 'bg-slate-100 text-slate-900 shadow-xs' 
+                    : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'
                 }`}
                 title="Table View (Watermelon Table 1)"
               >
@@ -255,7 +272,11 @@ export const ApprovalsDirectory: React.FC = () => {
         </div>
 
         {/* Filter & Search Bar */}
-        <div className="bg-slate-950/60 rounded-3xl p-5 shadow-2xl border border-white/10 backdrop-blur-2xl mb-8 space-y-4">
+        <div className={`rounded-3xl p-5 shadow-2xl border backdrop-blur-2xl mb-8 space-y-4 transition-colors ${
+          isDark 
+            ? 'bg-slate-950/60 border-white/10' 
+            : 'bg-white/90 border-slate-200 shadow-slate-200/60'
+        }`}>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
             
             {/* Search Input */}
@@ -265,13 +286,17 @@ export const ApprovalsDirectory: React.FC = () => {
                 placeholder="Search by clearance name, ministry, keyword..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-500 text-xs focus:outline-none focus:border-sky-400"
+                className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-xs focus:outline-none focus:border-sky-400 transition ${
+                  isDark 
+                    ? 'bg-white/5 border-white/10 text-white placeholder:text-slate-500' 
+                    : 'bg-white border-slate-200 text-slate-800 placeholder:text-slate-400'
+                }`}
               />
               <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:${isDark ? 'text-white' : 'text-slate-700'}`}
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -283,7 +308,11 @@ export const ApprovalsDirectory: React.FC = () => {
               <select
                 value={selectedState}
                 onChange={(e) => setSelectedState(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl border border-white/10 text-xs font-medium bg-[#0A1424] text-white focus:outline-none focus:border-sky-400"
+                className={`w-full px-3 py-2.5 rounded-xl border text-xs font-medium focus:outline-none focus:border-sky-400 transition ${
+                  isDark 
+                    ? 'bg-[#0A1424] text-white border-white/10' 
+                    : 'bg-white text-slate-800 border-slate-200'
+                }`}
               >
                 <option value="All">All States / Central</option>
                 {allIndianStatesList.map((st) => (
@@ -299,7 +328,11 @@ export const ApprovalsDirectory: React.FC = () => {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl border border-white/10 text-xs font-medium bg-[#0A1424] text-white focus:outline-none focus:border-sky-400"
+                className={`w-full px-3 py-2.5 rounded-xl border text-xs font-medium focus:outline-none focus:border-sky-400 transition ${
+                  isDark 
+                    ? 'bg-[#0A1424] text-white border-white/10' 
+                    : 'bg-white text-slate-800 border-slate-200'
+                }`}
               >
                 <option value="All">All Categories</option>
                 {categories.map((cat) => (
@@ -313,7 +346,11 @@ export const ApprovalsDirectory: React.FC = () => {
               <select
                 value={selectedSector}
                 onChange={(e) => setSelectedSector(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl border border-white/10 text-xs font-medium bg-[#0A1424] text-white focus:outline-none focus:border-sky-400"
+                className={`w-full px-3 py-2.5 rounded-xl border text-xs font-medium focus:outline-none focus:border-sky-400 transition ${
+                  isDark 
+                    ? 'bg-[#0A1424] text-white border-white/10' 
+                    : 'bg-white text-slate-800 border-slate-200'
+                }`}
               >
                 {sectors.map((sec) => (
                   <option key={sec} value={sec}>{sec}</option>
@@ -324,14 +361,16 @@ export const ApprovalsDirectory: React.FC = () => {
           </div>
 
           {/* Active Filter Tags & Results Counter */}
-          <div className="flex flex-wrap items-center justify-between text-xs pt-2 border-t border-white/5 text-slate-400">
+          <div className={`flex flex-wrap items-center justify-between text-xs pt-2 border-t ${
+            isDark ? 'border-white/5 text-slate-400' : 'border-slate-100 text-slate-500'
+          }`}>
             <div>
-              Showing <strong className="text-white">{filteredApprovals.length}</strong> statutory clearances matching criteria
+              Showing <strong className={isDark ? 'text-white' : 'text-slate-900'}>{filteredApprovals.length}</strong> statutory clearances matching criteria
             </div>
             {(searchQuery || selectedCategory !== 'All' || selectedLevel !== 'All' || selectedSector !== 'All') && (
               <button
                 onClick={resetFilters}
-                className="text-xs font-bold text-rose-400 hover:text-rose-300 underline"
+                className="text-xs font-bold text-rose-500 hover:text-rose-400 underline"
               >
                 Clear all filters
               </button>
@@ -352,71 +391,95 @@ export const ApprovalsDirectory: React.FC = () => {
             {filteredApprovals.map((app) => (
               <div
                 key={app.id}
-                className="bg-slate-950/70 rounded-3xl border border-white/10 hover:border-white/20 shadow-xl backdrop-blur-2xl transition-all duration-300 hover:scale-[1.01] p-6 flex flex-col justify-between space-y-4 group text-white"
+                className={`swagat-card rounded-3xl border transition-all duration-300 p-6 flex flex-col justify-between space-y-4 group ${
+                  isDark
+                    ? 'bg-slate-950/70 border-white/10 text-white backdrop-blur-2xl shadow-xl'
+                    : 'text-[#102A43]'
+                }`}
               >
                 <div className="space-y-3">
                   {/* Badges */}
                   <div className="flex items-center justify-between gap-2">
                     {app.centralOrState === 'Central' ? (
-                      <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-sky-500/15 text-sky-300 border border-sky-500/30 flex items-center space-x-1">
+                      <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-sky-500/15 text-sky-400 border border-sky-500/30 flex items-center space-x-1">
                         <ShieldCheck className="w-3 h-3 text-sky-400 shrink-0" />
                         <span>Central Approval • Pan-India</span>
                       </span>
                     ) : (
-                      <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center space-x-1">
+                      <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center space-x-1">
                         <MapPin className="w-3 h-3 text-emerald-400 shrink-0" />
                         <span>{app.stateName ? `${app.stateName} Clearance` : 'State / UT Clearance'}</span>
                       </span>
                     )}
 
-                    <span className="text-[10px] font-bold text-slate-400 bg-white/5 border border-white/10 px-2 py-0.5 rounded-md shrink-0">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md shrink-0 border ${
+                      isDark ? 'text-slate-400 bg-white/5 border-white/10' : 'text-slate-600 bg-slate-100 border-slate-200'
+                    }`}>
                       {app.stage}
                     </span>
                   </div>
 
                   {/* Approval Title */}
-                  <h3 className="text-base font-bold text-white group-hover:text-sky-300 transition-colors leading-snug">
+                  <h3 className={`text-base font-bold transition-colors leading-snug ${
+                    isDark ? 'text-white group-hover:text-sky-300' : 'text-slate-900 group-hover:text-sky-600'
+                  }`}>
                     {app.name}
                   </h3>
 
                   {/* Ministry / Department */}
-                  <div className="text-xs text-slate-400 font-medium flex items-center space-x-1.5">
-                    <Building2 className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                  <div className={`text-xs font-medium flex items-center space-x-1.5 ${
+                    isDark ? 'text-slate-400' : 'text-slate-500'
+                  }`}>
+                    <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                     <span className="truncate">{app.centralOrState === 'Central' ? app.ministry : app.department}</span>
                   </div>
 
                   {/* Description */}
-                  <p className="text-xs text-slate-300 line-clamp-3 leading-relaxed">
+                  <p className={`text-xs line-clamp-3 leading-relaxed ${
+                    isDark ? 'text-slate-300' : 'text-slate-600'
+                  }`}>
                     {app.description}
                   </p>
 
                   {/* Key Metrics */}
-                  <div className="grid grid-cols-2 gap-2 pt-3 border-t border-white/10 text-[11px] text-slate-300">
+                  <div className={`grid grid-cols-2 gap-2 pt-3 border-t text-[11px] ${
+                    isDark ? 'border-white/10 text-slate-300' : 'border-slate-100 text-slate-600'
+                  }`}>
                     <div className="flex items-center space-x-1.5">
-                      <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                      <span>SLA: <strong className="text-white">{app.processingDays} Days</strong></span>
+                      <Clock className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                      <span>SLA: <strong className={isDark ? 'text-white' : 'text-slate-900'}>{app.processingDays} Days</strong></span>
                     </div>
                     <div className="flex items-center space-x-1.5 truncate">
-                      <FileText className="w-3.5 h-3.5 text-sky-400 shrink-0" />
-                      <span className="truncate">Fee: <strong className="text-white">{app.statutoryFee}</strong></span>
+                      <FileText className="w-3.5 h-3.5 text-sky-500 shrink-0" />
+                      <span className="truncate">Fee: <strong className={isDark ? 'text-white' : 'text-slate-900'}>{app.statutoryFee}</strong></span>
                     </div>
                   </div>
 
                   {/* Required Documents Pill Summary */}
-                  <div className="text-[11px] bg-white/5 p-2.5 rounded-xl border border-white/5 text-slate-300 space-y-1">
-                    <div className="font-semibold text-slate-400 text-[10px] uppercase">Key Documents:</div>
-                    <div className="truncate text-slate-300">
+                  <div className={`text-[11px] p-2.5 rounded-xl border space-y-1 ${
+                    isDark ? 'bg-white/5 border-white/5 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
+                  }`}>
+                    <div className={`font-semibold text-[10px] uppercase ${
+                      isDark ? 'text-slate-400' : 'text-slate-500'
+                    }`}>Key Documents:</div>
+                    <div className={`truncate ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                       {app.requiredDocuments.slice(0, 2).join(' • ')} + {app.requiredDocuments.length - 2} more
                     </div>
                   </div>
                 </div>
 
                 {/* Action Buttons: View Details, Add to Dashboard, Apply */}
-                <div className="pt-3 border-t border-white/10 flex items-center justify-between gap-2">
+                <div className={`pt-3 border-t flex items-center justify-between gap-2 ${
+                  isDark ? 'border-white/10' : 'border-slate-100'
+                }`}>
                   <button
                     id={`btn-details-${app.id}`}
                     onClick={() => setSelectedApproval(app)}
-                    className="px-3 py-2 text-xs font-bold text-slate-300 hover:text-white hover:bg-white/10 rounded-xl transition"
+                    className={`px-3 py-2 text-xs font-bold rounded-xl transition ${
+                      isDark 
+                        ? 'text-slate-300 hover:text-white hover:bg-white/10' 
+                        : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100 border border-slate-200'
+                    }`}
                   >
                     {t('view_details')}
                   </button>
@@ -424,7 +487,9 @@ export const ApprovalsDirectory: React.FC = () => {
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => handleAddToDashboard(app)}
-                      className="p-2 text-xs font-semibold text-sky-300 hover:bg-sky-500/15 rounded-xl transition"
+                      className={`p-2 text-xs font-semibold rounded-xl transition ${
+                        isDark ? 'text-sky-300 hover:bg-sky-500/15' : 'text-sky-600 hover:bg-sky-50'
+                      }`}
                       title="Add to My Dashboard"
                     >
                       + Dashboard
@@ -433,10 +498,10 @@ export const ApprovalsDirectory: React.FC = () => {
                     <button
                       id={`btn-apply-${app.id}`}
                       onClick={() => startApplication(app)}
-                      className="px-4 py-2 text-xs font-extrabold text-slate-950 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-300 hover:to-blue-400 rounded-xl shadow-lg shadow-sky-500/20 transition active:scale-95 flex items-center space-x-1 cursor-pointer"
+                      className="px-4 py-2 text-xs font-extrabold !text-white bg-sky-500 hover:bg-sky-600 rounded-xl shadow-lg shadow-sky-500/20 transition active:scale-95 flex items-center space-x-1 cursor-pointer"
                     >
-                      <span>{t('apply')}</span>
-                      <ArrowRight className="w-3 h-3 ml-1 text-slate-950" />
+                      <span className="!text-white font-extrabold">{t('apply')}</span>
+                      <ArrowRight className="w-3 h-3 ml-1 !text-white shrink-0" />
                     </button>
                   </div>
                 </div>

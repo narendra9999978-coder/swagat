@@ -26,7 +26,8 @@ export const GlobalSearchModal: React.FC = () => {
     schemes, 
     setSelectedApproval, 
     setSelectedScheme,
-    setCurrentView
+    setCurrentView,
+    theme
   } = useSwagat();
 
   const [query, setQuery] = useState('');
@@ -70,33 +71,49 @@ export const GlobalSearchModal: React.FC = () => {
   if (!isSearchModalOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/75 backdrop-blur-xl p-4 pt-16 sm:pt-24 overflow-y-auto">
+    <div className={`fixed inset-0 z-50 flex items-start justify-center p-4 pt-16 sm:pt-24 overflow-y-auto ${
+      theme === 'light' ? 'bg-slate-900/40 backdrop-blur-md' : 'bg-black/75 backdrop-blur-xl'
+    }`}>
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: -10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: -10 }}
         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-        className="relative bg-slate-950/85 rounded-3xl max-w-2xl w-full shadow-2xl border border-white/15 backdrop-blur-2xl overflow-hidden"
+        className={`relative rounded-3xl max-w-2xl w-full border backdrop-blur-2xl overflow-hidden ${
+          theme === 'light'
+            ? 'bg-[#FFFFFF] border-[#D8E2EC] shadow-[0_20px_50px_rgba(20,40,60,0.18)] text-[#172B4D]'
+            : 'bg-slate-950/85 border-white/15 text-white shadow-2xl'
+        }`}
       >
         {/* Animated glowing border beam header */}
-        <div className="relative border-b border-white/10 p-4 sm:p-5 flex items-center space-x-3 bg-white/5">
-          <Search className="w-5 h-5 text-sky-400 shrink-0" />
+        <div className={`relative border-b p-4 sm:p-5 flex items-center space-x-3 ${
+          theme === 'light' ? 'border-[#D8E2EC] bg-[#F8FAFC]' : 'border-white/10 bg-white/5'
+        }`}>
+          <Search className="w-5 h-5 text-sky-500 shrink-0" />
           <input
             ref={inputRef}
             type="text"
             placeholder="Search approvals, schemes, departments, states (e.g. Pollution, Factory, PLI, Gujarat)..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full text-sm font-medium focus:outline-none bg-transparent text-white placeholder:text-slate-400"
+            className={`w-full text-sm font-medium focus:outline-none bg-transparent ${
+              theme === 'light' ? 'text-[#172B4D] placeholder:text-[#64748B]' : 'text-white placeholder:text-slate-400'
+            }`}
           />
           {query && (
-            <button onClick={() => setQuery('')} className="p-1 text-slate-400 hover:text-white transition">
+            <button onClick={() => setQuery('')} className={`p-1 transition ${
+              theme === 'light' ? 'text-slate-400 hover:text-slate-700' : 'text-slate-400 hover:text-white'
+            }`}>
               <X className="w-4 h-4" />
             </button>
           )}
           <button
             onClick={() => setIsSearchModalOpen(false)}
-            className="px-2.5 py-1 text-[10px] font-bold text-slate-300 bg-white/10 hover:bg-white/15 border border-white/10 rounded-lg transition"
+            className={`px-2.5 py-1 text-[10px] font-bold rounded-lg border transition ${
+              theme === 'light'
+                ? 'text-[#64748B] bg-slate-100 hover:bg-slate-200 border-[#D8E2EC]'
+                : 'text-slate-300 bg-white/10 hover:bg-white/15 border-white/10'
+            }`}
           >
             ESC
           </button>
@@ -106,16 +123,22 @@ export const GlobalSearchModal: React.FC = () => {
         <div className="p-5 max-h-96 overflow-y-auto space-y-6">
           
           {!query.trim() && (
-            <div className="py-8 text-center text-xs text-slate-400 space-y-2">
-              <Sparkles className="w-6 h-6 mx-auto text-amber-400" />
-              <div className="text-slate-200 font-semibold">Search across 1,400+ Central clearances, 28 State portals, and PLI schemes.</div>
-              <div className="text-[11px] text-slate-400 flex flex-wrap justify-center gap-2 pt-1">
+            <div className={`py-8 text-center text-xs space-y-2 ${
+              theme === 'light' ? 'text-[#64748B]' : 'text-slate-400'
+            }`}>
+              <Sparkles className="w-6 h-6 mx-auto text-amber-500" />
+              <div className={`font-semibold ${theme === 'light' ? 'text-[#172B4D]' : 'text-slate-200'}`}>
+                Search across 1,400+ Central clearances, 28 State portals, and PLI schemes.
+              </div>
+              <div className={`text-[11px] flex flex-wrap justify-center gap-2 pt-1 ${
+                theme === 'light' ? 'text-[#64748B]' : 'text-slate-400'
+              }`}>
                 <span>Try:</span>
-                <span className="text-sky-400 hover:underline cursor-pointer" onClick={() => setQuery('Pollution')}>"Pollution"</span>
+                <span className="text-sky-600 dark:text-sky-400 hover:underline cursor-pointer font-medium" onClick={() => setQuery('Pollution')}>"Pollution"</span>
                 <span>•</span>
-                <span className="text-amber-400 hover:underline cursor-pointer" onClick={() => setQuery('PLI')}>"PLI"</span>
+                <span className="text-amber-600 dark:text-amber-400 hover:underline cursor-pointer font-medium" onClick={() => setQuery('PLI')}>"PLI"</span>
                 <span>•</span>
-                <span className="text-emerald-400 hover:underline cursor-pointer" onClick={() => setQuery('Maharashtra')}>"Maharashtra"</span>
+                <span className="text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer font-medium" onClick={() => setQuery('Maharashtra')}>"Maharashtra"</span>
               </div>
             </div>
           )}
@@ -123,7 +146,7 @@ export const GlobalSearchModal: React.FC = () => {
           {/* Approvals Results */}
           {results.approvals.length > 0 && (
             <div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-2 flex items-center space-x-1.5">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400 mb-2 flex items-center space-x-1.5">
                 <Layers className="w-3.5 h-3.5" />
                 <span>Statutory Approvals &amp; Clearances</span>
               </div>
@@ -135,13 +158,23 @@ export const GlobalSearchModal: React.FC = () => {
                       setSelectedApproval(app);
                       setIsSearchModalOpen(false);
                     }}
-                    className="p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/15 cursor-pointer flex items-center justify-between text-xs transition group"
+                    className={`p-3 rounded-xl border cursor-pointer flex items-center justify-between text-xs transition group ${
+                      theme === 'light'
+                        ? 'bg-[#F8FAFC] hover:bg-[#EAF5FF] border-[#D8E2EC] hover:border-sky-300'
+                        : 'bg-white/5 hover:bg-white/10 border-white/5 hover:border-white/15'
+                    }`}
                   >
                     <div>
-                      <div className="font-bold text-white group-hover:text-sky-300 transition-colors">{app.name}</div>
-                      <div className="text-[11px] text-slate-400">{app.department} • {app.centralOrState}</div>
+                      <div className={`font-bold transition-colors ${
+                        theme === 'light' ? 'text-[#172B4D] group-hover:text-sky-700' : 'text-white group-hover:text-sky-300'
+                      }`}>{app.name}</div>
+                      <div className={`text-[11px] ${theme === 'light' ? 'text-[#64748B]' : 'text-slate-400'}`}>
+                        {app.department} • {app.centralOrState}
+                      </div>
                     </div>
-                    <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-white transition-transform group-hover:translate-x-0.5" />
+                    <ArrowRight className={`w-4 h-4 transition-transform group-hover:translate-x-0.5 ${
+                      theme === 'light' ? 'text-[#64748B] group-hover:text-[#172B4D]' : 'text-slate-500 group-hover:text-white'
+                    }`} />
                   </div>
                 ))}
               </div>
@@ -151,7 +184,7 @@ export const GlobalSearchModal: React.FC = () => {
           {/* Schemes Results */}
           {results.schemes.length > 0 && (
             <div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-purple-400 mb-2 flex items-center space-x-1.5">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 mb-2 flex items-center space-x-1.5">
                 <Award className="w-3.5 h-3.5" />
                 <span>Government Schemes &amp; Subsidies</span>
               </div>
@@ -163,13 +196,23 @@ export const GlobalSearchModal: React.FC = () => {
                       setSelectedScheme(sch);
                       setIsSearchModalOpen(false);
                     }}
-                    className="p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/15 cursor-pointer flex items-center justify-between text-xs transition group"
+                    className={`p-3 rounded-xl border cursor-pointer flex items-center justify-between text-xs transition group ${
+                      theme === 'light'
+                        ? 'bg-[#F8FAFC] hover:bg-[#FAF5FF] border-[#D8E2EC] hover:border-purple-300'
+                        : 'bg-white/5 hover:bg-white/10 border-white/5 hover:border-white/15'
+                    }`}
                   >
                     <div>
-                      <div className="font-bold text-white group-hover:text-purple-300 transition-colors">{sch.name}</div>
-                      <div className="text-[11px] text-slate-400">{sch.maxFinancialSupport} • {sch.sector}</div>
+                      <div className={`font-bold transition-colors ${
+                        theme === 'light' ? 'text-[#172B4D] group-hover:text-purple-700' : 'text-white group-hover:text-purple-300'
+                      }`}>{sch.name}</div>
+                      <div className={`text-[11px] ${theme === 'light' ? 'text-[#64748B]' : 'text-slate-400'}`}>
+                        {sch.maxFinancialSupport} • {sch.sector}
+                      </div>
                     </div>
-                    <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-white transition-transform group-hover:translate-x-0.5" />
+                    <ArrowRight className={`w-4 h-4 transition-transform group-hover:translate-x-0.5 ${
+                      theme === 'light' ? 'text-[#64748B] group-hover:text-[#172B4D]' : 'text-slate-500 group-hover:text-white'
+                    }`} />
                   </div>
                 ))}
               </div>
@@ -179,7 +222,7 @@ export const GlobalSearchModal: React.FC = () => {
           {/* States Results */}
           {results.states.length > 0 && (
             <div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 mb-2 flex items-center space-x-1.5">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-2 flex items-center space-x-1.5">
                 <MapPin className="w-3.5 h-3.5" />
                 <span>State Single Window Portals</span>
               </div>
@@ -193,13 +236,23 @@ export const GlobalSearchModal: React.FC = () => {
                       const el = document.getElementById('section-states');
                       if (el) el.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className="p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/15 cursor-pointer flex items-center justify-between text-xs transition group"
+                    className={`p-3 rounded-xl border cursor-pointer flex items-center justify-between text-xs transition group ${
+                      theme === 'light'
+                        ? 'bg-[#F8FAFC] hover:bg-[#F0FDF4] border-[#D8E2EC] hover:border-emerald-300'
+                        : 'bg-white/5 hover:bg-white/10 border-white/5 hover:border-white/15'
+                    }`}
                   >
                     <div>
-                      <div className="font-bold text-white group-hover:text-emerald-300 transition-colors">{st.name} ({st.portalName})</div>
-                      <div className="text-[11px] text-slate-400">{st.nodalAgency} • SLA: {st.clearanceDaysAvg} Days</div>
+                      <div className={`font-bold transition-colors ${
+                        theme === 'light' ? 'text-[#172B4D] group-hover:text-emerald-700' : 'text-white group-hover:text-emerald-300'
+                      }`}>{st.name} ({st.portalName})</div>
+                      <div className={`text-[11px] ${theme === 'light' ? 'text-[#64748B]' : 'text-slate-400'}`}>
+                        {st.nodalAgency} • SLA: {st.clearanceDaysAvg} Days
+                      </div>
                     </div>
-                    <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-white transition-transform group-hover:translate-x-0.5" />
+                    <ArrowRight className={`w-4 h-4 transition-transform group-hover:translate-x-0.5 ${
+                      theme === 'light' ? 'text-[#64748B] group-hover:text-[#172B4D]' : 'text-slate-500 group-hover:text-white'
+                    }`} />
                   </div>
                 ))}
               </div>
@@ -209,9 +262,15 @@ export const GlobalSearchModal: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <div className="bg-white/5 px-5 py-3 border-t border-white/10 text-[11px] text-slate-400 flex items-center justify-between">
+        <div className={`px-5 py-3 border-t text-[11px] flex items-center justify-between ${
+          theme === 'light'
+            ? 'bg-[#F8FAFC] border-[#D8E2EC] text-[#64748B]'
+            : 'bg-white/5 border-white/10 text-slate-400'
+        }`}>
           <span>Single-Window Search Index across Central &amp; State government portals</span>
-          <span className="font-mono text-amber-300">SWAGAT Quick Search</span>
+          <span className={`font-mono ${theme === 'light' ? 'text-amber-600 font-semibold' : 'text-amber-300'}`}>
+            SWAGAT Quick Search
+          </span>
         </div>
 
       </motion.div>

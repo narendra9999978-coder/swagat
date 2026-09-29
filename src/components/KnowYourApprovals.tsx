@@ -34,8 +34,10 @@ export const KnowYourApprovals: React.FC = () => {
     showToast,
     userProfile,
     setCurrentView,
-    setDashboardActiveTab
+    setDashboardActiveTab,
+    theme
   } = useSwagat();
+  const isDark = theme === 'dark';
 
   const { t } = useLanguage();
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -151,25 +153,37 @@ export const KnowYourApprovals: React.FC = () => {
   };
 
   return (
-    <section id="section-kya" className="py-20 bg-transparent border-t border-white/10">
+    <section id="section-kya" className={`py-20 bg-transparent border-t transition-colors duration-300 ${
+      isDark ? 'border-white/10' : 'border-slate-200'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-300 text-xs font-bold uppercase tracking-wider mb-3 backdrop-blur-md">
-            <Compass className="w-4 h-4 text-amber-400" />
+          <div className={`inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-3 backdrop-blur-md border ${
+            isDark 
+              ? 'bg-amber-500/10 border-amber-500/25 text-amber-300' 
+              : 'bg-amber-50 border-amber-200 text-amber-800'
+          }`}>
+            <Compass className={`w-4 h-4 ${isDark ? 'text-amber-400' : 'text-amber-600'}`} />
             <span>Smart Compliance Engine</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-white tracking-tight">
+          <h2 className={`text-3xl sm:text-4xl font-display font-extrabold tracking-tight ${
+            isDark ? 'text-white' : 'text-slate-900'
+          }`}>
             {t('kya_heading')}
           </h2>
-          <p className="mt-3 text-slate-300 text-base">
+          <p className={`mt-3 text-base ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
             {t('kya_subheading')}
           </p>
         </div>
 
         {/* 5-Step Progress Stepper Bar */}
-        <div className="mb-10 rounded-2xl p-4 sm:p-6 bg-slate-900/60 backdrop-blur-xl border border-white/10 shadow-xl">
+        <div className={`mb-10 rounded-2xl p-4 sm:p-6 backdrop-blur-xl shadow-xl transition-colors duration-300 border ${
+          isDark 
+            ? 'bg-slate-900/60 border-white/10' 
+            : 'bg-white/90 border-slate-200 shadow-sm'
+        }`}>
           <div className="grid grid-cols-5 gap-2 sm:gap-4 relative">
             {[
               { num: 1, title: 'Objective', label: '1. Intent' },
@@ -191,10 +205,10 @@ export const KnowYourApprovals: React.FC = () => {
                   }}
                   className={`flex flex-col items-center text-center p-2 rounded-xl transition-all ${
                     isCurrent 
-                      ? 'bg-amber-400/15 border border-amber-400/40 text-amber-300 shadow-sm' 
+                      ? 'bg-amber-400/15 border border-amber-400/40 text-amber-400 shadow-sm' 
                       : isDone 
-                      ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/15' 
-                      : 'opacity-50 hover:opacity-75'
+                      ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 hover:bg-emerald-500/15' 
+                      : isDark ? 'opacity-50 hover:opacity-75 text-slate-400' : 'opacity-60 hover:opacity-90 text-slate-500'
                   }`}
                 >
                   <div
@@ -203,13 +217,19 @@ export const KnowYourApprovals: React.FC = () => {
                         ? 'bg-emerald-500 text-slate-950 shadow-xs'
                         : isCurrent
                         ? 'bg-gradient-to-r from-amber-400 to-amber-300 text-slate-950 ring-4 ring-amber-400/20 shadow-md'
-                        : 'bg-white/10 text-slate-300 border border-white/15'
+                        : isDark
+                        ? 'bg-white/10 text-slate-300 border border-white/15'
+                        : 'bg-slate-100 text-slate-600 border border-slate-200'
                     }`}
                   >
                     {isDone ? '✓' : step.num}
                   </div>
                   <span className={`text-xs font-bold truncate max-w-full ${
-                    isCurrent ? 'text-amber-300' : isDone ? 'text-emerald-400' : 'text-slate-300'
+                    isCurrent 
+                      ? isDark ? 'text-amber-300' : 'text-amber-700' 
+                      : isDone 
+                      ? isDark ? 'text-emerald-400' : 'text-emerald-700' 
+                      : isDark ? 'text-slate-400' : 'text-slate-600'
                   }`}>
                     {step.label}
                   </span>
@@ -220,17 +240,21 @@ export const KnowYourApprovals: React.FC = () => {
         </div>
 
         {/* Step Container Card */}
-        <div className="rounded-3xl p-6 sm:p-10 bg-slate-900/60 backdrop-blur-xl border border-white/10 shadow-2xl transition-all">
+        <div className={`rounded-3xl p-6 sm:p-10 backdrop-blur-xl shadow-2xl transition-all border ${
+          isDark 
+            ? 'bg-slate-900/60 border-white/10' 
+            : 'bg-white/95 border-slate-200 shadow-xl'
+        }`}>
           
           {/* STEP 1: What are you planning? */}
           {currentStep === 1 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-right-2">
-              <div className="border-b border-white/10 pb-4">
-                <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">Step 1 of 5</span>
-                <h3 className="text-2xl font-display font-bold text-white mt-1">
+              <div className={`border-b pb-4 ${isDark ? 'border-white/10' : 'border-slate-200'}`}>
+                <span className="text-xs font-bold text-amber-500 uppercase tracking-wider">Step 1 of 5</span>
+                <h3 className={`text-2xl font-display font-bold mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   {t('kya_step1_title')}
                 </h3>
-                <p className="text-sm text-slate-300 mt-1">
+                <p className={`text-sm mt-1 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                   Select your primary investment and operational objective in India.
                 </p>
               </div>
@@ -242,18 +266,24 @@ export const KnowYourApprovals: React.FC = () => {
                     onClick={() => updateKyaState({ planningType: opt.id })}
                     className={`cursor-pointer p-5 rounded-2xl border transition-all flex items-start space-x-4 ${
                       kyaState.planningType === opt.id
-                        ? 'border-sky-400 bg-sky-500/15 shadow-lg shadow-sky-500/10 ring-1 ring-sky-400/50'
-                        : 'border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.08]'
+                        ? isDark
+                          ? 'border-sky-400 bg-sky-500/15 shadow-lg shadow-sky-500/10 ring-1 ring-sky-400/50'
+                          : 'border-sky-500 bg-[#EAF5FF] text-[#172B4D] shadow-sm ring-1 ring-sky-500/30'
+                        : isDark
+                        ? 'border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.08]'
+                        : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-[#F1F6FA] shadow-xs'
                     }`}
                   >
                     <div className={`mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                      kyaState.planningType === opt.id ? 'border-sky-400 bg-sky-500' : 'border-white/30 bg-white/5'
+                      kyaState.planningType === opt.id 
+                        ? 'border-sky-400 bg-sky-500' 
+                        : isDark ? 'border-white/30 bg-white/5' : 'border-slate-300 bg-slate-100'
                     }`}>
                       {kyaState.planningType === opt.id && <div className="w-2 h-2 rounded-full bg-white"></div>}
                     </div>
                     <div>
-                      <div className="text-base font-bold text-white">{opt.label}</div>
-                      <div className="text-xs text-slate-300 mt-1 leading-relaxed">{opt.desc}</div>
+                      <div className={`text-base font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{opt.label}</div>
+                      <div className={`text-xs mt-1 leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{opt.desc}</div>
                     </div>
                   </div>
                 ))}
@@ -275,12 +305,12 @@ export const KnowYourApprovals: React.FC = () => {
           {/* STEP 2: Select business sector */}
           {currentStep === 2 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-right-2">
-              <div className="border-b border-white/10 pb-4">
-                <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">Step 2 of 5</span>
-                <h3 className="text-2xl font-display font-bold text-white mt-1">
+              <div className={`border-b pb-4 ${isDark ? 'border-white/10' : 'border-slate-200'}`}>
+                <span className="text-xs font-bold text-amber-500 uppercase tracking-wider">Step 2 of 5</span>
+                <h3 className={`text-2xl font-display font-bold mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   {t('kya_step2_title')}
                 </h3>
-                <p className="text-sm text-slate-300 mt-1">
+                <p className={`text-sm mt-1 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                   Choose the specific industry vertical of your proposed project.
                 </p>
               </div>
@@ -292,17 +322,21 @@ export const KnowYourApprovals: React.FC = () => {
                     <button
                       key={sec}
                       onClick={() => updateKyaState({ sector: sec })}
-                      className={`p-4 rounded-xl text-left font-semibold text-sm transition-all border flex items-center justify-between ${
+                      className={`industry-chit p-4 rounded-xl text-left font-semibold text-sm transition-all border flex items-center justify-between cursor-pointer ${
                         isSelected
-                          ? 'border-sky-400 bg-sky-500/20 text-white shadow-md shadow-sky-500/10 ring-1 ring-sky-400/40'
-                          : 'border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.08] text-slate-200'
+                          ? isDark
+                            ? 'border-sky-400 bg-sky-500/20 text-sky-400 shadow-md shadow-sky-500/10 ring-1 ring-sky-400/40 font-bold'
+                            : 'border-sky-500 bg-[#EAF5FF] text-[#0284C7] shadow-sm ring-1 ring-sky-500/30 font-bold'
+                          : isDark
+                          ? 'border-white/10 bg-white/[0.03] text-slate-200 hover:border-white/20 hover:bg-white/[0.08]'
+                          : 'border-slate-200 bg-white text-slate-700 shadow-xs hover:border-slate-300 hover:bg-[#F1F6FA]'
                       }`}
                     >
                       <span className="truncate">{sec}</span>
                       {isSelected ? (
-                        <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
+                        <CheckCircle2 className={`w-4 h-4 shrink-0 ${isDark ? 'text-sky-400' : 'text-[#0284C7]'}`} />
                       ) : (
-                        <span className="w-2 h-2 rounded-full bg-white/20 shrink-0"></span>
+                        <span className={`w-2 h-2 rounded-full shrink-0 ${isDark ? 'bg-white/20' : 'bg-slate-300'}`}></span>
                       )}
                     </button>
                   );
@@ -312,7 +346,11 @@ export const KnowYourApprovals: React.FC = () => {
               <div className="flex justify-between items-center pt-4">
                 <button
                   onClick={() => setCurrentStep(1)}
-                  className="inline-flex items-center px-4 py-2.5 text-sm font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition cursor-pointer"
+                  className={`inline-flex items-center px-4 py-2.5 text-sm font-semibold rounded-xl transition cursor-pointer border ${
+                    isDark 
+                      ? 'text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border-white/10' 
+                      : 'text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border-slate-200'
+                  }`}
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   <span>Back</span>
@@ -332,12 +370,12 @@ export const KnowYourApprovals: React.FC = () => {
           {/* STEP 3: Select location/state */}
           {currentStep === 3 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-right-2">
-              <div className="border-b border-white/10 pb-4">
-                <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">Step 3 of 5</span>
-                <h3 className="text-2xl font-display font-bold text-white mt-1">
+              <div className={`border-b pb-4 ${isDark ? 'border-white/10' : 'border-slate-200'}`}>
+                <span className="text-xs font-bold text-amber-500 uppercase tracking-wider">Step 3 of 5</span>
+                <h3 className={`text-2xl font-display font-bold mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   {t('kya_step3_title')}
                 </h3>
-                <p className="text-sm text-slate-300 mt-1">
+                <p className={`text-sm mt-1 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                   Select the Indian State or Union Territory where your unit will be located.
                 </p>
               </div>
@@ -349,14 +387,18 @@ export const KnowYourApprovals: React.FC = () => {
                   placeholder="Filter State / UT (e.g. Maharashtra, Gujarat, Karnataka, Tamil Nadu)..."
                   value={stateSearch}
                   onChange={(e) => setStateSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-white/10 bg-white/5 focus:outline-none focus:border-sky-400 text-sm text-white placeholder-slate-400"
+                  className={`w-full pl-10 pr-4 py-3 rounded-xl border focus:outline-none focus:border-amber-400 text-sm ${
+                    isDark
+                      ? 'border-white/10 bg-white/5 text-white placeholder-slate-400'
+                      : 'border-slate-200 bg-white text-slate-900 placeholder-slate-400 shadow-xs'
+                  }`}
                 />
                 <MapPin className="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               </div>
 
               {/* Popular Industrial Hubs Quick Selection */}
               <div>
-                <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                <div className={`text-xs font-bold uppercase tracking-wider mb-2 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                   Top Industrial Destination States:
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -364,10 +406,12 @@ export const KnowYourApprovals: React.FC = () => {
                     <button
                       key={st}
                       onClick={() => updateKyaState({ state: st })}
-                      className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                         kyaState.state === st
                           ? 'bg-sky-500 text-white shadow-md shadow-sky-500/20'
-                          : 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10'
+                          : isDark
+                          ? 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10'
+                          : 'bg-white hover:bg-[#F1F6FA] text-slate-700 border border-slate-200 shadow-xs'
                       }`}
                     >
                       {st}
@@ -384,17 +428,21 @@ export const KnowYourApprovals: React.FC = () => {
                     <button
                       key={st.code}
                       onClick={() => updateKyaState({ state: st.name })}
-                      className={`p-3.5 rounded-xl text-left text-xs font-semibold transition-all border flex items-center justify-between ${
+                      className={`p-3.5 rounded-xl text-left text-xs font-semibold transition-all border flex items-center justify-between cursor-pointer ${
                         isSelected
-                          ? 'border-sky-400 bg-sky-500/20 text-white font-bold ring-1 ring-sky-400/50'
-                          : 'border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.08] text-slate-200'
+                          ? isDark
+                            ? 'border-sky-400 bg-sky-500/20 text-sky-400 font-bold ring-1 ring-sky-400/50'
+                            : 'border-sky-500 bg-[#EAF5FF] text-[#0284C7] font-bold ring-1 ring-sky-500/30'
+                          : isDark
+                          ? 'border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.08] text-slate-200'
+                          : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-[#F1F6FA] text-slate-700 shadow-xs'
                       }`}
                     >
                       <div className="truncate">
-                        <div>{st.name}</div>
-                        <span className="text-[10px] text-slate-400 font-normal">{st.zone} Zone • {st.type}</span>
+                        <div className={isSelected ? (isDark ? 'text-white' : 'text-[#0284C7] font-bold') : (isDark ? 'text-white' : 'text-slate-900')}>{st.name}</div>
+                        <span className={`text-[10px] font-normal ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{st.zone} Zone • {st.type}</span>
                       </div>
-                      {isSelected && <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0 ml-1" />}
+                      {isSelected && <CheckCircle2 className={`w-4 h-4 shrink-0 ml-1 ${isDark ? 'text-sky-400' : 'text-[#0284C7]'}`} />}
                     </button>
                   );
                 })}
@@ -403,7 +451,11 @@ export const KnowYourApprovals: React.FC = () => {
               <div className="flex justify-between items-center pt-4">
                 <button
                   onClick={() => setCurrentStep(2)}
-                  className="inline-flex items-center px-4 py-2.5 text-sm font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition cursor-pointer"
+                  className={`inline-flex items-center px-4 py-2.5 text-sm font-semibold rounded-xl transition cursor-pointer border ${
+                    isDark 
+                      ? 'text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border-white/10' 
+                      : 'text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border-slate-200'
+                  }`}
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   <span>Back</span>
@@ -423,12 +475,12 @@ export const KnowYourApprovals: React.FC = () => {
           {/* STEP 4: Business details */}
           {currentStep === 4 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-right-2">
-              <div className="border-b border-white/10 pb-4">
-                <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">Step 4 of 5</span>
-                <h3 className="text-2xl font-display font-bold text-white mt-1">
+              <div className={`border-b pb-4 ${isDark ? 'border-white/10' : 'border-slate-200'}`}>
+                <span className="text-xs font-bold text-amber-500 uppercase tracking-wider">Step 4 of 5</span>
+                <h3 className={`text-2xl font-display font-bold mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   {t('kya_step4_title')}
                 </h3>
-                <p className="text-sm text-slate-300 mt-1">
+                <p className={`text-sm mt-1 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                   Specify investment quantum, workforce, environmental criteria, and utility demands.
                 </p>
               </div>
@@ -437,98 +489,122 @@ export const KnowYourApprovals: React.FC = () => {
                 
                 {/* Investment Size */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                  <label className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                     Capital Investment in Plant &amp; Machinery
                   </label>
                   <select
                     value={kyaState.investmentSize}
                     onChange={(e) => updateKyaState({ investmentSize: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-sky-400 text-sm bg-slate-800/90 text-white font-medium"
+                    className={`w-full px-4 py-3 rounded-xl border text-sm font-medium focus:ring-2 focus:ring-amber-400 ${
+                      isDark
+                        ? 'border-white/10 bg-slate-800/90 text-white'
+                        : 'border-slate-300 bg-white text-slate-900 shadow-xs'
+                    }`}
                   >
                     {investmentOptions.map((inv) => (
-                      <option key={inv.value} value={inv.value} className="bg-slate-900 text-white">{inv.label}</option>
+                      <option key={inv.value} value={inv.value} className={isDark ? "bg-slate-900 text-white" : "bg-white text-slate-900"}>{inv.label}</option>
                     ))}
                   </select>
                 </div>
 
                 {/* Employee Count */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                  <label className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                     Anticipated Employee / Worker Strength
                   </label>
                   <select
                     value={kyaState.employeeCount}
                     onChange={(e) => updateKyaState({ employeeCount: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-sky-400 text-sm bg-slate-800/90 text-white font-medium"
+                    className={`w-full px-4 py-3 rounded-xl border text-sm font-medium focus:ring-2 focus:ring-amber-400 ${
+                      isDark
+                        ? 'border-white/10 bg-slate-800/90 text-white'
+                        : 'border-slate-300 bg-white text-slate-900 shadow-xs'
+                    }`}
                   >
-                    <option value="1 to 9 Workers" className="bg-slate-900 text-white">1 to 9 Workers (Exempt from Factory License)</option>
-                    <option value="10 to 49 Workers" className="bg-slate-900 text-white">10 to 49 Workers (Factories Act Applicable)</option>
-                    <option value="50 to 250 Employees" className="bg-slate-900 text-white">50 to 250 Workers / Staff</option>
-                    <option value="250+ Large Workforce" className="bg-slate-900 text-white">250+ Large Workforce (Canteen/Creche Mandatory)</option>
+                    <option value="1 to 9 Workers" className={isDark ? "bg-slate-900 text-white" : "bg-white text-slate-900"}>1 to 9 Workers (Exempt from Factory License)</option>
+                    <option value="10 to 49 Workers" className={isDark ? "bg-slate-900 text-white" : "bg-white text-slate-900"}>10 to 49 Workers (Factories Act Applicable)</option>
+                    <option value="50 to 250 Employees" className={isDark ? "bg-slate-900 text-white" : "bg-white text-slate-900"}>50 to 250 Workers / Staff</option>
+                    <option value="250+ Large Workforce" className={isDark ? "bg-slate-900 text-white" : "bg-white text-slate-900"}>250+ Large Workforce (Canteen/Creche Mandatory)</option>
                   </select>
                 </div>
 
                 {/* Land & Infrastructure Location */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                  <label className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                     Land &amp; Premises Arrangement
                   </label>
                   <select
                     value={kyaState.landRequirement}
                     onChange={(e) => updateKyaState({ landRequirement: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-sky-400 text-sm bg-slate-800/90 text-white font-medium"
+                    className={`w-full px-4 py-3 rounded-xl border text-sm font-medium focus:ring-2 focus:ring-amber-400 ${
+                      isDark
+                        ? 'border-white/10 bg-slate-800/90 text-white'
+                        : 'border-slate-300 bg-white text-slate-900 shadow-xs'
+                    }`}
                   >
-                    <option value="Required in Industrial Estate (MIDC)" className="bg-slate-900 text-white">Industrial Development Estate (MIDC/GIDC/SIPCOT)</option>
-                    <option value="Private Land (Requires NA Conversion)" className="bg-slate-900 text-white">Private Non-Agriculture (NA) Land</option>
-                    <option value="Leased Commercial Building" className="bg-slate-900 text-white">Leased Commercial / Tech Park Space</option>
-                    <option value="Special Economic Zone (SEZ)" className="bg-slate-900 text-white">Special Economic Zone (SEZ / EOU)</option>
+                    <option value="Required in Industrial Estate (MIDC)" className={isDark ? "bg-slate-900 text-white" : "bg-white text-slate-900"}>Industrial Development Estate (MIDC/GIDC/SIPCOT)</option>
+                    <option value="Private Land (Requires NA Conversion)" className={isDark ? "bg-slate-900 text-white" : "bg-white text-slate-900"}>Private Non-Agriculture (NA) Land</option>
+                    <option value="Leased Commercial Building" className={isDark ? "bg-slate-900 text-white" : "bg-white text-slate-900"}>Leased Commercial / Tech Park Space</option>
+                    <option value="Special Economic Zone (SEZ)" className={isDark ? "bg-slate-900 text-white" : "bg-white text-slate-900"}>Special Economic Zone (SEZ / EOU)</option>
                   </select>
                 </div>
 
                 {/* Power Requirement */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                  <label className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                     Electricity Power Demand
                   </label>
                   <select
                     value={kyaState.powerRequirement}
                     onChange={(e) => updateKyaState({ powerRequirement: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-sky-400 text-sm bg-slate-800/90 text-white font-medium"
+                    className={`w-full px-4 py-3 rounded-xl border text-sm font-medium focus:ring-2 focus:ring-amber-400 ${
+                      isDark
+                        ? 'border-white/10 bg-slate-800/90 text-white'
+                        : 'border-slate-300 bg-white text-slate-900 shadow-xs'
+                    }`}
                   >
-                    <option value="High Tension (HT > 150 kVA)" className="bg-slate-900 text-white">High Tension (HT &gt; 150 kVA Substation)</option>
-                    <option value="Low Tension Commercial (LT < 100 kW)" className="bg-slate-900 text-white">Low Tension Industrial / Commercial (&lt; 100 kW)</option>
-                    <option value="Captive Solar / Green Power" className="bg-slate-900 text-white">Captive Solar / Green Power Open Access</option>
+                    <option value="High Tension (HT > 150 kVA)" className={isDark ? "bg-slate-900 text-white" : "bg-white text-slate-900"}>High Tension (HT &gt; 150 kVA Substation)</option>
+                    <option value="Low Tension Commercial (LT < 100 kW)" className={isDark ? "bg-slate-900 text-white" : "bg-white text-slate-900"}>Low Tension Industrial / Commercial (&lt; 100 kW)</option>
+                    <option value="Captive Solar / Green Power" className={isDark ? "bg-slate-900 text-white" : "bg-white text-slate-900"}>Captive Solar / Green Power Open Access</option>
                   </select>
                 </div>
 
                 {/* Hazardous Substances / Effluent */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                  <label className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                     Chemicals, Solvents or Industrial Effluents
                   </label>
                   <select
                     value={kyaState.hazardousSubstances}
                     onChange={(e) => updateKyaState({ hazardousSubstances: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-sky-400 text-sm bg-slate-800/90 text-white font-medium"
+                    className={`w-full px-4 py-3 rounded-xl border text-sm font-medium focus:ring-2 focus:ring-amber-400 ${
+                      isDark
+                        ? 'border-white/10 bg-slate-800/90 text-white'
+                        : 'border-slate-300 bg-white text-slate-900 shadow-xs'
+                    }`}
                   >
-                    <option value="Yes (Standard Industrial Solvents)" className="bg-slate-900 text-white">Yes (Requires Pollution CTE/CTO + Fire NOC)</option>
-                    <option value="Yes (Bulk Petroleum / Explosives > 2500L)" className="bg-slate-900 text-white">Yes (Requires PESO License + Hazardous Waste)</option>
-                    <option value="No (Clean / IT / White Category)" className="bg-slate-900 text-white">No (Clean / Zero Discharge / Green Category)</option>
+                    <option value="Yes (Standard Industrial Solvents)" className={isDark ? "bg-slate-900 text-white" : "bg-white text-slate-900"}>Yes (Requires Pollution CTE/CTO + Fire NOC)</option>
+                    <option value="Yes (Bulk Petroleum / Explosives > 2500L)" className={isDark ? "bg-slate-900 text-white" : "bg-white text-slate-900"}>Yes (Requires PESO License + Hazardous Waste)</option>
+                    <option value="No (Clean / IT / White Category)" className={isDark ? "bg-slate-900 text-white" : "bg-white text-slate-900"}>No (Clean / Zero Discharge / Green Category)</option>
                   </select>
                 </div>
 
                 {/* Export Orientation */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                  <label className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                     Cross-Border Export / Import
                   </label>
                   <select
                     value={kyaState.exportOriented}
                     onChange={(e) => updateKyaState({ exportOriented: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-white/10 focus:ring-2 focus:ring-sky-400 text-sm bg-slate-800/90 text-white font-medium"
+                    className={`w-full px-4 py-3 rounded-xl border text-sm font-medium focus:ring-2 focus:ring-amber-400 ${
+                      isDark
+                        ? 'border-white/10 bg-slate-800/90 text-white'
+                        : 'border-slate-300 bg-white text-slate-900 shadow-xs'
+                    }`}
                   >
-                    <option value="Yes (Direct Export Planned)" className="bg-slate-900 text-white">Yes (Requires DGFT Import Export Code - IEC)</option>
-                    <option value="No (Domestic Indian Market Only)" className="bg-slate-900 text-white">No (Domestic Indian Market Only)</option>
+                    <option value="Yes (Direct Export Planned)" className={isDark ? "bg-slate-900 text-white" : "bg-white text-slate-900"}>Yes (Requires DGFT Import Export Code - IEC)</option>
+                    <option value="No (Domestic Indian Market Only)" className={isDark ? "bg-slate-900 text-white" : "bg-white text-slate-900"}>No (Domestic Indian Market Only)</option>
                   </select>
                 </div>
 
@@ -537,7 +613,11 @@ export const KnowYourApprovals: React.FC = () => {
               <div className="flex justify-between items-center pt-4">
                 <button
                   onClick={() => setCurrentStep(3)}
-                  className="inline-flex items-center px-4 py-2.5 text-sm font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition cursor-pointer"
+                  className={`inline-flex items-center px-4 py-2.5 text-sm font-semibold rounded-xl transition cursor-pointer border ${
+                    isDark 
+                      ? 'text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border-white/10' 
+                      : 'text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border-slate-200'
+                  }`}
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   <span>Back</span>
@@ -560,36 +640,50 @@ export const KnowYourApprovals: React.FC = () => {
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2">
               
               {/* Results Top Banner */}
-              <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-white/10 rounded-2xl p-6 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className={`border rounded-2xl p-6 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4 ${
+                isDark
+                  ? 'bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-white/10 text-white'
+                  : 'bg-gradient-to-r from-amber-50/80 via-white to-sky-50/80 border-slate-200 text-slate-800'
+              }`}>
                 <div>
-                  <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold mb-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                  <div className={`inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-bold mb-2 border ${
+                    isDark ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' : 'bg-emerald-100 text-emerald-700 border-emerald-300'
+                  }`}>
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
                     <span>Roadmap Generated</span>
                   </div>
-                  <h3 className="text-2xl font-display font-extrabold text-white">
+                  <h3 className={`text-2xl font-display font-extrabold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     {t('kya_step5_title')}
                   </h3>
-                  <p className="text-xs text-slate-300 mt-1">
-                    Project: <span className="text-amber-300 font-bold">{kyaState.sector}</span> in <span className="text-emerald-300 font-bold">{kyaState.state}</span> • Investment: <span className="text-white font-semibold">{kyaState.investmentSize}</span>
+                  <p className={`text-xs mt-1 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                    Project: <span className="text-amber-500 font-bold">{kyaState.sector}</span> in <span className="text-emerald-600 font-bold">{kyaState.state}</span> • Investment: <span className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>{kyaState.investmentSize}</span>
                   </p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
-                  <div className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-center">
-                    <div className="text-2xl font-black text-amber-300">{recommendedApprovals.length}</div>
-                    <div className="text-[10px] text-slate-300 uppercase font-semibold">Total Approvals</div>
+                  <div className={`px-4 py-2 rounded-xl text-center border ${
+                    isDark ? 'bg-white/5 border-white/10' : 'bg-white border-slate-200 shadow-xs'
+                  }`}>
+                    <div className="text-2xl font-black text-amber-500">{recommendedApprovals.length}</div>
+                    <div className={`text-[10px] uppercase font-semibold ${isDark ? 'text-slate-300' : 'text-slate-500'}`}>Total Approvals</div>
                   </div>
 
-                  <div className="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-center">
-                    <div className="text-lg font-bold text-sky-300">{centralCount} Central</div>
-                    <div className="text-[10px] text-slate-300">{stateCount} State ({kyaState.state})</div>
+                  <div className={`px-3.5 py-2 rounded-xl text-center border ${
+                    isDark ? 'bg-white/5 border-white/10' : 'bg-white border-slate-200 shadow-xs'
+                  }`}>
+                    <div className="text-lg font-bold text-sky-500">{centralCount} Central</div>
+                    <div className={`text-[10px] ${isDark ? 'text-slate-300' : 'text-slate-500'}`}>{stateCount} State ({kyaState.state})</div>
                   </div>
 
                   <button
                     id="kya-download-pdf-btn"
                     onClick={handleDownloadPdf}
                     disabled={isGeneratingPdf}
-                    className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold shadow-md flex items-center space-x-1.5 transition active:scale-95 disabled:opacity-75 disabled:cursor-not-allowed cursor-pointer"
+                    className={`px-4 py-2.5 rounded-xl text-xs font-bold shadow-md flex items-center space-x-1.5 transition active:scale-95 disabled:opacity-75 disabled:cursor-not-allowed cursor-pointer border ${
+                      isDark
+                        ? 'bg-white/10 hover:bg-white/20 border-white/15 text-white'
+                        : 'bg-white hover:bg-slate-50 border-slate-300 text-slate-800'
+                    }`}
                   >
                     <Download className={`w-3.5 h-3.5 ${isGeneratingPdf ? 'animate-bounce' : ''}`} />
                     <span>{isGeneratingPdf ? 'Generating PDF...' : 'Download PDF'}</span>
@@ -598,13 +692,15 @@ export const KnowYourApprovals: React.FC = () => {
               </div>
 
               {/* Central vs State Filter Tabs */}
-              <div className="flex items-center space-x-2 border-b border-white/10 pb-2">
+              <div className={`flex items-center space-x-2 border-b pb-2 ${isDark ? 'border-white/10' : 'border-slate-200'}`}>
                 <button
                   onClick={() => setActiveTab('all')}
                   className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                     activeTab === 'all' 
                       ? 'bg-sky-500 text-white shadow-md shadow-sky-500/20' 
-                      : 'text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10'
+                      : isDark
+                      ? 'text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10'
+                      : 'text-slate-600 bg-white hover:bg-slate-50 border border-slate-200 shadow-xs'
                   }`}
                 >
                   All Recommended ({recommendedApprovals.length})
@@ -614,7 +710,9 @@ export const KnowYourApprovals: React.FC = () => {
                   className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                     activeTab === 'central' 
                       ? 'bg-sky-500 text-white shadow-md shadow-sky-500/20' 
-                      : 'text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10'
+                      : isDark
+                      ? 'text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10'
+                      : 'text-slate-600 bg-white hover:bg-slate-50 border border-slate-200 shadow-xs'
                   }`}
                 >
                   Central Ministries ({centralCount})
@@ -624,7 +722,9 @@ export const KnowYourApprovals: React.FC = () => {
                   className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                     activeTab === 'state' 
                       ? 'bg-sky-500 text-white shadow-md shadow-sky-500/20' 
-                      : 'text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10'
+                      : isDark
+                      ? 'text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10'
+                      : 'text-slate-600 bg-white hover:bg-slate-50 border border-slate-200 shadow-xs'
                   }`}
                 >
                   {kyaState.state} State ({stateCount})
@@ -636,54 +736,66 @@ export const KnowYourApprovals: React.FC = () => {
                 {displayedApprovals.map((app) => (
                   <div
                     key={app.id}
-                    className="rounded-2xl border border-white/10 bg-slate-900/80 p-5 shadow-md hover:shadow-xl transition-all flex flex-col justify-between space-y-4 hover:border-sky-400/30"
+                    className={`rounded-2xl border p-5 shadow-md hover:shadow-xl transition-all flex flex-col justify-between space-y-4 ${
+                      isDark
+                        ? 'border-white/10 bg-slate-900/80 text-white hover:border-sky-400/30'
+                        : 'border-slate-200 bg-white/95 text-slate-800 shadow-sm hover:border-slate-300'
+                    }`}
                   >
                     <div className="space-y-2.5">
                       <div className="flex items-center justify-between gap-2">
                         <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider ${
                           app.centralOrState === 'Central'
-                            ? 'bg-sky-500/15 text-sky-300 border border-sky-500/30'
-                            : 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                            ? 'bg-sky-500/15 text-sky-400 border border-sky-500/30'
+                            : 'bg-emerald-500/15 text-emerald-500 border border-emerald-500/30'
                         }`}>
                           {app.centralOrState === 'Central' ? 'Central Clearance' : `${app.stateName || 'State'} Dept`}
                         </span>
 
                         <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                          app.mandatory ? 'bg-rose-500/15 text-rose-300 border border-rose-500/30' : 'bg-white/5 text-slate-300 border border-white/10'
+                          app.mandatory 
+                            ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30' 
+                            : isDark ? 'bg-white/5 text-slate-300 border border-white/10' : 'bg-slate-100 text-slate-600 border border-slate-200'
                         }`}>
                           {app.mandatory ? 'Mandatory' : 'Conditional'}
                         </span>
                       </div>
 
-                      <h4 className="text-base font-bold text-white leading-snug">
+                      <h4 className={`text-base font-bold leading-snug ${isDark ? 'text-white' : 'text-slate-900'}`}>
                         {app.name}
                       </h4>
 
-                      <div className="text-xs text-sky-400 font-medium">
+                      <div className={`text-xs font-medium ${isDark ? 'text-sky-400' : 'text-sky-600'}`}>
                         {app.department}
                       </div>
 
-                      <p className="text-xs text-slate-300 line-clamp-2">
+                      <p className={`text-xs line-clamp-2 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                         {app.description}
                       </p>
 
-                      <div className="grid grid-cols-2 gap-2 pt-2 text-[11px] border-t border-white/10 text-slate-300">
+                      <div className={`grid grid-cols-2 gap-2 pt-2 text-[11px] border-t ${
+                        isDark ? 'border-white/10 text-slate-300' : 'border-slate-100 text-slate-600'
+                      }`}>
                         <div className="flex items-center space-x-1.5">
-                          <Clock className="w-3.5 h-3.5 text-amber-400" />
-                          <span>SLA: <strong className="text-white">{app.processingDays} Days</strong></span>
+                          <Clock className="w-3.5 h-3.5 text-amber-500" />
+                          <span>SLA: <strong className={isDark ? 'text-white' : 'text-slate-900'}>{app.processingDays} Days</strong></span>
                         </div>
                         <div className="flex items-center space-x-1.5">
-                          <FileText className="w-3.5 h-3.5 text-sky-400" />
-                          <span>Fee: <strong className="text-white">{app.statutoryFee}</strong></span>
+                          <FileText className="w-3.5 h-3.5 text-sky-500" />
+                          <span>Fee: <strong className={isDark ? 'text-white' : 'text-slate-900'}>{app.statutoryFee}</strong></span>
                         </div>
                       </div>
                     </div>
 
                     {/* Action Buttons: View Details, Add to Dashboard, Apply */}
-                    <div className="pt-3 border-t border-white/10 flex items-center justify-between gap-2">
+                    <div className={`pt-3 border-t flex items-center justify-between gap-2 ${isDark ? 'border-white/10' : 'border-slate-100'}`}>
                       <button
                         onClick={() => setSelectedApproval(app)}
-                        className="px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition cursor-pointer"
+                        className={`px-3 py-2 text-xs font-semibold rounded-lg transition cursor-pointer border ${
+                          isDark 
+                            ? 'text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border-white/10' 
+                            : 'text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border-slate-200'
+                        }`}
                       >
                         {t('kya_view_details')}
                       </button>
@@ -691,7 +803,7 @@ export const KnowYourApprovals: React.FC = () => {
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => handleAddToDashboard(app)}
-                          className="px-3 py-2 text-xs font-semibold text-sky-300 bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/20 rounded-lg transition hidden sm:inline cursor-pointer"
+                          className="px-3 py-2 text-xs font-semibold text-sky-500 bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/20 rounded-lg transition hidden sm:inline cursor-pointer"
                           title="Bookmark to My Dashboard"
                         >
                           + Dashboard
@@ -700,7 +812,7 @@ export const KnowYourApprovals: React.FC = () => {
                         <button
                           id={`kya-apply-${app.id}`}
                           onClick={() => startApplication(app)}
-                          className="px-4 py-2 text-xs font-bold text-white bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 rounded-xl shadow-md shadow-sky-500/20 transition active:scale-95 cursor-pointer"
+                          className="px-4 py-2 text-xs font-bold !text-white bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 rounded-xl shadow-md shadow-sky-500/20 transition active:scale-95 cursor-pointer"
                         >
                           {t('kya_apply_now')} →
                         </button>
@@ -711,10 +823,14 @@ export const KnowYourApprovals: React.FC = () => {
               </div>
 
               {/* Bottom Actions */}
-              <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-white/10">
+              <div className={`flex flex-wrap items-center justify-between gap-4 pt-4 border-t ${isDark ? 'border-white/10' : 'border-slate-200'}`}>
                 <button
                   onClick={() => setCurrentStep(4)}
-                  className="inline-flex items-center px-4 py-2.5 text-sm font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition cursor-pointer"
+                  className={`inline-flex items-center px-4 py-2.5 text-sm font-semibold rounded-xl transition cursor-pointer border ${
+                    isDark 
+                      ? 'text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border-white/10' 
+                      : 'text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border-slate-200'
+                  }`}
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   <span>Modify Parameters</span>

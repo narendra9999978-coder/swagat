@@ -38,8 +38,10 @@ export const ApplicationTrackingSection: React.FC = () => {
     setIsAuthModalOpen,
     setCurrentView,
     setDashboardActiveTab,
-    refreshApplications
+    refreshApplications,
+    theme
   } = useSwagat();
+  const isDark = theme === 'dark';
 
   const [allApps, setAllApps] = useState<Application[]>(() => loadAllApplications());
   const [searchTrackingId, setSearchTrackingId] = useState<string>('');
@@ -104,7 +106,7 @@ export const ApplicationTrackingSection: React.FC = () => {
       key: 'trackingNumber',
       header: 'Tracking URN',
       render: (app) => (
-        <span className="font-mono font-bold text-amber-300">{app.trackingNumber}</span>
+        <span className={`font-mono font-bold ${isDark ? 'text-amber-300' : 'text-amber-700'}`}>{app.trackingNumber}</span>
       ),
     },
     {
@@ -112,8 +114,8 @@ export const ApplicationTrackingSection: React.FC = () => {
       header: 'Clearance Name',
       render: (app) => (
         <div>
-          <span className="font-semibold text-white block">{app.approvalName}</span>
-          <span className="text-[10px] text-slate-400">{app.department}</span>
+          <span className={`font-semibold block ${isDark ? 'text-white' : 'text-slate-900'}`}>{app.approvalName}</span>
+          <span className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{app.department}</span>
         </div>
       ),
     },
@@ -131,7 +133,7 @@ export const ApplicationTrackingSection: React.FC = () => {
     {
       key: 'submissionDate',
       header: 'Filed Date',
-      render: (app) => <span className="text-slate-300">{app.submissionDate}</span>,
+      render: (app) => <span className={isDark ? 'text-slate-300' : 'text-slate-600'}>{app.submissionDate}</span>,
     },
     {
       key: 'actions',
@@ -142,7 +144,7 @@ export const ApplicationTrackingSection: React.FC = () => {
             e.stopPropagation();
             setSelectedAppId(app.id);
           }}
-          className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/15 text-slate-200 hover:text-white text-[11px] font-semibold transition"
+          className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition ${isDark ? 'bg-white/10 hover:bg-white/15 text-slate-200 hover:text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900'}`}
         >
           Inspect
         </button>
@@ -156,28 +158,40 @@ export const ApplicationTrackingSection: React.FC = () => {
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/5 text-sky-400 border border-white/10 text-xs font-bold uppercase tracking-wider mb-3 backdrop-blur-md">
-            <Activity className="w-4 h-4" />
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-400/20 text-xs font-bold uppercase tracking-wider mb-3 backdrop-blur-md">
+            <Activity className="w-4 h-4 text-sky-400" />
             <span>National Unified Tracking Engine</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-white tracking-tight">
+          <h2 className={`text-3xl sm:text-4xl font-display font-extrabold tracking-tight ${
+            isDark ? 'text-white' : 'text-slate-900'
+          }`}>
             Real-Time Application Tracking
           </h2>
-          <p className="mt-3 text-slate-300 text-sm sm:text-base leading-relaxed">
+          <p className={`mt-3 text-sm sm:text-base leading-relaxed ${
+            isDark ? 'text-slate-300' : 'text-slate-600'
+          }`}>
             Track statutory clearances with stage-by-stage transparent timelines, respond to departmental queries, and download certificates.
           </p>
         </div>
 
         {/* Search / Lookup Bar with Watermelon Licence-Key styling */}
         <div className="max-w-2xl mx-auto mb-12">
-          <form onSubmit={handleSearch} className="flex gap-2 p-2 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-2xl shadow-xl">
+          <form onSubmit={handleSearch} className={`flex gap-2 p-2 rounded-2xl border backdrop-blur-2xl shadow-xl transition-colors ${
+            isDark 
+              ? 'bg-slate-950/60 border-white/10' 
+              : 'bg-white/90 border-slate-200 shadow-slate-200/50'
+          }`}>
             <div className="relative flex-1">
               <input
                 type="text"
                 placeholder="Enter Tracking URN (e.g. SWG-2026-MH-78942)..."
                 value={searchTrackingId}
                 onChange={(e) => setSearchTrackingId(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-500 text-xs sm:text-sm font-medium focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/50"
+                className={`w-full pl-10 pr-4 py-3 rounded-xl border text-xs sm:text-sm font-medium focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/50 transition ${
+                  isDark 
+                    ? 'bg-white/5 border-white/10 text-white placeholder:text-slate-500' 
+                    : 'bg-white border-slate-200 text-slate-800 placeholder:text-slate-400'
+                }`}
               />
               <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             </div>
@@ -192,28 +206,40 @@ export const ApplicationTrackingSection: React.FC = () => {
 
         {/* Live Application Detail & Timeline Card */}
         {activeApp && (
-          <div className="bg-slate-950/70 rounded-3xl border border-white/10 p-6 sm:p-10 shadow-2xl backdrop-blur-2xl mb-12 text-white">
+          <div className={`rounded-3xl border p-6 sm:p-10 shadow-2xl backdrop-blur-2xl mb-12 transition-all ${
+            isDark 
+              ? 'bg-slate-950/70 border-white/10 text-white' 
+              : 'bg-white/95 border-slate-200 text-slate-800 shadow-slate-200/50'
+          }`}>
             
             {/* Top Bar: Tracking ID + Status + Actions */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between pb-6 border-b border-white/10 gap-4">
+            <div className={`flex flex-col lg:flex-row lg:items-center justify-between pb-6 border-b gap-4 ${
+              isDark ? 'border-white/10' : 'border-slate-100'
+            }`}>
               <div>
                 <div className="flex flex-wrap items-center gap-3">
-                  <span className="font-mono text-xs font-extrabold px-3 py-1 rounded-lg bg-white/10 text-amber-300 border border-white/10">
+                  <span className={`font-mono text-xs font-extrabold px-3 py-1 rounded-lg border ${
+                    isDark 
+                      ? 'bg-white/10 text-amber-300 border-white/10' 
+                      : 'bg-amber-50 text-amber-800 border-amber-200'
+                  }`}>
                     {activeApp.trackingNumber}
                   </span>
                   <StatusMark
                     status={getStatusVariant(activeApp.currentStatus)}
                     label={activeApp.currentStatus}
                   />
-                  <span className="text-xs text-slate-400">
-                    Submitted on <strong>{activeApp.submissionDate}</strong>
+                  <span className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    Submitted on <strong className={isDark ? 'text-white' : 'text-slate-900'}>{activeApp.submissionDate}</strong>
                   </span>
                 </div>
 
-                <h3 className="text-2xl font-display font-extrabold text-white mt-2">
+                <h3 className={`text-2xl font-display font-extrabold mt-2 ${
+                  isDark ? 'text-white' : 'text-slate-900'
+                }`}>
                   {activeApp.approvalName}
                 </h3>
-                <div className="text-xs text-slate-400 font-medium">
+                <div className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                   {activeApp.department} • {activeApp.ministry}
                 </div>
               </div>
@@ -223,17 +249,25 @@ export const ApplicationTrackingSection: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowQrModal(!showQrModal)}
-                  className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 text-xs font-bold shadow-xs flex items-center space-x-1.5 transition"
+                  className={`px-4 py-2.5 rounded-xl border text-xs font-bold shadow-xs flex items-center space-x-1.5 transition cursor-pointer ${
+                    isDark 
+                      ? 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-200' 
+                      : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700'
+                  }`}
                 >
-                  <QrCode className="w-3.5 h-3.5 text-sky-400" />
+                  <QrCode className="w-3.5 h-3.5 text-sky-500" />
                   <span>{showQrModal ? 'Hide QR Code' : 'Verify QR Code'}</span>
                 </button>
 
                 <button
                   onClick={() => downloadAckSlip(activeApp)}
-                  className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 text-xs font-bold shadow-xs flex items-center space-x-1.5 transition"
+                  className={`px-4 py-2.5 rounded-xl border text-xs font-bold shadow-xs flex items-center space-x-1.5 transition cursor-pointer ${
+                    isDark 
+                      ? 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-200' 
+                      : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700'
+                  }`}
                 >
-                  <Download className="w-3.5 h-3.5 text-slate-400" />
+                  <Download className={`w-3.5 h-3.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`} />
                   <span>Download Ack</span>
                 </button>
 
@@ -262,7 +296,7 @@ export const ApplicationTrackingSection: React.FC = () => {
 
             {/* QR Code Animated Drawer (Watermelon Show-QR) */}
             {showQrModal && (
-              <div className="my-6 p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
+              <div className={`my-6 p-6 rounded-2xl backdrop-blur-md ${isDark ? 'bg-white/5 border border-white/10' : 'bg-slate-50 border border-slate-200'}`}>
                 <QRCodeDisplay
                   value={`https://swagat.gov.in/verify?urn=${activeApp.trackingNumber}`}
                   trackingNumber={activeApp.trackingNumber}
@@ -288,14 +322,16 @@ export const ApplicationTrackingSection: React.FC = () => {
                 <Clock className="w-5 h-5 text-sky-400 shrink-0 mt-0.5" />
               )}
               <div className="text-xs sm:text-sm">
-                <span className="font-bold uppercase tracking-wide text-[10px] block text-slate-300">Next Statutory Action / Status Note:</span>
+                <span className={`font-bold uppercase tracking-wide text-[10px] block ${isDark ? 'text-slate-300' : 'text-slate-500'}`}>Next Statutory Action / Status Note:</span>
                 <span className="font-medium">{activeApp.nextAction}</span>
               </div>
             </div>
 
             {/* Visual Status Timeline (5 Stages) */}
             <div className="my-8">
-              <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-6">
+              <div className={`text-xs font-bold uppercase tracking-wider mb-6 ${
+                isDark ? 'text-slate-400' : 'text-slate-500'
+              }`}>
                 Statutory Progress Lifecycle
               </div>
 
@@ -305,12 +341,14 @@ export const ApplicationTrackingSection: React.FC = () => {
                     key={idx}
                     className={`relative p-4 rounded-2xl border transition-all ${
                       step.completed
-                        ? 'bg-emerald-500/10 border-emerald-500/30 text-white'
+                        ? 'bg-emerald-500/10 border-emerald-500/30 ' + (isDark ? 'text-white' : 'text-slate-800')
                         : step.current
                         ? step.queryRaised
-                          ? 'bg-amber-500/15 border-amber-400/50 shadow-md text-white'
-                          : 'bg-sky-500/15 border-sky-400/50 shadow-md text-white'
-                        : 'bg-white/5 border-white/5 opacity-50 text-slate-400'
+                          ? 'bg-amber-500/15 border-amber-400/50 shadow-md ' + (isDark ? 'text-white' : 'text-slate-900')
+                          : 'bg-sky-500/15 border-sky-400/50 shadow-md ' + (isDark ? 'text-white' : 'text-slate-900')
+                        : isDark
+                          ? 'bg-white/5 border-white/5 opacity-50 text-slate-400'
+                          : 'bg-slate-50 border-slate-200 opacity-60 text-slate-500'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
@@ -319,23 +357,23 @@ export const ApplicationTrackingSection: React.FC = () => {
                           ? 'bg-emerald-500 text-slate-950'
                           : step.current
                           ? step.queryRaised ? 'bg-amber-400 text-slate-950' : 'bg-sky-400 text-slate-950'
-                          : 'bg-white/10 text-slate-400'
+                          : isDark ? 'bg-white/10 text-slate-400' : 'bg-slate-200 text-slate-600'
                       }`}>
                         {step.completed ? '✓' : idx + 1}
                       </div>
 
                       {step.date && (
-                        <span className="text-[10px] font-semibold text-slate-400">
+                        <span className={`text-[10px] font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                           {step.date}
                         </span>
                       )}
                     </div>
 
-                    <div className="text-xs font-bold">
+                    <div className={`text-xs font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                       {step.title}
                     </div>
 
-                    <div className="text-[11px] text-slate-400 mt-1 leading-tight">
+                    <div className={`text-[11px] mt-1 leading-tight ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                       {step.description}
                     </div>
                   </div>
@@ -344,22 +382,22 @@ export const ApplicationTrackingSection: React.FC = () => {
             </div>
 
             {/* Enterprise Project Parameters */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 text-xs">
+            <div className={`grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-2xl border text-xs ${isDark ? 'bg-white/5 border-white/10' : 'bg-slate-50 border-slate-200'}`}>
               <div>
-                <span className="text-[10px] uppercase text-slate-400 font-semibold block">Applicant Enterprise</span>
-                <span className="font-bold text-white truncate block">{activeApp.companyName}</span>
+                <span className={`text-[10px] uppercase font-semibold block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Applicant Enterprise</span>
+                <span className={`font-bold truncate block ${isDark ? 'text-white' : 'text-slate-900'}`}>{activeApp.companyName}</span>
               </div>
               <div>
-                <span className="text-[10px] uppercase text-slate-400 font-semibold block">Project Location</span>
-                <span className="font-bold text-white block">{activeApp.projectDistrict}, {activeApp.projectState}</span>
+                <span className={`text-[10px] uppercase font-semibold block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Project Location</span>
+                <span className={`font-bold block ${isDark ? 'text-white' : 'text-slate-900'}`}>{activeApp.projectDistrict}, {activeApp.projectState}</span>
               </div>
               <div>
-                <span className="text-[10px] uppercase text-slate-400 font-semibold block">Proposed Investment</span>
-                <span className="font-bold text-white block">{activeApp.investmentAmount}</span>
+                <span className={`text-[10px] uppercase font-semibold block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Proposed Investment</span>
+                <span className={`font-bold block ${isDark ? 'text-white' : 'text-slate-900'}`}>{activeApp.investmentAmount}</span>
               </div>
               <div>
-                <span className="text-[10px] uppercase text-slate-400 font-semibold block">Statutory Fee Paid</span>
-                <span className="font-bold text-emerald-400 block">{activeApp.statutoryFeePaid}</span>
+                <span className={`text-[10px] uppercase font-semibold block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Statutory Fee Paid</span>
+                <span className={`font-bold block ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`}>{activeApp.statutoryFeePaid}</span>
               </div>
             </div>
 
@@ -369,8 +407,8 @@ export const ApplicationTrackingSection: React.FC = () => {
         {/* Watermelon Table 1: All Applications Directory */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h4 className="text-base font-bold text-white">All Active Applications on Portal</h4>
-            <span className="text-xs text-slate-400">{allApps.length} total dossiers</span>
+            <h4 className={`text-base font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>All Active Applications on Portal</h4>
+            <span className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{allApps.length} total dossiers</span>
           </div>
 
           <GlassDataTable

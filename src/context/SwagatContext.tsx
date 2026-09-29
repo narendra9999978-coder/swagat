@@ -158,6 +158,11 @@ interface SwagatContextType {
   setWizardSession: React.Dispatch<React.SetStateAction<WizardSession | null>>;
   openWizard: (businessType: BusinessType) => void;
   closeWizard: () => void;
+
+  // Theme Mode
+  theme: 'dark' | 'light';
+  setTheme: (theme: 'dark' | 'light') => void;
+  toggleTheme: () => void;
 }
 
 // ── Default mock data ─────────────────────────────────────────────────────────
@@ -323,6 +328,45 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   // Logo click counter for super admin access
   const [logoClickCount, setLogoClickCount] = useState(0);
+
+  // Theme Mode State with persistence
+  const [theme, setThemeState] = useState<'dark' | 'light'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('swagat_theme');
+      if (saved === 'light' || saved === 'dark') return saved;
+    }
+    return 'light'; // Default to light theme matching user screenshot request
+  });
+
+  const setTheme = (newTheme: 'dark' | 'light') => {
+    setThemeState(newTheme);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('swagat_theme', newTheme);
+      if (newTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
+      } else {
+        document.documentElement.classList.add('light');
+        document.documentElement.classList.remove('dark');
+      }
+    }
+  };
+
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
+      } else {
+        document.documentElement.classList.add('light');
+        document.documentElement.classList.remove('dark');
+      }
+    }
+  }, [theme]);
 
   // ── Boot: health check + session restore ──────────────────────────────────
 
@@ -978,6 +1022,7 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       selectedStateFilter, setSelectedStateFilter,
       toastMessage, showToast,
       wizardSession, setWizardSession, openWizard, closeWizard,
+      theme, setTheme, toggleTheme,
     }}>
       {children}
     </SwagatContext.Provider>

@@ -5,10 +5,11 @@ import { NewsletterSubscribe } from './ui/NewsletterSubscribe';
 
 /**
  * CallToActionBanner
- * Curated with Watermelon Newsletter-2 integration & Dark Glassmorphism
+ * Curated with Watermelon Newsletter-2 integration & Dual-Theme support
  */
 export const CallToActionBanner: React.FC = () => {
-  const { kyaState, showToast } = useSwagat();
+  const { kyaState, showToast, theme } = useSwagat();
+  const isDark = theme === 'dark';
 
   const handleLaunch = () => {
     const el = document.getElementById('section-kya');
@@ -22,21 +23,33 @@ export const CallToActionBanner: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-12 text-center">
         
         {/* Main CTA Glass Card */}
-        <div className="relative overflow-hidden rounded-3xl p-8 sm:p-12 bg-slate-950/75 border border-white/15 backdrop-blur-2xl shadow-2xl">
+        <div className={`relative overflow-hidden rounded-3xl p-8 sm:p-12 backdrop-blur-2xl shadow-2xl border transition-colors duration-300 ${
+          isDark
+            ? 'bg-slate-950/75 border-white/15'
+            : 'bg-white/90 border-slate-200'
+        }`}>
           {/* Subtle ambient glows */}
           <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#FF9933]/15 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-[#138808]/15 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-amber-300 text-xs font-bold uppercase tracking-wider mb-4">
-            <Sparkles className="w-4 h-4 text-amber-400" />
+          <div className={`inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-4 border ${
+            isDark
+              ? 'bg-white/5 border-white/10 text-amber-300'
+              : 'bg-amber-50 border-amber-200 text-amber-700'
+          }`}>
+            <Sparkles className={`w-4 h-4 ${isDark ? 'text-amber-400' : 'text-amber-500'}`} />
             <span>Accelerate Your Business Launch</span>
           </div>
 
-          <h2 className="text-3xl sm:text-5xl font-display font-extrabold text-white tracking-tight max-w-3xl mx-auto">
+          <h2 className={`text-3xl sm:text-5xl font-display font-extrabold tracking-tight max-w-3xl mx-auto ${
+            isDark ? 'text-white' : 'text-slate-900'
+          }`}>
             Ready to Discover All Your Required Indian Business Approvals?
           </h2>
 
-          <p className="mt-4 text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
+          <p className={`mt-4 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed ${
+            isDark ? 'text-slate-300' : 'text-slate-600'
+          }`}>
             Join thousands of enterprises, startups, and manufacturers navigating compliance with transparent statutory timelines, zero paperwork, and unified tracking.
           </p>
 
@@ -52,17 +65,19 @@ export const CallToActionBanner: React.FC = () => {
             </button>
           </div>
 
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-400">
+          <div className={`mt-8 flex flex-wrap items-center justify-center gap-6 text-xs ${
+            isDark ? 'text-slate-400' : 'text-slate-500'
+          }`}>
             <div className="flex items-center space-x-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <ShieldCheck className="w-4 h-4 text-emerald-500" />
               <span>100% Free Public Platform</span>
             </div>
             <div className="flex items-center space-x-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <ShieldCheck className="w-4 h-4 text-emerald-500" />
               <span>Covers Central &amp; All 28 States</span>
             </div>
             <div className="flex items-center space-x-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <ShieldCheck className="w-4 h-4 text-emerald-500" />
               <span>SLA Backed Clearances</span>
             </div>
           </div>
@@ -79,3 +94,4 @@ export const CallToActionBanner: React.FC = () => {
     </section>
   );
 };
+

@@ -26,3 +26,7 @@ dist-ssr
 *.sln
 *.sw?
 *.tsbuildinfo
+
+# Scripts and scratch tools containing credentials
+*.cjs
+scratch/

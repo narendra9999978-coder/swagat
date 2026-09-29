@@ -11,9 +11,12 @@ import {
   Check
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { useSwagat } from '../context/SwagatContext';
 
 export const BenefitsSection: React.FC = () => {
   const { t } = useLanguage();
+  const { theme } = useSwagat();
+  const isDark = theme === 'dark';
 
   const benefits = [
     {
@@ -67,51 +70,71 @@ export const BenefitsSection: React.FC = () => {
   ];
 
   return (
-    <section className="py-20 bg-white border-t border-slate-200">
+    <section className={`py-20 bg-transparent border-t relative ${isDark ? 'border-white/10' : 'border-slate-200'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Heading */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-[#07182C] text-xs font-bold uppercase tracking-wider mb-3">
-            <ShieldCheck className="w-4 h-4 text-[#07182C]" />
+          <div className={`inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-3 backdrop-blur-md border ${
+            isDark ? 'bg-blue-500/10 border-blue-400/20 text-blue-300' : 'bg-blue-50 border-blue-200 text-blue-800'
+          }`}>
+            <ShieldCheck className="w-4 h-4 text-blue-600" />
             <span>GovTech Value Proposition</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-[#07182C] tracking-tight">
+          <h2 className={`text-3xl sm:text-4xl font-display font-extrabold tracking-tight ${
+            isDark ? 'text-white' : 'text-[#102A43]'
+          }`}>
             {t('benefits_heading')}
           </h2>
-          <p className="mt-3 text-slate-600 text-base">
+          <p className={`mt-3 text-base ${
+            isDark ? 'text-[#AFC4D8]' : 'text-[#52657A]'
+          }`}>
             {t('benefits_subheading')}
           </p>
         </div>
 
-        {/* 6 Benefits Cards Grid */}
+        {/* 6 Benefits Cards Grid — Option A Clean Light Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {benefits.map((b, idx) => {
             const Icon = b.icon;
             return (
               <div
                 key={idx}
-                className="group relative rounded-3xl p-7 bg-slate-50 hover:bg-white border border-slate-200/80 hover:border-slate-300 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+                className={`swagat-card group relative rounded-3xl p-7 border shadow-sm hover:shadow-xl backdrop-blur-xl transition-all duration-300 flex flex-col justify-between ${
+                  isDark
+                    ? 'bg-[#07182C] border-white/15 text-white shadow-black/40'
+                    : 'bg-white border-[#D8E2EE] text-[#102A43] shadow-[0_8px_24px_rgba(0,0,0,0.04)]'
+                }`}
               >
                 <div>
                   <div className="flex items-center justify-between mb-5">
                     <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${b.color} text-white flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300`}>
                       <Icon className="w-6 h-6" />
                     </div>
-                    <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white text-slate-700 border border-slate-200 shadow-2xs">
+                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider border ${
+                      isDark 
+                        ? 'bg-white/10 text-[#AFC4D8] border-white/10' 
+                        : 'bg-[#F1F5F9] text-[#334E68] border-[#CBD5E1]'
+                    }`}>
                       {b.badge}
                     </span>
                   </div>
 
-                  <h3 className="text-lg font-display font-bold text-[#07182C] mb-2">
+                  <h3 className={`text-lg font-display font-bold mb-2 ${
+                    isDark ? 'text-white' : 'text-[#102A43]'
+                  }`}>
                     {t(b.titleKey)}
                   </h3>
 
-                  <p className="text-xs text-slate-600 leading-relaxed mb-4">
+                  <p className={`text-xs leading-relaxed mb-4 ${
+                    isDark ? 'text-[#AFC4D8]' : 'text-[#52657A]'
+                  }`}>
                     {t(b.descKey)}
                   </p>
 
-                  <ul className="space-y-2 pt-2 border-t border-slate-200/60 text-xs text-slate-700">
+                  <ul className={`space-y-2 pt-2 border-t text-xs ${
+                    isDark ? 'border-white/10 text-[#D9E7F5]' : 'border-[#D8E2EE] text-[#334E68]'
+                  }`}>
                     {b.points.map((pt, i) => (
                       <li key={i} className="flex items-center space-x-2">
                         <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
@@ -121,7 +144,11 @@ export const BenefitsSection: React.FC = () => {
                   </ul>
                 </div>
 
-                <div className="mt-6 pt-3 flex items-center text-xs font-bold text-[#07182C] group-hover:text-blue-700 transition-colors">
+                <div className={`mt-6 pt-3 flex items-center text-xs font-bold transition-colors ${
+                  isDark 
+                    ? 'text-sky-300 group-hover:text-sky-200' 
+                    : 'text-[#0284C7] group-hover:text-[#0369A1]'
+                }`}>
                   <span>Learn workflow</span>
                   <ArrowRight className="w-3.5 h-3.5 ml-1.5 group-hover:translate-x-1 transition-transform" />
                 </div>

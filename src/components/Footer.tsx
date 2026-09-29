@@ -13,10 +13,11 @@ import { StatusMark } from './ui/StatusMark';
 /**
  * Footer
  * Curated from: https://ui.watermelon.sh/block/footer-16
- * Deep Dark Glassmorphism Footer with Live System Status & Micro-Borders
+ * Dual-Theme Glassmorphism Footer with Live System Status & Micro-Borders
  */
 export const Footer: React.FC = () => {
-  const { setCurrentView } = useSwagat();
+  const { setCurrentView, theme } = useSwagat();
+  const isDark = theme === 'dark';
   const { language, setLanguage, t } = useLanguage();
 
   const scrollToTop = () => {
@@ -31,21 +32,29 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="relative bg-slate-950/80 text-slate-400 text-xs border-t border-white/10 backdrop-blur-2xl">
+    <footer className={`relative border-t backdrop-blur-2xl transition-colors duration-300 ${
+      isDark 
+        ? 'bg-slate-950/80 text-slate-400 border-white/10' 
+        : 'bg-white/85 text-slate-600 border-slate-200/90 shadow-inner'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-white/10">
+        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b ${
+          isDark ? 'border-white/10' : 'border-slate-200'
+        }`}>
           
           {/* Col 1 & 2: Brand Identity */}
           <div className="lg:col-span-2 space-y-4">
-            <SwagatLogo size="lg" showWordmark={true} showTagline={true} theme="dark" />
+            <SwagatLogo size="lg" showWordmark={true} showTagline={true} theme={theme} />
 
-            <p className="text-slate-400 text-xs leading-relaxed max-w-sm mt-3">
+            <p className={`text-xs leading-relaxed max-w-sm mt-3 ${
+              isDark ? 'text-slate-400' : 'text-slate-600'
+            }`}>
               India’s intelligent single-window platform engineered to streamline business approval discovery, unified application filing, and real-time statutory tracking across Central Ministries and State Single Window Portals.
             </p>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
-              <div className="flex items-center space-x-2 text-[11px] text-amber-400 font-semibold">
+              <div className="flex items-center space-x-2 text-[11px] text-amber-500 font-semibold">
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>National Innovation Prototype • NSWS Reference Flow</span>
               </div>
@@ -55,32 +64,44 @@ export const Footer: React.FC = () => {
 
           {/* Col 3: Core Navigation */}
           <div className="space-y-3">
-            <div className="text-white font-bold text-xs uppercase tracking-wider">
+            <div className={`font-bold text-xs uppercase tracking-wider ${
+              isDark ? 'text-white' : 'text-slate-900'
+            }`}>
               Single Window Portals
             </div>
             <ul className="space-y-2">
               <li>
-                <button onClick={() => scrollTo('section-kya')} className="hover:text-white transition">
+                <button onClick={() => scrollTo('section-kya')} className={`transition cursor-pointer ${
+                  isDark ? 'hover:text-white' : 'hover:text-slate-900'
+                }`}>
                   Know Your Approvals (KYA)
                 </button>
               </li>
               <li>
-                <button onClick={() => scrollTo('section-approvals')} className="hover:text-white transition">
+                <button onClick={() => scrollTo('section-approvals')} className={`transition cursor-pointer ${
+                  isDark ? 'hover:text-white' : 'hover:text-slate-900'
+                }`}>
                   Central Approvals Directory
                 </button>
               </li>
               <li>
-                <button onClick={() => scrollTo('section-states')} className="hover:text-white transition">
+                <button onClick={() => scrollTo('section-states')} className={`transition cursor-pointer ${
+                  isDark ? 'hover:text-white' : 'hover:text-slate-900'
+                }`}>
                   State Single Window Portals
                 </button>
               </li>
               <li>
-                <button onClick={() => scrollTo('section-schemes')} className="hover:text-white transition">
+                <button onClick={() => scrollTo('section-schemes')} className={`transition cursor-pointer ${
+                  isDark ? 'hover:text-white' : 'hover:text-slate-900'
+                }`}>
                   Government Schemes &amp; Subsidies
                 </button>
               </li>
               <li>
-                <button onClick={() => scrollTo('section-tracking')} className="hover:text-white transition">
+                <button onClick={() => scrollTo('section-tracking')} className={`transition cursor-pointer ${
+                  isDark ? 'hover:text-white' : 'hover:text-slate-900'
+                }`}>
                   Real-Time Application Tracking
                 </button>
               </li>
@@ -89,65 +110,85 @@ export const Footer: React.FC = () => {
 
           {/* Col 4: Resources & Help */}
           <div className="space-y-3">
-            <div className="text-white font-bold text-xs uppercase tracking-wider">
+            <div className={`font-bold text-xs uppercase tracking-wider ${
+              isDark ? 'text-white' : 'text-slate-900'
+            }`}>
               Resources &amp; Support
             </div>
             <ul className="space-y-2">
               <li>
-                <button onClick={() => scrollTo('section-about')} className="hover:text-white transition">
+                <button onClick={() => scrollTo('section-about')} className={`transition cursor-pointer ${
+                  isDark ? 'hover:text-white' : 'hover:text-slate-900'
+                }`}>
                   About SWAGAT
                 </button>
               </li>
               <li>
-                <button onClick={() => scrollTo('section-help')} className="hover:text-white transition">
+                <button onClick={() => scrollTo('section-help')} className={`transition cursor-pointer ${
+                  isDark ? 'hover:text-white' : 'hover:text-slate-900'
+                }`}>
                   Step-by-Step User Guides
                 </button>
               </li>
               <li>
-                <button onClick={() => scrollTo('section-help')} className="hover:text-white transition">
+                <button onClick={() => scrollTo('section-help')} className={`transition cursor-pointer ${
+                  isDark ? 'hover:text-white' : 'hover:text-slate-900'
+                }`}>
                   Frequently Asked Questions
                 </button>
               </li>
               <li>
-                <button onClick={() => scrollTo('section-help')} className="hover:text-white transition">
+                <button onClick={() => scrollTo('section-help')} className={`transition cursor-pointer ${
+                  isDark ? 'hover:text-white' : 'hover:text-slate-900'
+                }`}>
                   Lodge Query / Grievance
                 </button>
               </li>
               <li>
-                <span className="text-slate-500">API Documentation (Coming Soon)</span>
+                <span className="text-slate-400">API Documentation (Coming Soon)</span>
               </li>
             </ul>
           </div>
 
           {/* Col 5: Compliance & Legal */}
           <div className="space-y-3">
-            <div className="text-white font-bold text-xs uppercase tracking-wider">
+            <div className={`font-bold text-xs uppercase tracking-wider ${
+              isDark ? 'text-white' : 'text-slate-900'
+            }`}>
               Governance &amp; Trust
             </div>
-            <ul className="space-y-2 text-slate-400">
-              <li><span className="hover:text-white cursor-pointer">Privacy Policy</span></li>
-              <li><span className="hover:text-white cursor-pointer">Terms of Use</span></li>
-              <li><span className="hover:text-white cursor-pointer">Accessibility Statement</span></li>
-              <li><span className="hover:text-white cursor-pointer">Digital Data Protection (DPDP)</span></li>
-              <li><span className="hover:text-white cursor-pointer">Sitemap</span></li>
+            <ul className={`space-y-2 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+              <li><span className={`cursor-pointer ${isDark ? 'hover:text-white' : 'hover:text-slate-900'}`}>Privacy Policy</span></li>
+              <li><span className={`cursor-pointer ${isDark ? 'hover:text-white' : 'hover:text-slate-900'}`}>Terms of Use</span></li>
+              <li><span className={`cursor-pointer ${isDark ? 'hover:text-white' : 'hover:text-slate-900'}`}>Accessibility Statement</span></li>
+              <li><span className={`cursor-pointer ${isDark ? 'hover:text-white' : 'hover:text-slate-900'}`}>Digital Data Protection (DPDP)</span></li>
+              <li><span className={`cursor-pointer ${isDark ? 'hover:text-white' : 'hover:text-slate-900'}`}>Sitemap</span></li>
             </ul>
           </div>
 
         </div>
 
         {/* Mandatory Transparency Disclaimer Box */}
-        <div className="mt-8 p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md text-slate-300 text-[11px] leading-relaxed">
+        <div className={`mt-8 p-4 rounded-2xl border backdrop-blur-md text-[11px] leading-relaxed ${
+          isDark 
+            ? 'bg-white/5 border-white/10 text-slate-300' 
+            : 'bg-slate-100/80 border-slate-200 text-slate-700'
+        }`}>
           <div className="flex items-start space-x-2.5">
-            <Shield className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+            <Shield className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
             <div>
-              <strong className="text-white font-bold block mb-0.5">Platform Disclaimer &amp; Notice:</strong>
+              <strong className={`font-bold block mb-0.5 ${
+                isDark ? 'text-white' : 'text-slate-900'
+              }`}>Platform Disclaimer &amp; Notice:</strong>
               SWAGAT is a digital single-window platform concept engineered for discovering, understanding, applying for and tracking business/government approvals in India. Functional architecture is referenced from the National Single Window System (NSWS) for demonstration and educational purposes. This platform does not imply official government ownership, government certification or statutory affiliation unless formally deployed and certified by respective Central/State authorities.
             </div>
           </div>
         </div>
 
         {/* Bottom Bar: Copyright & Back to Top */}
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-400 text-[11px]">
+        <div className={`mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] ${
+          isDark ? 'text-slate-400' : 'text-slate-500'
+        }`}>
           <div>
             © 2026 SWAGAT • INNOVATE | BUILD | SERVE • All Rights Reserved.
           </div>
@@ -155,7 +196,11 @@ export const Footer: React.FC = () => {
           <div className="flex items-center space-x-4">
             <button
               onClick={scrollToTop}
-              className="group flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-slate-300 hover:text-white transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:scale-[1.02] active:scale-[0.98]"
+              className={`group flex items-center space-x-1.5 px-3 py-1 rounded-full border transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:scale-[1.02] active:scale-[0.98] cursor-pointer ${
+                isDark 
+                  ? 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-300 hover:text-white' 
+                  : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700 hover:text-slate-900'
+              }`}
             >
               <span>Back to Top</span>
               <ArrowUp className="w-3.5 h-3.5 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:-translate-y-0.5" />

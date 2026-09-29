@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Mail, ArrowRight, CheckCircle2, Loader2, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useSwagat } from '../../context/SwagatContext';
 
 interface NewsletterSubscribeProps {
   title?: string;
@@ -24,6 +25,8 @@ export const NewsletterSubscribe: React.FC<NewsletterSubscribeProps> = ({
   onSubscribe,
   className = '',
 }) => {
+  const { theme } = useSwagat();
+  const isDark = theme === 'dark';
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -41,20 +44,32 @@ export const NewsletterSubscribe: React.FC<NewsletterSubscribeProps> = ({
   };
 
   return (
-    <div className={`relative overflow-hidden rounded-3xl p-6 sm:p-8 bg-slate-950/60 border border-white/10 backdrop-blur-2xl shadow-xl ${className}`}>
+    <div className={`relative overflow-hidden rounded-3xl p-6 sm:p-8 backdrop-blur-2xl shadow-xl transition-colors duration-300 ${
+      isDark
+        ? 'bg-slate-950/60 border border-white/10 text-white'
+        : 'bg-white/90 border border-slate-200 text-slate-800 shadow-md'
+    } ${className}`}>
       {/* Ambient glow */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative z-10 max-w-xl mx-auto text-center space-y-3">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-amber-300 text-xs font-bold uppercase tracking-wider">
+        <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+          isDark
+            ? 'bg-white/5 border border-white/10 text-amber-300'
+            : 'bg-amber-50 border border-amber-200 text-amber-800'
+        }`}>
           <Sparkles className="w-3.5 h-3.5 text-amber-400" />
           <span>Government Gazette &amp; Policy Bulletin</span>
         </div>
 
-        <h3 className="text-xl sm:text-2xl font-display font-extrabold text-white tracking-tight">
+        <h3 className={`text-xl sm:text-2xl font-display font-extrabold tracking-tight ${
+          isDark ? 'text-white' : 'text-slate-900'
+        }`}>
           {title}
         </h3>
-        <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+        <p className={`text-xs sm:text-sm leading-relaxed ${
+          isDark ? 'text-slate-300' : 'text-slate-600'
+        }`}>
           {description}
         </p>
 
@@ -63,9 +78,9 @@ export const NewsletterSubscribe: React.FC<NewsletterSubscribeProps> = ({
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 flex items-center justify-center gap-2 text-xs font-bold"
+              className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 flex items-center justify-center gap-2 text-xs font-bold"
             >
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
               <span>Subscribed! You will receive verified policy briefings directly to your inbox.</span>
             </motion.div>
           ) : (
@@ -78,7 +93,11 @@ export const NewsletterSubscribe: React.FC<NewsletterSubscribeProps> = ({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={placeholder}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-500 text-xs font-medium focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/50 backdrop-blur-md transition-all"
+                  className={`w-full pl-10 pr-4 py-3 rounded-xl text-xs font-medium focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 backdrop-blur-md transition-all ${
+                    isDark
+                      ? 'bg-white/5 border border-white/10 text-white placeholder:text-slate-500'
+                      : 'bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 shadow-xs'
+                  }`}
                 />
               </div>
               <button

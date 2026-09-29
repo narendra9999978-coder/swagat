@@ -2,11 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%2307182C'/><circle cx='50' cy='50' r='38' fill='none' stroke='%23FF9933' stroke-width='4'/><path d='M50 20 L50 80 M20 50 L80 50 M29 29 L71 71 M29 71 L71 29' stroke='%23FFFFFF' stroke-width='3' stroke-linecap='round'/><circle cx='50' cy='50' r='10' fill='%23138808'/></svg>" />
+    <link rel="icon" type="image/png" href="/swagat-emblem-transparent.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SWAGAT — India's Single Window for Business Approvals | INNOVATE • BUILD • SERVE</title>
-    <meta name="description" content="SWAGAT is India's modern digital single-window platform for discovering, understanding, applying for and tracking business & government approvals across Central ministries and 28 States." />
-    
+    <meta name="description" content="SWAGAT is India's modern digital single-window platform for discovering, understanding, applying for and tracking business &amp; government approvals across Central ministries and 28 States." />
+
     <!-- Google Fonts: Plus Jakarta Sans & Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,8 +14,47 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
+
+    <!--
+      CRITICAL: Synchronous theme-anti-flash script.
+      Runs BEFORE any CSS paint or React render.
+      Reads saved theme from localStorage and immediately:
+        1. Adds correct class ('dark' or 'light') to <html>
+        2. Adds 'splash-active' class to lock overflow during splash
+        3. Sets background so the very first painted pixel is already
+           the correct splash background color.
+      This eliminates FOUC / black-flash / glow-circle / wrong-theme-flash.
+    -->
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem('swagat_theme');
+          var t = (saved === 'dark' || saved === 'light') ? saved : 'light';
+          var el = document.documentElement;
+          el.classList.remove('dark', 'light');
+          el.classList.add(t);
+          el.classList.add('splash-active');
+          var bg = t === 'dark' ? '#071A2D' : '#FFFFFF';
+          el.style.backgroundColor = bg;
+        } catch (e) {
+          document.documentElement.classList.add('light');
+          document.documentElement.classList.add('splash-active');
+        }
+      })();
+    </script>
+
+    <!-- Splash style active during splash only -->
+    <style id="splash-init-style">
+      html.splash-active, html.splash-active body {
+        overflow: hidden !important;
+      }
+      /* Light splash base */
+      html.light, html.light body { background-color: #FFFFFF !important; }
+      /* Dark splash base */
+      html.dark, html.dark body   { background-color: #071A2D !important; }
+    </style>
   </head>
-  <body class="bg-[#F8FAFC] text-[#07182C] font-sans antialiased selection:bg-amber-400/30 selection:text-[#07182C]">
+  <body class="font-sans antialiased selection:bg-amber-400/30 selection:text-[#07182C]">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useJourney } from '../context/JourneyContext';
+import { useSwagat } from '../context/SwagatContext';
 import { 
   ShieldCheck, 
   Eye, 
@@ -13,47 +14,61 @@ import {
 export const TrustTransparency: React.FC = () => {
   const { t } = useLanguage();
   const { setIsArchitectureModalOpen } = useJourney();
+  const { theme } = useSwagat();
+  const isDark = theme === 'dark';
 
   const trustCards = [
     {
       title: t('trust_card1_title'),
       desc: t('trust_card1_desc'),
       icon: ShieldCheck,
-      color: 'bg-emerald-500/15 text-emerald-400 border-emerald-400/20'
+      colorDark: 'bg-emerald-500/15 text-emerald-400 border-emerald-400/20',
+      colorLight: 'bg-emerald-50 text-emerald-600 border-emerald-200'
     },
     {
       title: t('trust_card2_title'),
       desc: t('trust_card2_desc'),
       icon: Eye,
-      color: 'bg-blue-500/15 text-blue-400 border-blue-400/20'
+      colorDark: 'bg-blue-500/15 text-blue-400 border-blue-400/20',
+      colorLight: 'bg-blue-50 text-blue-600 border-blue-200'
     },
     {
       title: t('trust_card3_title'),
       desc: t('trust_card3_desc'),
       icon: AlertTriangle,
-      color: 'bg-amber-500/15 text-amber-400 border-amber-400/20'
+      colorDark: 'bg-amber-500/15 text-amber-400 border-amber-400/20',
+      colorLight: 'bg-amber-50 text-amber-600 border-amber-200'
     },
     {
       title: t('trust_card4_title'),
       desc: t('trust_card4_desc'),
       icon: FileLock2,
-      color: 'bg-purple-500/15 text-purple-400 border-purple-400/20'
+      colorDark: 'bg-purple-500/15 text-purple-400 border-purple-400/20',
+      colorLight: 'bg-purple-50 text-purple-600 border-purple-200'
     }
   ];
 
   return (
-    <section id="about" className="py-16 sm:py-24 bg-transparent border-b border-white/8">
+    <section id="about" className={`py-16 sm:py-24 bg-transparent border-b ${isDark ? 'border-white/8' : 'border-slate-200'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-400/20 text-xs font-bold text-emerald-400 uppercase tracking-wider mb-3">
+          <div className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full border text-xs font-bold uppercase tracking-wider mb-3 ${
+            isDark
+              ? 'bg-emerald-500/10 border-emerald-400/20 text-emerald-400'
+              : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+          }`}>
             <span>{t('trust_badge')}</span>
           </div>
-          <h2 className="font-display font-bold text-3xl sm:text-4xl text-white tracking-tight">
+          <h2 className={`font-display font-bold text-3xl sm:text-4xl tracking-tight ${
+            isDark ? 'text-white' : 'text-slate-900'
+          }`}>
             {t('trust_heading')}
           </h2>
-          <p className="mt-3 text-base sm:text-lg text-slate-400">
+          <p className={`mt-3 text-base sm:text-lg ${
+            isDark ? 'text-slate-400' : 'text-slate-600'
+          }`}>
             Engineered with strict ethical boundaries, official source attribution, and zero-compromise citizen privacy.
           </p>
         </div>
@@ -65,16 +80,24 @@ export const TrustTransparency: React.FC = () => {
             return (
               <div
                 key={i}
-                className="bg-white/4 backdrop-blur-xl rounded-3xl p-6 sm:p-7 border border-white/10 hover:border-white/18 transition-all flex items-start space-x-4"
+                className={`backdrop-blur-xl rounded-3xl p-6 sm:p-7 border transition-all flex items-start space-x-4 ${
+                  isDark
+                    ? 'bg-white/4 border-white/10 hover:border-white/18'
+                    : 'text-[#102A43]'
+                }`}
               >
-                <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center shrink-0 ${card.color}`}>
+                <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center shrink-0 ${isDark ? card.colorDark : card.colorLight}`}>
                   <Icon className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="font-display font-bold text-lg text-white mb-1.5">
+                  <h3 className={`font-display font-bold text-lg mb-1.5 ${
+                    isDark ? 'text-white' : 'text-slate-900'
+                  }`}>
                     {card.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                  <p className={`text-xs sm:text-sm leading-relaxed ${
+                    isDark ? 'text-slate-400' : 'text-slate-600'
+                  }`}>
                     {card.desc}
                   </p>
                 </div>
