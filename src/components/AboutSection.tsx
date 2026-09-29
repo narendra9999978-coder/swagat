@@ -107,34 +107,64 @@ export const AboutSection: React.FC = () => {
         </div>
 
         {/* Integration Architecture Banner */}
-        <div className="rounded-3xl bg-gradient-to-r from-[#0B2545] via-[#134074] to-[#0B2545] p-8 sm:p-12 border border-sky-900/30 text-white shadow-2xl">
+        <div className={`rounded-3xl p-8 sm:p-12 border backdrop-blur-2xl transition-all duration-300 ${
+          isDark
+            ? 'bg-gradient-to-r from-[#07182C] via-[#0B2545] to-[#07182C] border-sky-900/30 text-white shadow-2xl'
+            : 'bg-gradient-to-br from-white via-slate-50 to-blue-50/40 border-slate-200/90 text-slate-900 shadow-[0_20px_50px_rgba(15,35,65,0.08)] ring-1 ring-slate-900/5'
+        }`}>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-7 space-y-4">
-              <span className="text-xs font-bold uppercase tracking-widest text-amber-400">Cooperative Federalism</span>
-              <h3 className="text-2xl sm:text-3xl font-display font-bold text-white">
+              <span className={`text-xs font-extrabold uppercase tracking-widest px-3 py-1 rounded-full border inline-block ${
+                isDark
+                  ? 'bg-amber-400/10 border-amber-400/20 text-amber-300'
+                  : 'bg-amber-50 border-amber-200 text-amber-700'
+              }`}>
+                Cooperative Federalism
+              </span>
+              <h3 className={`text-2xl sm:text-3xl font-display font-extrabold tracking-tight ${
+                isDark ? 'text-white' : 'text-[#07182C]'
+              }`}>
                 Seamless Central &amp; State System Harmonization
               </h3>
-              <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
+              <p className={`text-xs sm:text-sm leading-relaxed ${
+                isDark ? 'text-slate-300' : 'text-slate-600'
+              }`}>
                 SWAGAT connects directly into state engines like Maharashtra’s MAITRI, Gujarat’s IFP, Uttar Pradesh’s Nivesh Mitra, Karnataka’s eBiz, and Tamil Nadu’s Guidance SWP 2.0 alongside central ministries (DPIIT, MCA, MoEFCC, FSSAI, DGFT, PESO).
               </p>
             </div>
 
             <div className="lg:col-span-5 grid grid-cols-2 gap-3 text-xs">
-              <div className="p-4 rounded-2xl bg-white/10 border border-white/10 backdrop-blur-md">
-                <div className="text-2xl font-black text-amber-300">1,400+</div>
-                <div className="text-slate-200 text-[11px]">Integrated Approvals</div>
+              <div className={`p-4 rounded-2xl border transition-all duration-200 ${
+                isDark 
+                  ? 'bg-white/5 border-white/10 text-white hover:bg-white/10 backdrop-blur-md' 
+                  : 'bg-white border-slate-200 text-slate-900 shadow-xs hover:border-slate-300'
+              }`}>
+                <div className={`text-2xl font-black ${isDark ? 'text-amber-300' : 'text-amber-600'}`}>1,400+</div>
+                <div className={`text-[11px] font-semibold mt-0.5 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>Integrated Approvals</div>
               </div>
-              <div className="p-4 rounded-2xl bg-white/10 border border-white/10 backdrop-blur-md">
-                <div className="text-2xl font-black text-emerald-300">36 States/UTs</div>
-                <div className="text-slate-200 text-[11px]">Covered Pan-India</div>
+              <div className={`p-4 rounded-2xl border transition-all duration-200 ${
+                isDark 
+                  ? 'bg-white/5 border-white/10 text-white hover:bg-white/10 backdrop-blur-md' 
+                  : 'bg-white border-slate-200 text-slate-900 shadow-xs hover:border-slate-300'
+              }`}>
+                <div className={`text-2xl font-black ${isDark ? 'text-emerald-300' : 'text-emerald-600'}`}>36 States/UTs</div>
+                <div className={`text-[11px] font-semibold mt-0.5 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>Covered Pan-India</div>
               </div>
-              <div className="p-4 rounded-2xl bg-white/10 border border-white/10 backdrop-blur-md">
-                <div className="text-2xl font-black text-sky-300">100% Digital</div>
-                <div className="text-slate-200 text-[11px]">Paperless Workflow</div>
+              <div className={`p-4 rounded-2xl border transition-all duration-200 ${
+                isDark 
+                  ? 'bg-white/5 border-white/10 text-white hover:bg-white/10 backdrop-blur-md' 
+                  : 'bg-white border-slate-200 text-slate-900 shadow-xs hover:border-slate-300'
+              }`}>
+                <div className={`text-2xl font-black ${isDark ? 'text-sky-300' : 'text-sky-600'}`}>100% Digital</div>
+                <div className={`text-[11px] font-semibold mt-0.5 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>Paperless Workflow</div>
               </div>
-              <div className="p-4 rounded-2xl bg-white/10 border border-white/10 backdrop-blur-md">
-                <div className="text-2xl font-black text-purple-300">24/7 SLA</div>
-                <div className="text-slate-200 text-[11px]">Grievance Escalation</div>
+              <div className={`p-4 rounded-2xl border transition-all duration-200 ${
+                isDark 
+                  ? 'bg-white/5 border-white/10 text-white hover:bg-white/10 backdrop-blur-md' 
+                  : 'bg-white border-slate-200 text-slate-900 shadow-xs hover:border-slate-300'
+              }`}>
+                <div className={`text-2xl font-black ${isDark ? 'text-purple-300' : 'text-purple-600'}`}>24/7 SLA</div>
+                <div className={`text-[11px] font-semibold mt-0.5 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>Grievance Escalation</div>
               </div>
             </div>
           </div>
