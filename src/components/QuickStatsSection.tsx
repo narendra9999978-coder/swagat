@@ -56,7 +56,7 @@ export const QuickStatsSection: React.FC = () => {
       icon: ShieldCheck,
       accentDark: 'text-sky-400 bg-sky-400/10 border-sky-400/30',
       accentLight: 'text-sky-700 bg-sky-100 border-sky-300',
-      badge: 'Federal Single Window',
+      badge: 'Central Portal',
       targetSectionId: 'section-approvals'
     },
     {
@@ -159,15 +159,15 @@ export const QuickStatsSection: React.FC = () => {
                     : 'bg-white border-[#D9E3EE]'
                 }`}
               >
-                <div className="flex items-center justify-between mb-3">
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center border transition-transform group-hover:scale-110 ${isDark ? item.accentDark : item.accentLight}`}>
-                    <IconComponent className="w-4 h-4" />
+                <div className="flex items-center justify-between gap-2.5 mb-3 min-h-[36px]">
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center border shrink-0 transition-transform group-hover:scale-110 ${isDark ? item.accentDark : item.accentLight}`}>
+                    <IconComponent className="w-4 h-4 shrink-0" />
                   </div>
-                  <span className={`text-[10px] font-bold uppercase tracking-wider flex items-center transition-colors ${
+                  <span className={`flex-1 min-w-0 text-right text-[10px] font-bold uppercase tracking-wider flex items-center justify-end transition-colors ${
                     isDark ? 'text-slate-400 group-hover:text-amber-300' : 'text-slate-500 group-hover:text-amber-600'
                   }`}>
-                    <span>{item.badge}</span>
-                    <ArrowUpRight className="w-3 h-3 ml-0.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <span className="truncate">{item.badge}</span>
+                    <ArrowUpRight className="w-3 h-3 ml-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </span>
                 </div>
 
