@@ -85,7 +85,7 @@ export const StateDetailModal: React.FC = () => {
     }`}>
       <div 
         className={`relative w-full max-w-4xl backdrop-blur-2xl rounded-3xl shadow-2xl border overflow-hidden my-6 max-h-[92vh] flex flex-col animate-in fade-in zoom-in-95 duration-200 ${
-          isDark ? 'bg-[#071322]/95 border-white/12 text-white' : 'bg-white border-slate-200 text-slate-900 ring-1 ring-slate-900/5'
+          isDark ? 'bg-[#071322] border-white/12 text-white' : 'bg-white border-slate-200 text-slate-900 ring-1 ring-slate-900/5'
         }`}
         onClick={(e) => e.stopPropagation()}
       >
@@ -213,7 +213,9 @@ export const StateDetailModal: React.FC = () => {
         </div>
 
         {/* Tab Body - Scrollable */}
-        <div className="p-6 overflow-y-auto flex-1 space-y-6 text-xs">
+        <div className={`p-6 overflow-y-auto flex-1 space-y-6 text-xs ${
+          isDark ? 'bg-[#071322]' : 'bg-white'
+        }`}>
           
           {/* TAB 1: OVERVIEW */}
           {activeTab === 'overview' && (

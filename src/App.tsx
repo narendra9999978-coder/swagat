@@ -210,7 +210,7 @@ const AppContent: React.FC = () => {
       {/* Watermelon Notification-3 Glass Toast */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-[100] animate-in fade-in slide-in-from-bottom-3 duration-300 max-w-md">
-          <div className="relative overflow-hidden p-4 rounded-2xl bg-slate-950/85 text-white shadow-2xl border border-white/15 backdrop-blur-2xl text-xs font-semibold flex items-center space-x-3">
+          <div className="relative overflow-hidden p-4 rounded-2xl bg-slate-950/90 text-white shadow-2xl border border-white/15 backdrop-blur-2xl text-xs font-semibold flex items-center space-x-3">
             <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
             </div>

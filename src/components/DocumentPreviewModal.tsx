@@ -41,8 +41,8 @@ export const DocumentPreviewModal: React.FC = () => {
         transition={{ type: 'spring', stiffness: 350, damping: 28 }}
         className={`rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border backdrop-blur-2xl relative my-8 transition-colors ${
           isDark
-            ? 'bg-[#071322]/95 border-white/15 text-white'
-            : 'bg-white/98 border-slate-200 text-slate-900 shadow-2xl ring-1 ring-slate-900/5'
+            ? 'bg-[#071322] border-white/15 text-white'
+            : 'bg-white border-slate-200 text-slate-900 shadow-2xl ring-1 ring-slate-900/5'
         }`}
       >
         {/* Close Button */}

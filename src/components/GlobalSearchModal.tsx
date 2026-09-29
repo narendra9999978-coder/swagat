@@ -82,7 +82,7 @@ export const GlobalSearchModal: React.FC = () => {
         className={`relative rounded-3xl max-w-2xl w-full border backdrop-blur-2xl overflow-hidden ${
           theme === 'light'
             ? 'bg-[#FFFFFF] border-[#D8E2EC] shadow-[0_20px_50px_rgba(20,40,60,0.18)] text-[#172B4D]'
-            : 'bg-slate-950/85 border-white/15 text-white shadow-2xl'
+            : 'bg-slate-950/90 border-white/15 text-white shadow-2xl'
         }`}
       >
         {/* Animated glowing border beam header */}

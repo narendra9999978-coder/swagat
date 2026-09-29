@@ -35,7 +35,7 @@ export const Footer: React.FC = () => {
     <footer className={`relative border-t backdrop-blur-2xl transition-colors duration-300 ${
       isDark 
         ? 'bg-slate-950/80 text-slate-400 border-white/10' 
-        : 'bg-white/85 text-slate-600 border-slate-200/90 shadow-inner'
+        : 'bg-white/95 text-slate-600 border-slate-200/90 shadow-inner'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         

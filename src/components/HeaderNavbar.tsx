@@ -164,7 +164,7 @@ export const HeaderNavbar: React.FC = () => {
         transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
         className={`pointer-events-auto w-[96%] max-w-[1650px] rounded-[34px] backdrop-blur-2xl transition-all duration-300 px-4 sm:px-5 ${
           theme === 'light'
-            ? 'bg-white/92 border border-[#D9E3EE] shadow-[0_6px_20px_rgba(15,35,60,0.08)] text-slate-800'
+            ? 'bg-white/95 border border-[#D9E3EE] shadow-[0_6px_20px_rgba(15,35,60,0.08)] text-slate-800'
             : 'bg-[rgba(5,20,34,0.92)] border border-[rgba(120,165,195,0.25)] shadow-[0_8px_30px_rgba(0,0,0,0.35)] text-[#DCE8F2]'
         }`}
       >
@@ -279,8 +279,8 @@ export const HeaderNavbar: React.FC = () => {
                       transition={{ duration: 0.15 }}
                       className={`absolute right-0 mt-2.5 w-52 rounded-2xl shadow-2xl p-2 z-[1050] backdrop-blur-2xl ${
                         theme === 'light'
-                          ? 'bg-white/98 border border-slate-200/90 text-slate-800 shadow-[0_16px_40px_rgba(0,0,0,0.12)]'
-                          : 'bg-[#061525]/98 border border-white/15 text-white shadow-[0_16px_40px_rgba(0,0,0,0.8)]'
+                          ? 'bg-white border border-slate-200/90 text-slate-800 shadow-[0_16px_40px_rgba(0,0,0,0.12)]'
+                          : 'bg-[#061525] border border-white/15 text-white shadow-[0_16px_40px_rgba(0,0,0,0.8)]'
                       }`}
                     >
                       <div className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider border-b mb-1 ${
@@ -922,8 +922,8 @@ export const HeaderNavbar: React.FC = () => {
             exit={{ opacity: 0, y: -10, scale: 0.97 }}
             className={`pointer-events-auto min-[901px]:hidden w-full max-w-lg shadow-2xl backdrop-blur-2xl rounded-3xl p-4 mt-2 space-y-4 max-h-[80vh] overflow-y-auto border ${
               theme === 'light'
-                ? 'bg-white/98 border-slate-200/90 text-slate-800 shadow-[0_20px_50px_rgba(0,0,0,0.12)]'
-                : 'bg-[#071322]/98 border-white/15 text-slate-200'
+                ? 'bg-white border-slate-200/90 text-slate-800 shadow-[0_20px_50px_rgba(0,0,0,0.12)]'
+                : 'bg-[#071322] border-white/15 text-slate-200'
             }`}
           >
             <nav className={`flex flex-col space-y-1 font-medium text-sm ${

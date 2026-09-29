@@ -152,7 +152,7 @@ export const HeroSection: React.FC = () => {
             <div className={`p-4 sm:p-5 rounded-2xl shadow-xl space-y-3 max-w-2xl relative z-30 border backdrop-blur-2xl ${
               theme === 'light'
                 ? 'bg-white border-[#D8E2EE] shadow-[0_12px_36px_rgba(0,0,0,0.06)] text-[#102A43]'
-                : 'bg-black/85 border-white/20 shadow-2xl ring-1 ring-white/15 text-white'
+                : 'bg-black/90 border-white/20 shadow-2xl ring-1 ring-white/15 text-white'
             }`}>
               <div className="text-xs font-bold uppercase tracking-wider text-amber-500 dark:text-amber-300 flex items-center space-x-1.5">
                 <Sparkles className="w-3.5 h-3.5" />

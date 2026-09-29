@@ -34,15 +34,15 @@ export const ApprovalDetailModal: React.FC = () => {
         transition={{ type: 'spring', stiffness: 380, damping: 30 }}
         className={`rounded-3xl max-w-2xl w-full shadow-2xl border backdrop-blur-2xl relative my-8 max-h-[90vh] flex flex-col overflow-hidden transition-colors ${
           isDark
-            ? 'bg-[#071322]/95 border-white/15 text-white'
-            : 'bg-white/98 border-slate-200 text-slate-900 shadow-2xl ring-1 ring-slate-900/5'
+            ? 'bg-[#071322] border-white/15 text-white'
+            : 'bg-white border-slate-200 text-slate-900 shadow-2xl ring-1 ring-slate-900/5'
         }`}
       >
         {/* Sticky Glass Header */}
-        <div className={`sticky top-0 z-20 p-6 border-b backdrop-blur-xl flex items-center justify-between ${
+        <div className={`sticky top-0 z-20 p-6 border-b flex items-center justify-between ${
           isDark
-            ? 'border-white/10 bg-[#071322]/90 text-white'
-            : 'border-slate-200 bg-white/90 text-slate-900'
+            ? 'border-white/10 bg-[#071322] text-white'
+            : 'border-slate-200 bg-white text-slate-900'
         }`}>
           <div className="flex items-center gap-2">
             <BackButton onClick={() => setSelectedApproval(null)} label="Close" />
@@ -66,7 +66,9 @@ export const ApprovalDetailModal: React.FC = () => {
         </div>
 
         {/* Scrollable Content Body */}
-        <div className="p-6 overflow-y-auto space-y-6 flex-1 text-xs">
+        <div className={`p-6 overflow-y-auto space-y-6 flex-1 text-xs ${
+          isDark ? 'bg-[#071322]' : 'bg-white'
+        }`}>
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${
@@ -192,10 +194,10 @@ export const ApprovalDetailModal: React.FC = () => {
         </div>
 
         {/* Sticky Glass Footer */}
-        <div className={`sticky bottom-0 z-20 p-4 border-t backdrop-blur-xl flex items-center justify-between gap-3 ${
+        <div className={`sticky bottom-0 z-20 p-4 border-t flex items-center justify-between gap-3 ${
           isDark
-            ? 'border-white/10 bg-[#071322]/90'
-            : 'border-slate-200 bg-white/90'
+            ? 'border-white/10 bg-[#071322]'
+            : 'border-slate-200 bg-white'
         }`}>
           <button
             onClick={() => setSelectedApproval(null)}
