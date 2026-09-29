@@ -287,22 +287,10 @@ export const HeroSection: React.FC = () => {
                   }`}>
                     <Sparkles className="w-4 h-4" />
                   </div>
-                  <div>
-                    <div className={`text-xs font-bold uppercase tracking-wider ${theme === 'light' ? 'text-[#102A43]' : 'text-white'}`}>
-                      SWAGAT Gateway
-                    </div>
-                    <div className={`text-[11px] ${theme === 'light' ? 'text-[#64748B]' : 'text-slate-300'}`}>
-                      Live Clearance Infrastructure
-                    </div>
+                  <div className={`text-xs font-bold uppercase tracking-wider ${theme === 'light' ? 'text-[#102A43]' : 'text-white'}`}>
+                    SWAGAT Gateway
                   </div>
                 </div>
-                <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-                  theme === 'light'
-                    ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                    : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                }`}>
-                  99.9% Uptime
-                </span>
               </div>
 
               {/* 4 Floating UI Badges */}
