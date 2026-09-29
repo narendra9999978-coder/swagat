@@ -116,18 +116,21 @@ export const TricolourHeritageBackground: React.FC<TricolourHeritageBackgroundPr
             viewBox="0 0 200 200"
             className="w-full h-full animate-spin [animation-duration:180s]"
             fill="none"
-            stroke="#1E40AF"
-            strokeOpacity={0.35}
+            stroke="#1D4ED8"
+            strokeOpacity={0.55}
           >
-            <circle cx="100" cy="100" r="92" strokeWidth="1.6" />
-            <circle cx="100" cy="100" r="86" strokeWidth="0.75" strokeDasharray="3 3" />
-            <circle cx="100" cy="100" r="22" strokeWidth="1.6" />
-            <circle cx="100" cy="100" r="5" fill="#1E40AF" fillOpacity={0.35} />
+            <circle cx="100" cy="100" r="92" strokeWidth="2" stroke="#1D4ED8" strokeOpacity={0.55} />
+            <circle cx="100" cy="100" r="86" strokeWidth="0.9" strokeDasharray="3 3" stroke="#1D4ED8" strokeOpacity={0.55} />
+            <circle cx="100" cy="100" r="22" strokeWidth="2" stroke="#1D4ED8" strokeOpacity={0.55} />
+            <circle cx="100" cy="100" r="5" fill="#1D4ED8" fillOpacity={0.6} />
             {[0,15,30,45,60,75,90,105,120,135,150,165,180,195,210,225,240,255,270,285,300,315,330,345].map((deg) => (
               <line
                 key={deg}
                 x1="100" y1="100" x2="100" y2="12"
-                strokeWidth="1.1" strokeLinecap="round"
+                stroke="#1D4ED8"
+                strokeWidth="1.4"
+                strokeOpacity={0.55}
+                strokeLinecap="round"
                 transform={`rotate(${deg} 100 100)`}
               />
             ))}
@@ -256,22 +259,25 @@ export const TricolourHeritageBackground: React.FC<TricolourHeritageBackgroundPr
       />
 
       {/* ── 4. ASHOKA CHAKRA WATERMARK (Bottom-Right Area) ── */}
-      <div className="absolute -bottom-16 -right-16 sm:-bottom-24 sm:-right-24 w-[340px] h-[340px] sm:w-[460px] sm:h-[460px] pointer-events-none z-0">
+      <div className="absolute -bottom-12 -right-12 sm:-bottom-16 sm:-right-16 w-[360px] h-[360px] sm:w-[480px] sm:h-[480px] pointer-events-none z-[1]">
         <svg
           viewBox="0 0 200 200"
-          className="w-full h-full animate-spin [animation-duration:180s] opacity-[0.20] text-[#000080]"
+          className="w-full h-full animate-spin [animation-duration:180s]"
           fill="none"
-          stroke="currentColor"
+          stroke="#0038A8"
         >
-          <circle cx="100" cy="100" r="92" strokeWidth="1.8" />
-          <circle cx="100" cy="100" r="86" strokeWidth="0.8" strokeDasharray="3 3" />
-          <circle cx="100" cy="100" r="22" strokeWidth="1.8" />
-          <circle cx="100" cy="100" r="5" fill="currentColor" />
+          <circle cx="100" cy="100" r="92" strokeWidth="2.4" stroke="#0038A8" strokeOpacity={0.65} />
+          <circle cx="100" cy="100" r="86" strokeWidth="1" strokeDasharray="3 3" stroke="#0038A8" strokeOpacity={0.65} />
+          <circle cx="100" cy="100" r="22" strokeWidth="2.4" stroke="#0038A8" strokeOpacity={0.65} />
+          <circle cx="100" cy="100" r="6" fill="#0038A8" fillOpacity={0.7} />
           {[0,15,30,45,60,75,90,105,120,135,150,165,180,195,210,225,240,255,270,285,300,315,330,345].map((deg) => (
             <line
               key={deg}
               x1="100" y1="100" x2="100" y2="12"
-              strokeWidth="1.1" strokeLinecap="round"
+              stroke="#0038A8"
+              strokeWidth="1.6"
+              strokeOpacity={0.65}
+              strokeLinecap="round"
               transform={`rotate(${deg} 100 100)`}
             />
           ))}
