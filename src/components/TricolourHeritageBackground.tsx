@@ -102,34 +102,26 @@ export const TricolourHeritageBackground: React.FC<TricolourHeritageBackgroundPr
           }}
         />
 
-        {/* ── 3. ASHOKA CHAKRA — reduced 40%, low opacity, bottom-right edge ── */}
-        <div
-          className="absolute pointer-events-none z-0"
-          style={{
-            bottom: '-60px',
-            right: '-60px',
-            width: '260px',
-            height: '260px',
-          }}
-        >
+        {/* ── 3. ASHOKA CHAKRA WATERMARK (Bottom-Right Area - Normal Size) ── */}
+        <div className="absolute -bottom-16 -right-16 sm:-bottom-20 sm:-right-20 w-[280px] h-[280px] sm:w-[340px] sm:h-[340px] pointer-events-none z-0">
           <svg
             viewBox="0 0 200 200"
             className="w-full h-full animate-spin [animation-duration:180s]"
             fill="none"
             stroke="#1D4ED8"
-            strokeOpacity={0.55}
+            strokeOpacity={0.45}
           >
-            <circle cx="100" cy="100" r="92" strokeWidth="2" stroke="#1D4ED8" strokeOpacity={0.55} />
-            <circle cx="100" cy="100" r="86" strokeWidth="0.9" strokeDasharray="3 3" stroke="#1D4ED8" strokeOpacity={0.55} />
-            <circle cx="100" cy="100" r="22" strokeWidth="2" stroke="#1D4ED8" strokeOpacity={0.55} />
-            <circle cx="100" cy="100" r="5" fill="#1D4ED8" fillOpacity={0.6} />
+            <circle cx="100" cy="100" r="92" strokeWidth="1.8" stroke="#1D4ED8" strokeOpacity={0.45} />
+            <circle cx="100" cy="100" r="86" strokeWidth="0.8" strokeDasharray="3 3" stroke="#1D4ED8" strokeOpacity={0.45} />
+            <circle cx="100" cy="100" r="22" strokeWidth="1.8" stroke="#1D4ED8" strokeOpacity={0.45} />
+            <circle cx="100" cy="100" r="5" fill="#1D4ED8" fillOpacity={0.5} />
             {[0,15,30,45,60,75,90,105,120,135,150,165,180,195,210,225,240,255,270,285,300,315,330,345].map((deg) => (
               <line
                 key={deg}
                 x1="100" y1="100" x2="100" y2="12"
                 stroke="#1D4ED8"
-                strokeWidth="1.4"
-                strokeOpacity={0.55}
+                strokeWidth="1.2"
+                strokeOpacity={0.45}
                 strokeLinecap="round"
                 transform={`rotate(${deg} 100 100)`}
               />
@@ -258,25 +250,25 @@ export const TricolourHeritageBackground: React.FC<TricolourHeritageBackgroundPr
         }}
       />
 
-      {/* ── 4. ASHOKA CHAKRA WATERMARK (Bottom-Right Area) ── */}
-      <div className="absolute -bottom-12 -right-12 sm:-bottom-16 sm:-right-16 w-[360px] h-[360px] sm:w-[480px] sm:h-[480px] pointer-events-none z-[1]">
+      {/* ── 4. ASHOKA CHAKRA WATERMARK (Bottom-Right Area - Normal Size) ── */}
+      <div className="absolute -bottom-16 -right-16 sm:-bottom-20 sm:-right-20 w-[280px] h-[280px] sm:w-[340px] sm:h-[340px] pointer-events-none z-0">
         <svg
           viewBox="0 0 200 200"
           className="w-full h-full animate-spin [animation-duration:180s]"
           fill="none"
           stroke="#0038A8"
         >
-          <circle cx="100" cy="100" r="92" strokeWidth="2.4" stroke="#0038A8" strokeOpacity={0.65} />
-          <circle cx="100" cy="100" r="86" strokeWidth="1" strokeDasharray="3 3" stroke="#0038A8" strokeOpacity={0.65} />
-          <circle cx="100" cy="100" r="22" strokeWidth="2.4" stroke="#0038A8" strokeOpacity={0.65} />
-          <circle cx="100" cy="100" r="6" fill="#0038A8" fillOpacity={0.7} />
+          <circle cx="100" cy="100" r="92" strokeWidth="1.8" stroke="#0038A8" strokeOpacity={0.45} />
+          <circle cx="100" cy="100" r="86" strokeWidth="0.8" strokeDasharray="3 3" stroke="#0038A8" strokeOpacity={0.45} />
+          <circle cx="100" cy="100" r="22" strokeWidth="1.8" stroke="#0038A8" strokeOpacity={0.45} />
+          <circle cx="100" cy="100" r="5" fill="#0038A8" fillOpacity={0.5} />
           {[0,15,30,45,60,75,90,105,120,135,150,165,180,195,210,225,240,255,270,285,300,315,330,345].map((deg) => (
             <line
               key={deg}
               x1="100" y1="100" x2="100" y2="12"
               stroke="#0038A8"
-              strokeWidth="1.6"
-              strokeOpacity={0.65}
+              strokeWidth="1.2"
+              strokeOpacity={0.45}
               strokeLinecap="round"
               transform={`rotate(${deg} 100 100)`}
             />
