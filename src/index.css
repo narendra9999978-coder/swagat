@@ -107,8 +107,18 @@ section { background-color: transparent !important; }
    ═══════════════════════════════════════════════════════════════════════════ */
 .light { color-scheme: light; }
 
-.light h1, .light h2, .light h3, .light h4, .light h5, .light h6 {
+.light h1:not(.text-white):not([class*="text-white"]),
+.light h2:not(.text-white):not([class*="text-white"]),
+.light h3:not(.text-white):not([class*="text-white"]),
+.light h4:not(.text-white):not([class*="text-white"]),
+.light h5:not(.text-white):not([class*="text-white"]),
+.light h6:not(.text-white):not([class*="text-white"]) {
   color: #102A43;
+}
+
+/* Ensure explicit text-white headings stay white across all portal themes */
+.text-white, h1.text-white, h2.text-white, h3.text-white {
+  color: #ffffff !important;
 }
 
 /* Light form inputs */

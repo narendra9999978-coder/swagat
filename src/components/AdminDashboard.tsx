@@ -1244,7 +1244,10 @@ export const AdminDashboard: React.FC = () => {
                 National Governance Command Center • Live Telemetry
               </span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+            <h1
+              className="text-xl sm:text-2xl font-black !text-white tracking-tight"
+              style={{ color: '#ffffff' }}
+            >
               Single-Window Statutory Operations & Regulatory Gateways
             </h1>
             <p className="text-xs text-slate-300 max-w-2xl mt-1 leading-relaxed">
@@ -3337,7 +3340,7 @@ export const AdminDashboard: React.FC = () => {
   // MAIN RENDER
   // ─────────────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-[#070D18] text-slate-100 flex font-sans selection:bg-amber-400 selection:text-[#07182C]">
+    <div className="dark min-h-screen bg-[#070D18] text-slate-100 flex font-sans selection:bg-amber-400 selection:text-[#07182C]">
 
       {/* Sidebar Overlay (mobile) */}
       {sidebarOpen && (
