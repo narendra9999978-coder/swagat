@@ -17,7 +17,7 @@ interface SplashAnimationProps {
  * - India Gate & Taj Mahal line art emerging from bottom-left corner
  * - Centered SWAGAT emblem pod with rotating Ashoka Blue dotted ring
  * - Bold SWAGAT wordmark with tricolour gradient 'G'
- * - "India’s Single Window Gateway" tagline
+ * - "India’s Single Window Approval Gateway" tagline
  * - HIGH CONTRAST & CLEARLY READABLE "National Digital Infrastructure Portal" badge
  * - Shimmering Indian tricolour loading ribbon
  * - Seamless transition to main website
@@ -212,12 +212,12 @@ export const SplashAnimation: React.FC<SplashAnimationProps> = ({ onComplete }) 
             <span>AT</span>
           </div>
 
-          {/* Official Tagline: "India’s Single Window Gateway" */}
+          {/* Official Tagline: "India’s Single Window Approval Gateway" */}
           <p
             className="mt-2 text-base sm:text-lg md:text-xl font-bold tracking-wide"
             style={{ color: isDark ? '#C2D1DF' : '#1E293B' }}
           >
-            India’s Single Window Gateway
+            India’s Single Window Approval Gateway
           </p>
 
           {/* ── HIGH-CONTRAST SUBTITLE BADGE: "NATIONAL DIGITAL INFRASTRUCTURE PORTAL" ── */}

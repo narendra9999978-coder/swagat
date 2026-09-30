@@ -30,7 +30,7 @@ export const SwagatLogo: React.FC<SwagatLogoProps> = ({
     return (
       <img
         src="/swagat_official_logo.jpg"
-        alt="SWAGAT – India’s Single Window Gateway"
+        alt="SWAGAT – India’s Single Window Approval Gateway"
         className={`${imgHeights[size]} w-auto object-contain rounded-xl shadow-lg select-none ${className}`}
       />
     );
@@ -131,7 +131,7 @@ export const SwagatLogo: React.FC<SwagatLogoProps> = ({
                 theme === 'dark' ? 'text-slate-300' : 'text-slate-600'
               }`}
             >
-              India’s Single Window Gateway
+              India’s Single Window Approval Gateway
             </span>
           )}
         </div>

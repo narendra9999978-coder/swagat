@@ -140,14 +140,14 @@
       <text x="342" y="112" fill="#FFFFFF">T</text>
     </g>
 
-    <!-- Tagline: India's Single Window Gateway -->
+    <!-- Tagline: India's Single Window Approval Gateway -->
     <text x="4" y="152" 
           font-family="'Inter', 'Montserrat', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" 
           font-size="18.5" 
           font-weight="500" 
           fill="#94A3B8" 
           letter-spacing="3.2">
-      India’s Single Window Gateway
+      India’s Single Window Approval Gateway
     </text>
 
     <!-- Tiny Tricolour Underline Accent -->
