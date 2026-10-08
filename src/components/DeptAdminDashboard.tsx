@@ -46,6 +46,7 @@ export const DeptAdminDashboard: React.FC = () => {
   const [localStatuses, setLocalStatuses] = useState<Record<string, string>>({});
   const [searchQuery, setSearchQuery] = useState('');
   const [now, setNow] = useState(Date.now());
+  const [previewDoc, setPreviewDoc] = useState<QueueDoc | null>(null);
 
   // Load queue
   useEffect(() => {
@@ -382,14 +383,21 @@ export const DeptAdminDashboard: React.FC = () => {
                               <div className="flex items-center space-x-2 shrink-0">
                                 {doc.file_url && doc.file_url !== '#' && (
                                   <>
-                                    <button className="flex items-center space-x-1 px-2.5 py-1.5 bg-white/10 hover:bg-white/20 text-slate-400 hover:text-white text-xs rounded-lg transition">
+                                    <button 
+                                      onClick={() => setPreviewDoc(doc)}
+                                      className="flex items-center space-x-1 px-2.5 py-1.5 bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white text-xs rounded-lg transition cursor-pointer"
+                                    >
                                       <Eye className="w-3 h-3" />
                                       <span>View</span>
                                     </button>
-                                    <button className="flex items-center space-x-1 px-2.5 py-1.5 bg-white/10 hover:bg-white/20 text-slate-400 hover:text-white text-xs rounded-lg transition">
+                                    <a 
+                                      href={doc.file_url} 
+                                      download={doc.document_type_name}
+                                      className="flex items-center space-x-1 px-2.5 py-1.5 bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white text-xs rounded-lg transition cursor-pointer"
+                                    >
                                       <Download className="w-3 h-3" />
                                       <span>Download</span>
-                                    </button>
+                                    </a>
                                   </>
                                 )}
                                 {docStatus === 'pending_review' && (
@@ -425,6 +433,63 @@ export const DeptAdminDashboard: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Document Preview Modal */}
+      {previewDoc && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-[#071322] border border-white/15 rounded-2xl p-6 max-w-lg w-full text-white space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <div className="flex items-center space-x-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <h3 className="text-sm font-bold">{previewDoc.document_type_name}</h3>
+              </div>
+              <button onClick={() => setPreviewDoc(null)} className="p-1 text-slate-400 hover:text-white rounded-lg">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-3 bg-white/5 rounded-xl text-xs space-y-2 border border-white/5">
+              <div className="flex justify-between">
+                <span className="text-slate-400">Applicant:</span>
+                <span className="font-semibold">{previewDoc.applicant_name || 'Applicant'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Company:</span>
+                <span className="font-semibold">{previewDoc.company_name || 'Enterprise'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Status:</span>
+                <span className="font-bold text-amber-300">{previewDoc.status}</span>
+              </div>
+            </div>
+
+            <div className="h-44 rounded-xl bg-black/40 border border-white/10 flex flex-col items-center justify-center p-4 text-center">
+              <FileCheck2 className="w-10 h-10 text-amber-400 mb-2" />
+              <div className="text-xs font-bold text-white">{previewDoc.document_type_name}</div>
+              <div className="text-[10px] text-slate-400 mt-1">DigiLocker Certified Statutory Clearance Dossier</div>
+            </div>
+
+            <div className="flex justify-between pt-2">
+              <button
+                onClick={() => setPreviewDoc(null)}
+                className="px-4 py-2 bg-white/10 hover:bg-white/20 text-xs rounded-xl transition"
+              >
+                Close
+              </button>
+              {previewDoc.file_url && previewDoc.file_url !== '#' && (
+                <a
+                  href={previewDoc.file_url}
+                  download={previewDoc.document_type_name}
+                  className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-[#07182C] font-bold text-xs rounded-xl flex items-center space-x-1 transition"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download Document</span>
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

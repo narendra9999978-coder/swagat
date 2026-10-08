@@ -36,6 +36,11 @@ export default defineConfig({
         target: 'https://swagat-backend.onrender.com',
         changeOrigin: true,
         secure: false,
+      },
+      '/uploads': {
+        target: 'https://swagat-backend.onrender.com',
+        changeOrigin: true,
+        secure: false,
       }
     }
   },

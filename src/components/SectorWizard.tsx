@@ -16,7 +16,7 @@ import {
   SectorChecklistDocument
 } from '../data/sectorDecisionTrees';
 import { WizardStep, Application, ApplicationDocumentItem, ApplicationApprovalItem } from '../types/swagat';
-import { loadAllApplications, saveAllApplications } from '../lib/applicationStore';
+import { loadAllApplications, saveAllApplications, addApplication } from '../lib/applicationStore';
 import { ApplicationStatusResponseAPI, applicantApi } from '../services/api';
 
 const WIZARD_STEPS: { key: WizardStep; label: string; short: string; description: string }[] = [
@@ -227,16 +227,42 @@ export const SectorWizard: React.FC = () => {
         new Set(Object.values(answersByStep).flatMap(stepList => stepList.flatMap(a => a.recommendations)))
       );
 
+      // Read uploaded files into base64 data URLs for seamless cross-device synchronization
+      const readFileAsDataUrl = (file: File): Promise<string> => {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve((reader.result as string) || '');
+          reader.onerror = () => resolve('');
+          reader.readAsDataURL(file);
+        });
+      };
+
       // Build document items for application store
-      const docItems: ApplicationDocumentItem[] = checklist.map((c, i) => ({
-        id: `doc-${appId}-${i}`,
-        documentName: c.documentName,
-        category: c.department,
-        uploadDate: today,
-        verificationStatus: c.reusedFromVault ? 'Approved' : 'Under Review',
-        adminRemark: c.reusedFromVault ? 'Pre-verified via Corporate DigiLocker Vault' : 'Awaiting departmental scrutiny',
-        fileUrl: c.reusedFromVault ? '#vault' : uploadedDocs[c.id] ? URL.createObjectURL(uploadedDocs[c.id].file) : undefined,
-      }));
+      const docItems: ApplicationDocumentItem[] = await Promise.all(
+        checklist.map(async (c, i) => {
+          const uploaded = uploadedDocs[c.id];
+          let fileDataUrl: string | undefined = undefined;
+          if (uploaded?.file) {
+            try {
+              fileDataUrl = await readFileAsDataUrl(uploaded.file);
+            } catch {
+              fileDataUrl = undefined;
+            }
+          }
+
+          return {
+            id: `doc-${appId}-${i}`,
+            documentName: c.documentName,
+            category: c.department,
+            uploadDate: today,
+            verificationStatus: c.reusedFromVault ? 'Approved' : 'Under Review',
+            adminRemark: c.reusedFromVault ? 'Pre-verified via Corporate DigiLocker Vault' : 'Awaiting departmental scrutiny',
+            fileName: uploaded ? uploaded.name : c.reusedFromVault ? 'DigiLocker_Verified_Certificate.pdf' : undefined,
+            fileData: fileDataUrl,
+            fileUrl: fileDataUrl || (c.reusedFromVault ? '#vault' : undefined),
+          };
+        })
+      );
 
       // Unique departments from checklist
       const uniqueDepts = Array.from(new Set(checklist.map(c => c.department)));
@@ -284,15 +310,14 @@ export const SectorWizard: React.FC = () => {
           { title: 'Departmental SLA Scrutiny', date: 'In Progress', description: 'Live SLA countdown active across all clearance bodies', completed: false, current: true },
           { title: 'Deemed Approval / Final Composite NOC', date: 'Expected in 14 days', description: 'Digital Composite Clearance Certificate generation', completed: false, current: false },
         ],
-        documentsAttached: docItems.map(d => ({ name: d.documentName, category: d.category, verified: d.verificationStatus === 'Approved' })),
+        documentsAttached: docItems.map(d => ({ name: d.documentName, category: d.category, verified: d.verificationStatus === 'Approved', url: d.fileUrl })),
         documentsList: docItems,
         approvalsList: approvalItems,
         queries: [],
       };
 
-      // Save to shared store so both User & Admin see it instantly
-      const existing = loadAllApplications();
-      saveAllApplications([newApp, ...existing]);
+      // Save to shared store and push to cloud database so both User & Admin on ANY device see it instantly
+      addApplication(newApp);
 
       // Build mock SLA response for the SLA view
       const mockSla: ApplicationStatusResponseAPI = {

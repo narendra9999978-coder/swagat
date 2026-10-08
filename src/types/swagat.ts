@@ -146,6 +146,8 @@ export interface ApplicationDocumentItem {
   documentName: string;
   category: string;
   fileUrl?: string;
+  fileName?: string;
+  fileData?: string;
   uploadDate: string;
   verificationStatus: DocumentVerificationStatus;
   adminRemark?: string;
@@ -188,6 +190,9 @@ export interface Application {
   certificateUrl?: string;
   projectCategory?: string;
   businessActivity?: string;
+  lockedByAdminId?: string;
+  lockedByAdminName?: string;
+  lockedAt?: string;
 }
 
 export interface DocumentItem {

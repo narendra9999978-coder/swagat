@@ -17,8 +17,12 @@ import {
   loadNotifications,
   markNotificationRead,
   addNotification,
+  claimApplicationLock,
+  releaseApplicationLock,
+  isAppLockedByOther,
+  syncApplicationsFromCloud,
 } from '../lib/applicationStore';
-import { Application, DocumentVerificationStatus, ApprovalItemStatus, AppNotification } from '../types/swagat';
+import { Application, ApplicationDocumentItem, DocumentVerificationStatus, ApprovalItemStatus, AppNotification } from '../types/swagat';
 import {
   adminDepartments, adminApprovalsCatalog, adminSectors,
   adminSchemes,
@@ -274,15 +278,15 @@ const EmptyState: React.FC<{ icon?: React.ComponentType<{ className?: string }>;
 // ─────────────────────────────────────────────────────────────────────────────
 // ACTION BTN
 // ─────────────────────────────────────────────────────────────────────────────
-const ActionBtn: React.FC<{ label: string; icon?: React.ComponentType<{ className?: string }>; onClick: () => void; variant?: 'primary' | 'danger' | 'secondary' | 'ghost' }> = ({ label, icon: Icon, onClick, variant = 'ghost' }) => {
+const ActionBtn: React.FC<{ label: string; icon?: React.ComponentType<{ className?: string }>; onClick: () => void; variant?: 'primary' | 'danger' | 'secondary' | 'ghost'; disabled?: boolean }> = ({ label, icon: Icon, onClick, variant = 'ghost', disabled = false }) => {
   const cls = {
-    primary: 'bg-amber-400 hover:bg-amber-300 text-[#07182C] font-extrabold shadow-lg shadow-amber-400/20',
-    danger: 'bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/30',
-    secondary: 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border border-emerald-500/30',
-    ghost: 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/[0.08]',
+    primary: disabled ? 'bg-amber-400/30 text-amber-300/40 cursor-not-allowed border border-white/5' : 'bg-amber-400 hover:bg-amber-300 text-[#07182C] font-extrabold shadow-lg shadow-amber-400/20 cursor-pointer',
+    danger: disabled ? 'bg-rose-500/5 text-rose-400/40 cursor-not-allowed border border-rose-500/10' : 'bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/30 cursor-pointer',
+    secondary: disabled ? 'bg-emerald-500/5 text-emerald-400/40 cursor-not-allowed border border-emerald-500/10' : 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border border-emerald-500/30 cursor-pointer',
+    ghost: disabled ? 'bg-white/5 text-slate-500 cursor-not-allowed border border-white/5' : 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/[0.08] cursor-pointer',
   }[variant];
   return (
-    <button onClick={onClick} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer ${cls}`}>
+    <button onClick={disabled ? undefined : onClick} disabled={disabled} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition ${cls}`}>
       {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
       <span>{label}</span>
     </button>
@@ -412,6 +416,12 @@ export const AdminDashboard: React.FC = () => {
   const [selectedApp, setSelectedApp] = useState<AdminApplication | null>(null);
   const [selectedAppFull, setSelectedAppFull] = useState<Application | null>(null);
 
+  // Viewing document state for statutory dossier modal
+  const [viewingDoc, setViewingDoc] = useState<{
+    doc: ApplicationDocumentItem | DocumentReviewQueueItem;
+    app?: Application | AdminApplication;
+  } | null>(null);
+
   // Real Uploaded Documents Scrutiny Queue
   const [docQueue, setDocQueue] = useState<DocumentReviewQueueItem[]>(() =>
     getAllDocumentsAcrossApplications()
@@ -450,6 +460,13 @@ export const AdminDashboard: React.FC = () => {
 
   // Unified reload from single source of truth (Database + Local Store)
   const reloadAll = useCallback(async () => {
+    // 0. Synchronize real-time applications from Supabase Cloud
+    try {
+      await syncApplicationsFromCloud();
+    } catch (e) {
+      console.warn('[SWAGAT] Cloud sync in reloadAll:', e);
+    }
+
     // 1. Synchronize Registered Users with Go Backend
     try {
       const backendUsers = await superAdminApi.getUsers();
@@ -625,7 +642,45 @@ export const AdminDashboard: React.FC = () => {
     return matchSearch && matchState && matchStatus;
   }), [appList, appSearch, appStateFilter, appStatusFilter]);
 
+  // Concurrency-aware detail opener
+  const handleOpenAppDetail = async (a: AdminApplication) => {
+    const all = loadAllApplications();
+    const full = all.find(app => app.id === a.id);
+    const currentAdminId = userProfile?.id || userProfile?.email || 'admin-root';
+    const currentAdminName = userProfile?.name || 'Administrator';
+
+    if (full) {
+      const lockStatus = isAppLockedByOther(full, currentAdminId);
+      if (lockStatus.isLocked) {
+        showToast(`⚠️ Concurrency Notice: Currently locked by ${lockStatus.lockedByName}`);
+      } else {
+        await claimApplicationLock(full.id, currentAdminId, currentAdminName);
+      }
+    }
+
+    setSelectedApp(a);
+    setSelectedAppFull(full || null);
+  };
+
+  const handleCloseAppDetail = async () => {
+    if (selectedApp) {
+      const currentAdminId = userProfile?.id || userProfile?.email || 'admin-root';
+      await releaseApplicationLock(selectedApp.id, currentAdminId);
+      reloadAll();
+    }
+    setSelectedApp(null);
+    setSelectedAppFull(null);
+  };
+
   const changeAppStatus = async (id: string, newStatus: AppStatusAdmin) => {
+    const all = loadAllApplications();
+    const target = all.find(app => app.id === id);
+    const currentAdminId = userProfile?.id || userProfile?.email || 'admin-root';
+    if (target && isAppLockedByOther(target, currentAdminId).isLocked) {
+      showToast('Action Blocked: This application is locked by another administrator.');
+      return;
+    }
+
     const remark = newStatus === 'Approved'
       ? 'Application has been approved. Certificate/licence will be issued.'
       : newStatus === 'Rejected'
@@ -639,6 +694,11 @@ export const AdminDashboard: React.FC = () => {
       newStatus as Application['currentStatus'],
       remark,
     );
+
+    // Release lock once decision is final
+    if (newStatus === 'Approved' || newStatus === 'Rejected') {
+      await releaseApplicationLock(id, currentAdminId);
+    }
 
     // Sync status change directly to Go Backend
     try {
@@ -1449,7 +1509,7 @@ export const AdminDashboard: React.FC = () => {
             </thead>
             <tbody className="divide-y divide-white/5">
               {appList.slice(0, 5).map(a => (
-                <tr key={a.id} className="hover:bg-white/3 transition cursor-pointer" onClick={() => { setSelectedApp(a); setActiveTab('applications'); }}>
+                <tr key={a.id} className="hover:bg-white/3 transition cursor-pointer" onClick={() => { handleOpenAppDetail(a); setActiveTab('applications'); }}>
                   <TD><span className="font-mono text-amber-400 text-[10px]">{a.trackingNumber}</span></TD>
                   <TD><div className="font-semibold text-white">{a.applicantName}</div><div className="text-[10px] text-slate-400">{a.companyName}</div></TD>
                   <TD><span className="text-slate-300">{a.state}</span></TD>
@@ -1691,10 +1751,34 @@ export const AdminDashboard: React.FC = () => {
                   <TD><span className="text-slate-300 text-xs">{a.state}</span></TD>
                   <TD><span className="text-slate-400 text-xs truncate max-w-[90px] block">{a.sector}</span></TD>
                   <TD><span className="text-slate-400 text-xs">{a.submittedDate}</span></TD>
-                  <TD><Badge label={a.currentStatus} className={statusColor(a.currentStatus)} /></TD>
+                  <TD>
+                    <div className="flex flex-col gap-1 items-start">
+                      <Badge label={a.currentStatus} className={statusColor(a.currentStatus)} />
+                      {(() => {
+                        const fullApp = loadAllApplications().find(fa => fa.id === a.id);
+                        const currentAdminId = userProfile?.id || userProfile?.email || 'admin-root';
+                        const lock = fullApp ? isAppLockedByOther(fullApp, currentAdminId) : { isLocked: false };
+                        if (lock.isLocked) {
+                          return (
+                            <span className="inline-flex items-center gap-1 text-[9px] font-bold text-amber-300 bg-amber-500/20 border border-amber-500/30 px-1.5 py-0.5 rounded-md">
+                              <Lock className="w-2.5 h-2.5" /> Locked: {lock.lockedByName}
+                            </span>
+                          );
+                        }
+                        if (fullApp?.lockedByAdminId === currentAdminId) {
+                          return (
+                            <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-300 bg-emerald-500/20 border border-emerald-500/30 px-1.5 py-0.5 rounded-md">
+                              <Lock className="w-2.5 h-2.5" /> In Your Review
+                            </span>
+                          );
+                        }
+                        return null;
+                      })()}
+                    </div>
+                  </TD>
                   <TD><span className="text-slate-400 text-xs">{a.lastUpdated}</span></TD>
                   <TD className="text-right">
-                    <ActionBtn label="View" icon={Eye} onClick={() => setSelectedApp(a)} variant="primary" />
+                    <ActionBtn label="View" icon={Eye} onClick={() => handleOpenAppDetail(a)} variant="primary" />
                   </TD>
                 </tr>
               ))}
@@ -1704,12 +1788,40 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Application Detail Modal */}
-      <Modal open={!!selectedApp} onClose={() => { setSelectedApp(null); setSelectedAppFull(null); }} title="Application Details" maxW="max-w-3xl">
+      <Modal open={!!selectedApp} onClose={handleCloseAppDetail} title="Application Details" maxW="max-w-3xl">
         {selectedApp && (() => {
           const fullApps = loadAllApplications();
           const full = fullApps.find(a => a.id === selectedApp.id);
+          const currentAdminId = userProfile?.id || userProfile?.email || 'admin-root';
+          const currentAdminName = userProfile?.name || 'Administrator';
+          const lockStatus = full ? isAppLockedByOther(full, currentAdminId) : { isLocked: false };
+
           return (
             <div className="space-y-4 text-xs">
+              {/* Concurrency Lock Alert Banner */}
+              {lockStatus.isLocked && (
+                <div className="p-3 bg-amber-500/15 border border-amber-500/30 rounded-xl text-amber-300 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-amber-400 shrink-0" />
+                    <span className="text-xs">
+                      <strong>Concurrency Lock Active:</strong> This application is currently being scrutinized by <strong>{lockStatus.lockedByName}</strong> on another terminal. Decision actions are locked to prevent conflicting approvals.
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!full) return;
+                      await releaseApplicationLock(full.id);
+                      await claimApplicationLock(full.id, currentAdminId, currentAdminName);
+                      reloadAll();
+                      showToast('Lock transferred to your terminal.');
+                    }}
+                    className="text-[10px] px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-400/30 rounded-lg font-bold transition cursor-pointer shrink-0"
+                  >
+                    Supervisor Override
+                  </button>
+                </div>
+              )}
               <div className="flex items-start justify-between gap-3 p-3 bg-[#08111F] rounded-xl border border-white/[0.08]">
                 <div>
                   <div className="flex items-center gap-2">
@@ -1833,16 +1945,13 @@ export const AdminDashboard: React.FC = () => {
                           <div className="flex items-center gap-2">
                             <FileText className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                             <span className="text-white font-bold text-[11px] truncate">{doc.documentName}</span>
-                            {doc.fileUrl && (
-                              <a
-                                href={doc.fileUrl}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-[10px] text-amber-400 underline font-mono hover:text-amber-300"
-                              >
-                                View File
-                              </a>
-                            )}
+                            <button
+                              type="button"
+                              onClick={() => setViewingDoc({ doc, app: full || selectedApp })}
+                              className="text-[10px] text-amber-400 underline font-mono hover:text-amber-300 cursor-pointer flex items-center gap-1"
+                            >
+                              <Eye className="w-3 h-3" /> View File
+                            </button>
                           </div>
                           <p className="text-[10px] text-slate-400 mt-0.5 ml-5">
                             Category: <span className="text-slate-300">{doc.category}</span> • Uploaded: {doc.uploadDate}
@@ -1868,22 +1977,25 @@ export const AdminDashboard: React.FC = () => {
                       <div className="ml-5 pt-1 flex items-center gap-1.5 flex-wrap">
                         <button
                           type="button"
+                          disabled={lockStatus.isLocked}
                           onClick={() => handleVerifyDoc(selectedApp.id, doc.id, 'Approved', 'Verified successfully by scrutiny officer')}
-                          className="px-2.5 py-1 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold transition cursor-pointer"
+                          className="px-2.5 py-1 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                           ✓ Approve
                         </button>
                         <button
                           type="button"
+                          disabled={lockStatus.isLocked}
                           onClick={() => openDocActionModal(doc.id, doc.documentName, 'Correction Required', selectedApp.id)}
-                          className="px-2.5 py-1 rounded-lg bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 border border-amber-500/40 text-[10px] font-bold transition cursor-pointer"
+                          className="px-2.5 py-1 rounded-lg bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 border border-amber-500/40 text-[10px] font-bold transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                           ⚠ Request Correction
                         </button>
                         <button
                           type="button"
+                          disabled={lockStatus.isLocked}
                           onClick={() => openDocActionModal(doc.id, doc.documentName, 'Rejected', selectedApp.id)}
-                          className="px-2.5 py-1 rounded-lg bg-rose-600/30 hover:bg-rose-600/50 text-rose-300 border border-rose-500/40 text-[10px] font-bold transition cursor-pointer"
+                          className="px-2.5 py-1 rounded-lg bg-rose-600/30 hover:bg-rose-600/50 text-rose-300 border border-rose-500/40 text-[10px] font-bold transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                           ✕ Reject
                         </button>
@@ -1964,8 +2076,8 @@ export const AdminDashboard: React.FC = () => {
                 <div className="flex flex-wrap gap-1.5">
                   {(['Under Review', 'Query Raised', 'Approved', 'Rejected'] as AppStatusAdmin[]).map(s => (
                     <button key={s} onClick={() => changeAppStatus(selectedApp.id, s)}
-                      className={`px-3 py-1.5 rounded-xl text-[10px] font-bold transition cursor-pointer ${statusColor(s)} ${selectedApp.currentStatus === s ? 'opacity-40 cursor-not-allowed' : 'hover:opacity-90'}`}
-                      disabled={selectedApp.currentStatus === s}>
+                      className={`px-3 py-1.5 rounded-xl text-[10px] font-bold transition cursor-pointer ${statusColor(s)} ${selectedApp.currentStatus === s || lockStatus.isLocked ? 'opacity-40 cursor-not-allowed' : 'hover:opacity-90'}`}
+                      disabled={selectedApp.currentStatus === s || lockStatus.isLocked}>
                       {s}
                     </button>
                   ))}
@@ -1973,8 +2085,14 @@ export const AdminDashboard: React.FC = () => {
               </div>
 
               <div className="flex justify-between gap-2 flex-wrap pt-2 border-t border-white/[0.08]">
-                <ActionBtn label="Raise Query to Applicant" icon={MessageSquare} onClick={() => setQueryModalOpen(true)} variant="primary" />
-                <ActionBtn label="Close" onClick={() => { setSelectedApp(null); setSelectedAppFull(null); }} />
+                <ActionBtn 
+                  label="Raise Query to Applicant" 
+                  icon={MessageSquare} 
+                  onClick={() => setQueryModalOpen(true)} 
+                  variant="primary" 
+                  disabled={lockStatus.isLocked} 
+                />
+                <ActionBtn label="Close" onClick={handleCloseAppDetail} />
               </div>
             </div>
           );
@@ -2400,18 +2518,13 @@ export const AdminDashboard: React.FC = () => {
                             <div className="text-[10px] text-slate-400 truncate max-w-[150px]">{doc.companyName}</div>
                           </TD>
                           <TD>
-                            {doc.fileUrl ? (
-                              <a
-                                href={doc.fileUrl}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-amber-400 text-[10px] font-semibold border border-white/[0.08]"
-                              >
-                                <Eye className="w-3 h-3" /> View
-                              </a>
-                            ) : (
-                              <span className="text-slate-500 text-[10px]">PDF Attached</span>
-                            )}
+                            <button
+                              type="button"
+                              onClick={() => setViewingDoc({ doc })}
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-400/10 hover:bg-amber-400/20 text-amber-400 text-[10px] font-semibold border border-amber-400/20 cursor-pointer transition"
+                            >
+                              <Eye className="w-3 h-3" /> View Dossier
+                            </button>
                           </TD>
                           <TD>
                             <span className="text-slate-300 text-[11px]">{doc.uploadDate}</span>
@@ -3406,6 +3519,155 @@ export const AdminDashboard: React.FC = () => {
             </button>
           </div>
         </form>
+      </Modal>
+
+      {/* ── Statutory Document Viewer Modal (In-Portal Scrutiny Dossier) ── */}
+      <Modal 
+        open={!!viewingDoc} 
+        onClose={() => setViewingDoc(null)} 
+        title="Statutory Scrutiny Dossier" 
+        maxW="max-w-2xl"
+      >
+        {viewingDoc && (() => {
+          const doc = viewingDoc.doc;
+          const targetAppId = (doc as any).applicationId || viewingDoc.app?.id || (selectedApp ? selectedApp.id : '');
+          const appName = viewingDoc.app?.companyName || (doc as any).companyName || 'Corporate Enterprise';
+          const applicantName = viewingDoc.app?.applicantName || (doc as any).applicantName || 'Authorized Signatory';
+          const trackingNo = viewingDoc.app?.trackingNumber || (doc as any).trackingNumber || 'SWG-2026-STATUTORY';
+          const hasFileData = !!(doc.fileData || (doc.fileUrl && !doc.fileUrl.startsWith('#') && !doc.fileUrl.startsWith('/uploads')));
+          const isPdf = (doc.fileName && doc.fileName.toLowerCase().endsWith('.pdf')) || (doc.fileData && doc.fileData.includes('application/pdf'));
+          const isImg = (doc.fileData && doc.fileData.startsWith('data:image/'));
+
+          return (
+            <div className="space-y-4 text-xs">
+              <div className="p-3.5 bg-[#08111F] rounded-xl border border-white/[0.08] flex items-start justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span className="font-extrabold text-white text-sm">{doc.documentName}</span>
+                    <Badge label={doc.verificationStatus} className={
+                      doc.verificationStatus === 'Approved' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                      doc.verificationStatus === 'Correction Required' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' :
+                      doc.verificationStatus === 'Rejected' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
+                      'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                    } />
+                  </div>
+                  <p className="text-slate-400 mt-1">
+                    Entity: <span className="text-white font-semibold">{appName}</span> • Signatory: <span className="text-slate-300">{applicantName}</span>
+                  </p>
+                  <p className="text-[10px] text-slate-500 font-mono mt-0.5">
+                    Tracking ID: {trackingNo} • Category: {doc.category}
+                  </p>
+                </div>
+                <div className="text-right text-[10px] text-slate-400 shrink-0">
+                  <div>Uploaded: <span className="text-slate-200">{doc.uploadDate}</span></div>
+                  <div className="text-emerald-400 font-mono text-[9px] mt-1 flex items-center gap-1 justify-end">
+                    <Lock className="w-2.5 h-2.5 text-emerald-400" /> DigiLocker Verified
+                  </div>
+                </div>
+              </div>
+
+              {/* Document Visual Content / Preview Canvas */}
+              <div className="p-4 bg-[#061525] rounded-2xl border border-white/10 flex flex-col items-center justify-center min-h-[180px] text-center relative overflow-hidden">
+                {isImg && doc.fileData ? (
+                  <div className="w-full flex flex-col items-center gap-2">
+                    <img 
+                      src={doc.fileData} 
+                      alt={doc.documentName} 
+                      className="max-h-72 max-w-full rounded-xl border border-white/10 object-contain shadow-lg" 
+                    />
+                    <span className="text-[10px] text-slate-400">{doc.fileName || 'Attached Image Document'}</span>
+                  </div>
+                ) : isPdf && doc.fileData ? (
+                  <div className="w-full h-80 rounded-xl overflow-hidden border border-white/10 flex flex-col">
+                    <iframe 
+                      src={doc.fileData} 
+                      title={doc.documentName} 
+                      className="w-full h-full rounded-xl"
+                    />
+                  </div>
+                ) : (
+                  <div className="space-y-3 py-4 max-w-md">
+                    <div className="w-12 h-12 rounded-2xl bg-amber-400/10 border border-amber-400/20 text-amber-400 flex items-center justify-center mx-auto shadow-inner">
+                      <FileText className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-extrabold text-white">{doc.documentName}</h4>
+                      <p className="text-[11px] text-slate-400 mt-1">
+                        {doc.fileName ? `Attached File: ${doc.fileName}` : 'Statutory e-Dossier attached via National Single Window Portal'}
+                      </p>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-[10px] text-slate-400 space-y-1 text-left font-mono">
+                      <div>Cryptographic Seal: <span className="text-emerald-400">SHA-256 Validated</span></div>
+                      <div>Statutory Authority: <span className="text-sky-300">{doc.category} Directorate</span></div>
+                      <div>Audit Timestamp: <span className="text-slate-300">{doc.uploadDate}</span></div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Remarks */}
+              {doc.adminRemark && (
+                <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.08] text-xs">
+                  <span className="text-slate-400 font-bold">Current Scrutiny Remark: </span>
+                  <span className="text-slate-200">{doc.adminRemark}</span>
+                </div>
+              )}
+
+              {/* Scrutiny Decision Actions */}
+              <div className="pt-2 border-t border-white/[0.08] flex items-center justify-between gap-2 flex-wrap">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!targetAppId) return;
+                      handleVerifyDoc(targetAppId, doc.id, 'Approved', 'Verified successfully by Scrutiny Authority');
+                      setViewingDoc(null);
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-[#07182C] text-xs font-extrabold transition cursor-pointer flex items-center gap-1 shadow-sm"
+                  >
+                    <CheckCircle className="w-3.5 h-3.5" /> Approve Document
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!targetAppId) return;
+                      openDocActionModal(doc.id, doc.documentName, 'Correction Required', targetAppId);
+                      setViewingDoc(null);
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 text-xs font-bold transition cursor-pointer flex items-center gap-1"
+                  >
+                    <AlertTriangle className="w-3.5 h-3.5" /> Request Correction
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!targetAppId) return;
+                      openDocActionModal(doc.id, doc.documentName, 'Rejected', targetAppId);
+                      setViewingDoc(null);
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-xs font-bold transition cursor-pointer flex items-center gap-1"
+                  >
+                    <XCircle className="w-3.5 h-3.5" /> Reject
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {hasFileData && (
+                    <a
+                      href={doc.fileData || doc.fileUrl}
+                      download={doc.fileName || `${doc.documentName}.pdf`}
+                      className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+                    >
+                      <Download className="w-3.5 h-3.5" /> Download
+                    </a>
+                  )}
+                  <ActionBtn label="Close" onClick={() => setViewingDoc(null)} />
+                </div>
+              </div>
+            </div>
+          );
+        })()}
       </Modal>
     </div>
   );

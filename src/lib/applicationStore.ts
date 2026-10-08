@@ -20,9 +20,244 @@ import {
   ApprovalItemStatus,
   AppNotification
 } from '../types/swagat';
+import { supabase, isSupabaseConfigured } from './supabaseClient';
 
 const STORE_KEY = 'swagat_applications_v1';
 const NOTIF_STORE_KEY = 'swagat_notifications_v1';
+
+// Concurrency lock validity duration (15 minutes)
+export const LOCK_EXPIRY_MS = 15 * 60 * 1000;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Database Mapping Helpers for Cross-Device Synchronization
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function mapDbRowToApplication(row: any): Application {
+  return {
+    id: row.id,
+    trackingNumber: row.tracking_number,
+    userId: row.user_id || undefined,
+    applicantName: row.applicant_name || 'Applicant',
+    applicantEmail: row.applicant_email || undefined,
+    applicantPhone: row.applicant_phone || undefined,
+    companyName: row.company_name || 'Enterprise',
+    businessType: row.business_type || undefined,
+    projectTitle: row.project_title || 'Project Setup',
+    approvalId: row.approval_id || 'app-gen',
+    approvalName: row.approval_name || 'Single Window Clearance',
+    department: row.department || 'Single Window Authority',
+    ministry: row.ministry || 'Ministry of Commerce & Industry',
+    centralOrState: (row.central_or_state || 'State') as any,
+    stateName: row.state_name || 'Maharashtra',
+    submissionDate: row.submission_date || (row.created_at ? new Date(row.created_at).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')),
+    lastUpdated: row.last_updated || 'Just now',
+    currentStatus: (row.current_status || 'Under Review') as any,
+    nextAction: row.next_action || 'Scrutiny in progress',
+    estimatedCompletionDays: row.estimated_completion_days || 14,
+    statutoryFeePaid: row.statutory_fee_paid || '₹15,000',
+    panNumber: row.pan_number || '',
+    gstNumber: row.gst_number || '',
+    cinNumber: row.cin_number || '',
+    projectState: row.project_state || row.state_name || 'Maharashtra',
+    projectDistrict: row.project_district || 'Industrial Area',
+    investmentAmount: row.investment_amount || '₹10 Cr',
+    timeline: Array.isArray(row.timeline) ? row.timeline : [],
+    documentsList: Array.isArray(row.documents_list) ? row.documents_list : [],
+    documentsAttached: (Array.isArray(row.documents_list) ? row.documents_list : []).map((d: any) => ({
+      name: d.documentName || d.name,
+      category: d.category || 'General',
+      verified: d.verificationStatus === 'Approved',
+      url: d.fileUrl
+    })),
+    approvalsList: Array.isArray(row.approvals_list) ? row.approvals_list : [],
+    queries: Array.isArray(row.queries) ? row.queries : [],
+    lockedByAdminId: row.locked_by_admin_id || undefined,
+    lockedByAdminName: row.locked_by_admin_name || undefined,
+    lockedAt: row.locked_at || undefined,
+  };
+}
+
+export function mapApplicationToDbRow(app: Application) {
+  return {
+    id: app.id,
+    tracking_number: app.trackingNumber,
+    user_id: app.userId || null,
+    applicant_name: app.applicantName,
+    applicant_email: app.applicantEmail || null,
+    applicant_phone: app.applicantPhone || null,
+    company_name: app.companyName,
+    business_type: app.businessType || null,
+    project_title: app.projectTitle || null,
+    approval_id: app.approvalId || null,
+    approval_name: app.approvalName || null,
+    department: app.department || null,
+    ministry: app.ministry || null,
+    central_or_state: app.centralOrState || 'State',
+    state_name: app.stateName || null,
+    submission_date: app.submissionDate,
+    last_updated: app.lastUpdated,
+    current_status: app.currentStatus,
+    next_action: app.nextAction,
+    estimated_completion_days: app.estimatedCompletionDays || 14,
+    statutory_fee_paid: app.statutoryFeePaid || null,
+    pan_number: app.panNumber || null,
+    gst_number: app.gstNumber || null,
+    cin_number: app.cinNumber || null,
+    project_state: app.projectState || app.stateName || null,
+    project_district: app.projectDistrict || null,
+    investment_amount: app.investmentAmount || null,
+    timeline: app.timeline || [],
+    documents_list: app.documentsList || [],
+    approvals_list: app.approvalsList || [],
+    queries: app.queries || [],
+    locked_by_admin_id: app.lockedByAdminId || null,
+    locked_by_admin_name: app.lockedByAdminName || null,
+    locked_at: app.lockedAt || null,
+    updated_at: new Date().toISOString(),
+  };
+}
+
+export async function pushApplicationToSupabase(app: Application): Promise<void> {
+  if (!isSupabaseConfigured()) return;
+  try {
+    const row = mapApplicationToDbRow(app);
+    await supabase.from('swagat_portal_applications').upsert(row, { onConflict: 'id' });
+  } catch (err) {
+    console.warn('[SWAGAT] Cloud push error:', err);
+  }
+}
+
+export async function syncApplicationsFromCloud(): Promise<Application[]> {
+  if (!isSupabaseConfigured()) return loadAllApplications();
+  try {
+    const { data, error } = await supabase
+      .from('swagat_portal_applications')
+      .select('*')
+      .order('updated_at', { ascending: false });
+
+    if (error || !data) return loadAllApplications();
+
+    const cloudApps = data.map(mapDbRowToApplication);
+    const localApps = loadAllApplications();
+
+    const mergedMap = new Map<string, Application>();
+    cloudApps.forEach(ca => mergedMap.set(ca.id, ca));
+    localApps.forEach(la => {
+      if (!mergedMap.has(la.id)) {
+        mergedMap.set(la.id, la);
+        pushApplicationToSupabase(la);
+      }
+    });
+
+    const merged = Array.from(mergedMap.values());
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify(merged));
+      broadcastStoreUpdate();
+    } catch {}
+
+    return merged;
+  } catch (err) {
+    console.warn('[SWAGAT] Cloud sync error:', err);
+    return loadAllApplications();
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Concurrency Control & Approval Locking Helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function isAppLockedByOther(
+  app: Application, 
+  currentAdminId?: string
+): { isLocked: boolean; lockedByName?: string; lockedAt?: string } {
+  if (!app.lockedByAdminId) return { isLocked: false };
+  if (currentAdminId && app.lockedByAdminId === currentAdminId) return { isLocked: false };
+  if (!app.lockedAt) return { isLocked: false };
+
+  const lockTime = new Date(app.lockedAt).getTime();
+  if (isNaN(lockTime)) return { isLocked: false };
+  const isExpired = Date.now() - lockTime > LOCK_EXPIRY_MS;
+  if (isExpired) return { isLocked: false };
+
+  return {
+    isLocked: true,
+    lockedByName: app.lockedByAdminName || 'Another Administrator',
+    lockedAt: app.lockedAt,
+  };
+}
+
+export async function claimApplicationLock(
+  appId: string, 
+  adminId: string, 
+  adminName: string
+): Promise<{ success: boolean; lockedByName?: string }> {
+  const all = loadAllApplications();
+  const app = all.find(a => a.id === appId);
+  if (!app) return { success: false, lockedByName: 'Not Found' };
+
+  const lockInfo = isAppLockedByOther(app, adminId);
+  if (lockInfo.isLocked) {
+    return { success: false, lockedByName: lockInfo.lockedByName };
+  }
+
+  const nowIso = new Date().toISOString();
+  app.lockedByAdminId = adminId;
+  app.lockedByAdminName = adminName;
+  app.lockedAt = nowIso;
+  saveAllApplications(all, false);
+
+  if (isSupabaseConfigured()) {
+    try {
+      await supabase
+        .from('swagat_portal_applications')
+        .update({
+          locked_by_admin_id: adminId,
+          locked_by_admin_name: adminName,
+          locked_at: nowIso,
+          updated_at: nowIso,
+        })
+        .eq('id', appId);
+    } catch (e) {
+      console.warn('[SWAGAT] Cloud lock claim error:', e);
+    }
+  }
+
+  broadcastStoreUpdate();
+  return { success: true };
+}
+
+export async function releaseApplicationLock(appId: string, adminId?: string): Promise<void> {
+  const all = loadAllApplications();
+  const app = all.find(a => a.id === appId);
+  if (!app) return;
+
+  if (adminId && app.lockedByAdminId && app.lockedByAdminId !== adminId) {
+    return; // Don't release if locked by another admin unless adminId omitted for force release
+  }
+
+  app.lockedByAdminId = undefined;
+  app.lockedByAdminName = undefined;
+  app.lockedAt = undefined;
+  saveAllApplications(all, false);
+
+  if (isSupabaseConfigured()) {
+    try {
+      await supabase
+        .from('swagat_portal_applications')
+        .update({
+          locked_by_admin_id: null,
+          locked_by_admin_name: null,
+          locked_at: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', appId);
+    } catch (e) {
+      console.warn('[SWAGAT] Cloud lock release error:', e);
+    }
+  }
+
+  broadcastStoreUpdate();
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Broadcaster: notifies other components & windows in real-time
@@ -101,13 +336,19 @@ export function loadAllApplications(): Application[] {
   }
 }
 
-/** Persist the full application list to localStorage and broadcast. */
-export function saveAllApplications(applications: Application[]): void {
+/** Persist the full application list to localStorage, Supabase cloud, and broadcast. */
+export function saveAllApplications(applications: Application[], syncCloud = true): void {
   try {
     localStorage.setItem(STORE_KEY, JSON.stringify(applications));
     broadcastStoreUpdate();
   } catch {
     console.warn('[SWAGAT] applicationStore: could not persist to localStorage.');
+  }
+
+  if (syncCloud && isSupabaseConfigured()) {
+    applications.forEach(app => {
+      pushApplicationToSupabase(app);
+    });
   }
 }
 
@@ -730,3 +971,51 @@ export function markNotificationRead(id: string): void {
     // ignore
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Real-time Cloud Synchronization Listener
+// ─────────────────────────────────────────────────────────────────────────────
+
+if (typeof window !== 'undefined') {
+  setTimeout(() => {
+    // Initial fetch from cloud
+    syncApplicationsFromCloud();
+
+    // Supabase Realtime channel
+    try {
+      if (isSupabaseConfigured()) {
+        supabase
+          .channel('swagat_portal_live_sync')
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'swagat_portal_applications' },
+            (payload) => {
+              if (payload.new) {
+                const app = mapDbRowToApplication(payload.new);
+                const all = loadAllApplications();
+                const idx = all.findIndex(a => a.id === app.id);
+                if (idx >= 0) {
+                  all[idx] = app;
+                } else {
+                  all.unshift(app);
+                }
+                try {
+                  localStorage.setItem(STORE_KEY, JSON.stringify(all));
+                  broadcastStoreUpdate();
+                } catch {}
+              }
+            }
+          )
+          .subscribe();
+      }
+    } catch (e) {
+      console.warn('[SWAGAT] Realtime subscription init warning:', e);
+    }
+
+    // Interval polling sync (every 5 seconds) to ensure all devices stay in sync
+    setInterval(() => {
+      syncApplicationsFromCloud();
+    }, 5000);
+  }, 300);
+}
+

@@ -451,18 +451,18 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           const gName = su.user_metadata?.full_name || su.user_metadata?.name || su.email?.split('@')[0] || 'User';
           const gEmail = (su.email || '').toLowerCase().trim();
           
-          // Role requested during OAuth sign-in flow
-          const rawRole = (sessionStorage.getItem('swagat_oauth_role') || localStorage.getItem('swagat_oauth_role') || 'USER').toUpperCase();
-          const requestedRole: UserRole = rawRole === 'ADMIN' ? 'ADMIN' : 'USER';
-
           // Check if account already has a bound role in cloud Supabase user_metadata or local mockUsers
           const cloudBoundRole = su.user_metadata?.swagat_role as UserRole | undefined;
           const existingMockUser = getMockUsers().find(u => u.email.toLowerCase() === gEmail);
           const boundRole: UserRole | undefined = cloudBoundRole || (existingMockUser?.role as UserRole);
 
-          // STRICT ROLE-BINDING ENFORCEMENT
-          if (boundRole && boundRole !== requestedRole) {
-            console.error(`[Google Auth] Role conflict for ${gEmail}: Account is registered as ${boundRole}, attempted login as ${requestedRole}`);
+          // Role requested during explicit OAuth sign-in flow
+          const storedRequestedRole = (sessionStorage.getItem('swagat_oauth_role') || localStorage.getItem('swagat_oauth_role'))?.toUpperCase() as UserRole | undefined;
+          const isExplicitSignInIntent = sessionStorage.getItem('swagat_oauth_intent_active') === 'true';
+
+          // STRICT ROLE-BINDING ENFORCEMENT: ONLY during an active, explicit sign-in flow
+          if (isExplicitSignInIntent && boundRole && storedRequestedRole && boundRole !== storedRequestedRole) {
+            console.error(`[Google Auth] Role conflict for ${gEmail}: Account is registered as ${boundRole}, attempted login as ${storedRequestedRole}`);
             
             // Immediately sign out from Supabase & clear OAuth states
             await supabase.auth.signOut();
@@ -470,20 +470,25 @@ export const SwagatProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             clearStoredAuth();
             localStorage.removeItem('swagat_oauth_role');
             sessionStorage.removeItem('swagat_oauth_role');
+            sessionStorage.removeItem('swagat_oauth_intent_active');
             
             // Clean URL hash
             if (window.location.hash.includes('access_token') || window.location.hash.includes('id_token')) {
               window.history.replaceState(null, '', '/');
             }
             
-            const msg = `Access Denied: This Google account (${gEmail}) is registered as ${boundRole === 'ADMIN' ? 'Officer / Admin' : 'Business'}. You cannot log in via the ${requestedRole === 'ADMIN' ? 'Admin' : 'Business'} portal.`;
+            const msg = `Access Denied: This Google account (${gEmail}) is registered as ${boundRole === 'ADMIN' ? 'Officer / Admin' : 'Business'}. You cannot log in via the ${storedRequestedRole === 'ADMIN' ? 'Admin' : 'Business'} portal.`;
             showToast(msg);
-            alert(`Access Denied!\n\nThis Google account (${gEmail}) is permanently registered as ${boundRole === 'ADMIN' ? 'Officer / Admin' : 'Business'}.\n\nYou cannot use it to log in to the ${requestedRole === 'ADMIN' ? 'Admin' : 'Business'} portal.`);
+            alert(`Access Denied!\n\nThis Google account (${gEmail}) is permanently registered as ${boundRole === 'ADMIN' ? 'Officer / Admin' : 'Business'}.\n\nYou cannot use it to log in to the ${storedRequestedRole === 'ADMIN' ? 'Admin' : 'Business'} portal.`);
             setCurrentView('home');
             return;
           }
 
-          const finalRole: UserRole = boundRole || requestedRole;
+          // If session is active / restoring / across tabs, role IS their boundRole
+          const finalRole: UserRole = boundRole || storedRequestedRole || 'USER';
+          localStorage.setItem('swagat_oauth_role', finalRole);
+          sessionStorage.setItem('swagat_oauth_role', finalRole);
+          sessionStorage.removeItem('swagat_oauth_intent_active');
 
           // If not bound in cloud Supabase metadata yet, bind it permanently in Supabase
           if (!cloudBoundRole) {
