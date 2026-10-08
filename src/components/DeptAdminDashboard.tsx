@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useSwagat } from '../context/SwagatContext';
 import { deptAdminApi } from '../services/api';
+import { InPageDocumentViewer } from './InPageDocumentViewer';
 
 interface QueueDoc {
   id: string;
@@ -437,13 +438,13 @@ export const DeptAdminDashboard: React.FC = () => {
       {/* Document Preview Modal */}
       {previewDoc && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-[#071322] border border-white/15 rounded-2xl p-6 max-w-lg w-full text-white space-y-4">
+          <div className="bg-[#071322] border border-white/15 rounded-2xl p-6 max-w-4xl w-full text-white space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-white/10">
               <div className="flex items-center space-x-2">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
                 <h3 className="text-sm font-bold">{previewDoc.document_type_name}</h3>
               </div>
-              <button onClick={() => setPreviewDoc(null)} className="p-1 text-slate-400 hover:text-white rounded-lg">
+              <button onClick={() => setPreviewDoc(null)} className="p-1 text-slate-400 hover:text-white rounded-lg cursor-pointer">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -463,11 +464,17 @@ export const DeptAdminDashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="h-44 rounded-xl bg-black/40 border border-white/10 flex flex-col items-center justify-center p-4 text-center">
-              <FileCheck2 className="w-10 h-10 text-amber-400 mb-2" />
-              <div className="text-xs font-bold text-white">{previewDoc.document_type_name}</div>
-              <div className="text-[10px] text-slate-400 mt-1">DigiLocker Certified Statutory Clearance Dossier</div>
-            </div>
+            {/* In-Page Interactive Document Reader */}
+            <InPageDocumentViewer
+              documentName={previewDoc.document_type_name}
+              category="Department Statutory Dossier"
+              fileUrl={previewDoc.file_url}
+              applicantName={previewDoc.applicant_name}
+              companyName={previewDoc.company_name}
+              uploadDate={previewDoc.uploaded_at ? new Date(previewDoc.uploaded_at).toLocaleDateString('en-GB') : undefined}
+              verificationStatus={previewDoc.status}
+              theme="dark"
+            />
 
             <div className="flex justify-between pt-2">
               <button

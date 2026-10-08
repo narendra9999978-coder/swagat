@@ -35,6 +35,7 @@ import {
 import { allIndianStatesList } from '../data/indiaStatesData';
 import { LiquidChrome } from './reactbits/LiquidChrome';
 import { superAdminApi, deptAdminApi } from '../services/api';
+import { InPageDocumentViewer } from './InPageDocumentViewer';
 import {
   LayoutDashboard, Users, FileText, Building2, Map, Layers, Building,
   FileCheck, Brain, Clock, HelpCircle, DollarSign, RefreshCw, Bell,
@@ -3536,7 +3537,7 @@ export const AdminDashboard: React.FC = () => {
         open={!!viewingDoc} 
         onClose={() => setViewingDoc(null)} 
         title="Statutory Scrutiny Dossier" 
-        maxW="max-w-2xl"
+        maxW="max-w-4xl"
       >
         {viewingDoc && (() => {
           const doc = viewingDoc.doc;
@@ -3545,8 +3546,6 @@ export const AdminDashboard: React.FC = () => {
           const applicantName = viewingDoc.app?.applicantName || (doc as any).applicantName || 'Authorized Signatory';
           const trackingNo = viewingDoc.app?.trackingNumber || (doc as any).trackingNumber || 'SWG-2026-STATUTORY';
           const hasFileData = !!(doc.fileData || (doc.fileUrl && !doc.fileUrl.startsWith('#') && !doc.fileUrl.startsWith('/uploads')));
-          const isPdf = (doc.fileName && doc.fileName.toLowerCase().endsWith('.pdf')) || (doc.fileData && doc.fileData.includes('application/pdf'));
-          const isImg = (doc.fileData && doc.fileData.startsWith('data:image/'));
 
           return (
             <div className="space-y-4 text-xs">
@@ -3577,44 +3576,21 @@ export const AdminDashboard: React.FC = () => {
                 </div>
               </div>
 
-              {/* Document Visual Content / Preview Canvas */}
-              <div className="p-4 bg-[#061525] rounded-2xl border border-white/10 flex flex-col items-center justify-center min-h-[180px] text-center relative overflow-hidden">
-                {isImg && doc.fileData ? (
-                  <div className="w-full flex flex-col items-center gap-2">
-                    <img 
-                      src={doc.fileData} 
-                      alt={doc.documentName} 
-                      className="max-h-72 max-w-full rounded-xl border border-white/10 object-contain shadow-lg" 
-                    />
-                    <span className="text-[10px] text-slate-400">{doc.fileName || 'Attached Image Document'}</span>
-                  </div>
-                ) : isPdf && doc.fileData ? (
-                  <div className="w-full h-80 rounded-xl overflow-hidden border border-white/10 flex flex-col">
-                    <iframe 
-                      src={doc.fileData} 
-                      title={doc.documentName} 
-                      className="w-full h-full rounded-xl"
-                    />
-                  </div>
-                ) : (
-                  <div className="space-y-3 py-4 max-w-md">
-                    <div className="w-12 h-12 rounded-2xl bg-amber-400/10 border border-amber-400/20 text-amber-400 flex items-center justify-center mx-auto shadow-inner">
-                      <FileText className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-extrabold text-white">{doc.documentName}</h4>
-                      <p className="text-[11px] text-slate-400 mt-1">
-                        {doc.fileName ? `Attached File: ${doc.fileName}` : 'Statutory e-Dossier attached via National Single Window Portal'}
-                      </p>
-                    </div>
-                    <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-[10px] text-slate-400 space-y-1 text-left font-mono">
-                      <div>Cryptographic Seal: <span className="text-emerald-400">SHA-256 Validated</span></div>
-                      <div>Statutory Authority: <span className="text-sky-300">{doc.category} Directorate</span></div>
-                      <div>Audit Timestamp: <span className="text-slate-300">{doc.uploadDate}</span></div>
-                    </div>
-                  </div>
-                )}
-              </div>
+              {/* In-Page Interactive Document Reader */}
+              <InPageDocumentViewer
+                documentName={doc.documentName}
+                category={doc.category}
+                fileName={doc.fileName}
+                fileData={doc.fileData}
+                fileUrl={doc.fileUrl}
+                applicantName={applicantName}
+                companyName={appName}
+                trackingNumber={trackingNo}
+                uploadDate={doc.uploadDate}
+                verificationStatus={doc.verificationStatus}
+                adminRemark={doc.adminRemark}
+                theme="dark"
+              />
 
               {/* Remarks */}
               {doc.adminRemark && (

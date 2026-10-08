@@ -11,9 +11,11 @@ import {
 import { motion } from 'motion/react';
 import { useSwagat } from '../context/SwagatContext';
 
+import { InPageDocumentViewer } from './InPageDocumentViewer';
+
 /**
  * DocumentPreviewModal
- * Adaptive light/dark glassmorphic verified statutory preview with progress bar & cryptographic seal
+ * Adaptive light/dark glassmorphic verified statutory preview with in-page document reading
  */
 export const DocumentPreviewModal: React.FC = () => {
   const { previewDocument, setPreviewDocument, showToast, theme } = useSwagat();
@@ -39,7 +41,7 @@ export const DocumentPreviewModal: React.FC = () => {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ type: 'spring', stiffness: 350, damping: 28 }}
-        className={`rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border backdrop-blur-2xl relative my-8 transition-colors ${
+        className={`rounded-3xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl border backdrop-blur-2xl relative my-8 max-h-[90vh] overflow-y-auto transition-colors ${
           isDark
             ? 'bg-[#071322] border-white/15 text-white'
             : 'bg-white border-slate-200 text-slate-900 shadow-2xl ring-1 ring-slate-900/5'
@@ -65,7 +67,7 @@ export const DocumentPreviewModal: React.FC = () => {
         </h3>
 
         {/* Metadata Grid */}
-        <div className={`my-5 p-4 rounded-2xl border text-xs space-y-2.5 backdrop-blur-md ${
+        <div className={`my-4 p-4 rounded-2xl border text-xs space-y-2 backdrop-blur-md ${
           isDark ? 'bg-white/5 border-white/10' : 'bg-slate-50 border-slate-200 text-slate-800'
         }`}>
           <div className="flex justify-between">
@@ -77,41 +79,25 @@ export const DocumentPreviewModal: React.FC = () => {
             <span className={`font-mono font-bold ${isDark ? 'text-amber-300' : 'text-amber-700'}`}>{previewDocument.documentNumber}</span>
           </div>
           <div className="flex justify-between">
-            <span className={`uppercase text-[10px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Verification Body:</span>
+            <span className={`uppercase text-[10px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Verification Agency:</span>
             <span className={`font-bold ${isDark ? 'text-emerald-300' : 'text-emerald-700'}`}>{previewDocument.verificationAgency}</span>
           </div>
           <div className="flex justify-between">
             <span className={`uppercase text-[10px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Uploaded Date:</span>
             <span className={`font-medium ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{previewDocument.uploadedAt}</span>
           </div>
-          {previewDocument.expiryDate && (
-            <div className="flex justify-between">
-              <span className={`uppercase text-[10px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Statutory Expiry:</span>
-              <span className={`font-bold ${isDark ? 'text-amber-300' : 'text-amber-700'}`}>{previewDocument.expiryDate}</span>
-            </div>
-          )}
         </div>
 
-        {/* Mock Document Preview Canvas */}
-        <div className={`relative overflow-hidden h-44 rounded-2xl flex flex-col items-center justify-center p-4 text-center border shadow-inner ${
-          isDark
-            ? 'bg-[#061525] text-white border-white/10'
-            : 'bg-slate-100 text-slate-800 border-slate-200'
-        }`}>
-          <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center mb-2 shadow-inner ${
-            isDark ? 'bg-white/10 border-white/10 text-amber-400' : 'bg-white border-slate-200 text-amber-600'
-          }`}>
-            <FileText className="w-6 h-6" />
-          </div>
-          <div className={`text-xs font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{previewDocument.name}</div>
-          <div className={`text-[10px] mt-1 flex items-center gap-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-            <Lock className="w-3 h-3 text-emerald-500" />
-            <span>Digitally Sealed with SHA-256 Checksum by DigiLocker Authority</span>
-          </div>
-
-          {downloading && (
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-sky-400 to-emerald-400 animate-shimmer" />
-          )}
+        {/* In-Page Interactive Document Reader */}
+        <div className="my-2">
+          <InPageDocumentViewer
+            documentName={previewDocument.name}
+            category={previewDocument.category}
+            trackingNumber={previewDocument.documentNumber}
+            uploadDate={previewDocument.uploadedAt}
+            verificationStatus="Approved"
+            theme={isDark ? 'dark' : 'light'}
+          />
         </div>
 
         {/* Modal Actions */}
