@@ -127,6 +127,58 @@ export async function pushApplicationToSupabase(app: Application): Promise<void>
   }
 }
 
+// In-memory cache to ensure instant access across components & avoid 5MB localStorage quota limits
+let cachedApplications: Application[] = [];
+
+export async function fetchApplicationByIdOrTracking(
+  id: string,
+  trackingNumber?: string
+): Promise<Application | null> {
+  const all = loadAllApplications();
+  const found = all.find(a => 
+    a.id === id || 
+    (trackingNumber && (a.trackingNumber === trackingNumber || a.trackingNumber === id)) ||
+    a.id === trackingNumber
+  );
+
+  if (found && found.documentsList && found.documentsList.length > 0 && found.approvalsList && found.approvalsList.length > 0) {
+    return found;
+  }
+
+  if (isSupabaseConfigured()) {
+    try {
+      const orFilters = [
+        `id.eq.${id}`,
+        trackingNumber ? `tracking_number.eq.${trackingNumber}` : null,
+        `tracking_number.eq.${id}`,
+      ].filter(Boolean).join(',');
+
+      const { data, error } = await supabase
+        .from('swagat_portal_applications')
+        .select('*')
+        .or(orFilters)
+        .limit(1)
+        .maybeSingle();
+
+      if (!error && data) {
+        const fullApp = mapDbRowToApplication(data);
+        const existingIdx = cachedApplications.findIndex(a => a.id === fullApp.id || a.trackingNumber === fullApp.trackingNumber);
+        if (existingIdx >= 0) {
+          cachedApplications[existingIdx] = fullApp;
+        } else {
+          cachedApplications.unshift(fullApp);
+        }
+        broadcastStoreUpdate();
+        return fullApp;
+      }
+    } catch (e) {
+      console.warn('[SWAGAT] Cloud direct fetch error:', e);
+    }
+  }
+
+  return found || null;
+}
+
 export async function syncApplicationsFromCloud(): Promise<Application[]> {
   if (!isSupabaseConfigured()) return loadAllApplications();
   try {
@@ -141,20 +193,40 @@ export async function syncApplicationsFromCloud(): Promise<Application[]> {
     const localApps = loadAllApplications();
 
     const mergedMap = new Map<string, Application>();
-    cloudApps.forEach(ca => mergedMap.set(ca.id, ca));
+    // Cloud applications are canonical
+    cloudApps.forEach(ca => {
+      mergedMap.set(ca.id, ca);
+      if (ca.trackingNumber) mergedMap.set(ca.trackingNumber, ca);
+    });
+
     localApps.forEach(la => {
-      if (!mergedMap.has(la.id)) {
+      if (!mergedMap.has(la.id) && !mergedMap.has(la.trackingNumber)) {
         mergedMap.set(la.id, la);
         pushApplicationToSupabase(la);
       }
     });
 
-    const merged = Array.from(mergedMap.values());
-    try {
-      localStorage.setItem(STORE_KEY, JSON.stringify(merged));
-      broadcastStoreUpdate();
-    } catch {}
+    const uniqueMap = new Map<string, Application>();
+    mergedMap.forEach(app => uniqueMap.set(app.id, app));
+    const merged = Array.from(uniqueMap.values());
 
+    cachedApplications = merged;
+
+    try {
+      // Store quota-safe version in localStorage (strip huge fileData so localStorage doesn't throw QuotaExceededError)
+      const safeForLocalStorage = merged.map(app => ({
+        ...app,
+        documentsList: (app.documentsList || []).map(d => ({
+          ...d,
+          fileData: d.fileData && d.fileData.length > 300000 ? undefined : d.fileData,
+        })),
+      }));
+      localStorage.setItem(STORE_KEY, JSON.stringify(safeForLocalStorage));
+    } catch {
+      console.warn('[SWAGAT] localStorage quota hit during cloud sync; memory cache active.');
+    }
+
+    broadcastStoreUpdate();
     return merged;
   } catch (err) {
     console.warn('[SWAGAT] Cloud sync error:', err);
@@ -279,8 +351,12 @@ function broadcastNotifUpdate() {
 // Public Application Store helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Load all applications from localStorage. No demo data is seeded. */
+/** Load all applications. In-memory cache is preferred, with localStorage fallback. */
 export function loadAllApplications(): Application[] {
+  if (cachedApplications.length > 0) {
+    return cachedApplications;
+  }
+
   try {
     const raw = localStorage.getItem(STORE_KEY);
     if (!raw) {
@@ -304,7 +380,7 @@ export function loadAllApplications(): Application[] {
       localStorage.setItem(STORE_KEY, JSON.stringify(cleaned));
     }
 
-    return cleaned.map(app => ({
+    const formatted = cleaned.map(app => ({
       ...app,
       documentsList: app.documentsList && app.documentsList.length > 0 
         ? app.documentsList 
@@ -331,19 +407,31 @@ export function loadAllApplications(): Application[] {
             },
           ],
     }));
+
+    cachedApplications = formatted;
+    return formatted;
   } catch {
     return [];
   }
 }
 
-/** Persist the full application list to localStorage, Supabase cloud, and broadcast. */
+/** Persist the full application list to memory, localStorage, Supabase cloud, and broadcast. */
 export function saveAllApplications(applications: Application[], syncCloud = true): void {
+  cachedApplications = applications;
   try {
-    localStorage.setItem(STORE_KEY, JSON.stringify(applications));
-    broadcastStoreUpdate();
+    const safeForLocalStorage = applications.map(app => ({
+      ...app,
+      documentsList: (app.documentsList || []).map(d => ({
+        ...d,
+        fileData: d.fileData && d.fileData.length > 300000 ? undefined : d.fileData,
+      })),
+    }));
+    localStorage.setItem(STORE_KEY, JSON.stringify(safeForLocalStorage));
   } catch {
-    console.warn('[SWAGAT] applicationStore: could not persist to localStorage.');
+    console.warn('[SWAGAT] applicationStore: localStorage quota hit, continuing with in-memory & cloud store.');
   }
+
+  broadcastStoreUpdate();
 
   if (syncCloud && isSupabaseConfigured()) {
     applications.forEach(app => {
@@ -443,7 +531,10 @@ export function getAllQueriesAcrossApplications(): AdminQueryItem[] {
 /** Add or upsert an application in the shared store. */
 export function addApplication(application: Application): void {
   const all = loadAllApplications();
-  const idx = all.findIndex(a => a.id === application.id);
+  const idx = all.findIndex(a => 
+    a.id === application.id || 
+    (a.trackingNumber && application.trackingNumber && a.trackingNumber === application.trackingNumber)
+  );
   if (idx === -1) {
     all.unshift(application);
   } else {

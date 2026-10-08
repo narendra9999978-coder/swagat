@@ -21,6 +21,7 @@ import {
   releaseApplicationLock,
   isAppLockedByOther,
   syncApplicationsFromCloud,
+  fetchApplicationByIdOrTracking,
 } from '../lib/applicationStore';
 import { Application, ApplicationDocumentItem, DocumentVerificationStatus, ApprovalItemStatus, AppNotification } from '../types/swagat';
 import {
@@ -644,8 +645,18 @@ export const AdminDashboard: React.FC = () => {
 
   // Concurrency-aware detail opener
   const handleOpenAppDetail = async (a: AdminApplication) => {
+    setSelectedApp(a);
     const all = loadAllApplications();
-    const full = all.find(app => app.id === a.id);
+    let full = all.find(app => app.id === a.id || app.trackingNumber === a.trackingNumber || app.trackingNumber === a.id);
+
+    // If not found locally or if documentsList / approvalsList is empty, fetch full record from cloud
+    if (!full || !full.documentsList?.length || !full.approvalsList?.length) {
+      const cloudApp = await fetchApplicationByIdOrTracking(a.id, a.trackingNumber);
+      if (cloudApp) {
+        full = cloudApp;
+      }
+    }
+
     const currentAdminId = userProfile?.id || userProfile?.email || 'admin-root';
     const currentAdminName = userProfile?.name || 'Administrator';
 
@@ -658,7 +669,6 @@ export const AdminDashboard: React.FC = () => {
       }
     }
 
-    setSelectedApp(a);
     setSelectedAppFull(full || null);
   };
 
@@ -1791,7 +1801,7 @@ export const AdminDashboard: React.FC = () => {
       <Modal open={!!selectedApp} onClose={handleCloseAppDetail} title="Application Details" maxW="max-w-3xl">
         {selectedApp && (() => {
           const fullApps = loadAllApplications();
-          const full = fullApps.find(a => a.id === selectedApp.id);
+          const full = selectedAppFull || fullApps.find(a => a.id === selectedApp.id || a.trackingNumber === selectedApp.trackingNumber);
           const currentAdminId = userProfile?.id || userProfile?.email || 'admin-root';
           const currentAdminName = userProfile?.name || 'Administrator';
           const lockStatus = full ? isAppLockedByOther(full, currentAdminId) : { isLocked: false };
